@@ -1,0 +1,21 @@
+export type Blog = {
+  _id?: string;
+  id?: number;
+  title: string;
+  type?: string;
+  category?: string;
+  slug: string;
+  excerpt: string;
+  coverImage?: string;
+  image?: string;
+  content?: string;
+  date?: string;
+  publishedAt?: string;
+  author?: string;
+  tags?: string[];
+  views?: number;
+  likes?: number;
+  isPublished?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
