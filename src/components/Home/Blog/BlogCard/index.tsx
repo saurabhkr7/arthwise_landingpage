@@ -26,7 +26,7 @@ const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
           </p>
         </div>
         <p className="text-17 font-medium text-muted leading-loose mb-0">
-          {format(new Date(date), "MMM dd, yyyy")}
+          {date ? format(new Date(date), "MMM dd, yyyy") : ""}
         </p>
       </div>
     </Link>

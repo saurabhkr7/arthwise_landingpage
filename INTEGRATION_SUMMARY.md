@@ -53,7 +53,7 @@ We have successfully:
 
 #### Search Section → **Signup & Get Started**
 - **Before**: Get Demo with email
-- **After**: Sign up with ₹10,000 virtual capital
+- **After**: Sign up with ₹10,00,000 virtual capital
 - **CTA**: Links to `/auth/signup` page
 - **Message**: "Completely free to use, no deposit required, trade with confidence"
 

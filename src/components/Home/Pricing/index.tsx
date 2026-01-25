@@ -81,14 +81,13 @@ const Pricing = () => {
         >
           <motion.div {...TopAnimation}>
             <h2 className="dark:text-white text-midnight_text text-center md:text-35 sm:text-28 text-24">
-              Choose your
+              All plans are
               <span className="text-primary max-w-max ml-2">
-                preferred plan
+                completely free
               </span>
             </h2>
             <p className="text-base text-6 font-normal text-muted dark:text-darktext text-center m-auto py-6 lg:max-w-50% sm:max-w-75%">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              No hidden fees, no subscriptions required. Start trading today with virtual capital and learn in a risk-free environment.
             </p>
           </motion.div>
           <motion.div {...bottomAnimation}>
@@ -106,8 +105,8 @@ const Pricing = () => {
                       payload: {
                         duration: "Monthly",
                         personalPrice: "Free",
-                        professionalPrice: "9.00",
-                        organizationPrice: "18.00",
+                        professionalPrice: "Free",
+                        organizationPrice: "Free",
                       },
                     })
                   }
@@ -126,8 +125,8 @@ const Pricing = () => {
                       payload: {
                         duration: "Annually",
                         personalPrice: "Free",
-                        professionalPrice: "90.00",
-                        organizationPrice: "180.00",
+                        professionalPrice: "Free",
+                        organizationPrice: "Free",
                       },
                     })
                   }
@@ -139,28 +138,28 @@ const Pricing = () => {
             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-8 items-end mt-12">
               <div>
                 <p className="pb-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  Monthly service fee
+                  Virtual Capital
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  Direct debits
+                  Real-Time Data
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  Online payments
+                  Advanced Charts
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  Deposits to Savers
+                  Order Management
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  ATM withdrawals
+                  Portfolio Tracking
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  International transaction fees
+                  Performance Analytics
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  International ATM withdrawal
+                  Trading Contests
                 </p>
                 <p className="py-3 border-b border-border dark:border-dark_border text-muted text-17">
-                  Overdrawn interest rate
+                  Educational Resources
                 </p>
               </div>
               <div className="bg-white dark:bg-midnight_text  pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
@@ -172,7 +171,7 @@ const Pricing = () => {
                     {tabConfig.personalPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    {tabConfig.duration}
+                    ₹10,000 Capital
                   </p>
                 </div>
                 <Link
@@ -183,12 +182,12 @@ const Pricing = () => {
                 </Link>
                 <div className="mt-10 mb-2">
                   <p className="pb-3 text-muted text-center border-b border-border dark:border-dark_border">
-                    Free
+                    ₹10,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                       <Icon
-                        icon="iconamoon:close-fill"
+                        icon="solar:unread-outline"
                         width="18"
                         height="18"
                         className="text-white"
@@ -196,10 +195,13 @@ const Pricing = () => {
                     </div>
                   </div>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    *Free
+                    Basic Charts
                   </p>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    *Free
+                    Limit & Market
+                  </p>
+                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
+                    Basic Portfolio
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
@@ -231,7 +233,7 @@ const Pricing = () => {
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">9.81% P.A.</p>
+                  <p className="py-3 text-muted text-center">Not Included</p>
                 </div>
               </div>
               <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
@@ -240,21 +242,21 @@ const Pricing = () => {
                 </h3>
                 <div className="mt-4 flex flex-col items-center">
                   <p className="text-40 font-medium uppercase text-midnight_text dark:text-white">
-                    ${tabConfig.professionalPrice}
+                    {tabConfig.professionalPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    {tabConfig.duration}
+                    ₹10,000 Capital
                   </p>
                 </div>
                 <Link
                   href="#"
                   className="mt-6 text-17 block text-center bg-primary border-2 border-primary hover:bg-transparent hover:text-primary duration-300 text-white py-2 rounded-lg"
                 >
-                  Try free for 14 days
+                  Get Started
                 </Link>
                 <div className="mt-10 mb-2">
                   <p className="pb-3 border-b dark:border-dark_border border-border text-muted text-center">
-                    Free
+                    ₹10,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -267,10 +269,10 @@ const Pricing = () => {
                     </div>
                   </div>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Free & unlimited
+                    Advanced Charts
                   </p>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Free & unlimited
+                    Limit & Market Orders
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -283,42 +285,42 @@ const Pricing = () => {
                     </div>
                   </div>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    0.5%
+                    Detailed Analytics
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
+                        icon="iconamoon:close-fill"
                         width="18"
                         height="18"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">9.81% P.A.</p>
+                  <p className="py-3 text-muted text-center">Not Included</p>
                 </div>
               </div>
               <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
                 <h3 className="text-22 text-center font-bold text-midnight_text dark:text-primary">
-                  Association
+                  Advanced
                 </h3>
                 <div className="mt-4 flex flex-col items-center">
                   <p className="text-40 font-medium uppercase text-midnight_text dark:text-white">
-                    ${tabConfig.organizationPrice}
+                    {tabConfig.organizationPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    {tabConfig.duration}
+                    ₹50,000 Capital
                   </p>
                 </div>
                 <Link
                   href="#"
                   className="mt-6 text-17 block text-center bg-primary border-2 border-primary hover:bg-transparent hover:text-primary duration-300 text-white py-2 rounded-lg"
                 >
-                  Try free for 14 days
+                  Get Started
                 </Link>
                 <div className="mt-10 mb-2">
                   <p className="pb-3 border-b dark:border-dark_border border-border text-muted text-center">
-                    Free
+                    ₹50,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -331,10 +333,10 @@ const Pricing = () => {
                     </div>
                   </div>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Free & unlimited
+                    Advanced Charts
                   </p>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Free & unlimited
+                    Limit & Market + Algo Orders
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -347,7 +349,7 @@ const Pricing = () => {
                     </div>
                   </div>
                   <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    0.5%
+                    Advanced Analytics
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
                     <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -359,7 +361,7 @@ const Pricing = () => {
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">6% P.A.</p>
+                  <p className="py-3 text-muted text-center">Contests Included</p>
                 </div>
               </div>
             </div>

@@ -27,15 +27,14 @@ const Mobile = () => {
         <div ref={ref} className="grid md:grid-cols-12 items-center lg:gap-12 gap-6">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
             <h2 className="lg:text-35 text-24 text-midnight_text font-semibold dark:text-white">
-              Mobile wallets made for
+              Trade on the go
               <br />
               <span className="lg:text-35 text-24 text-primary font-semibold lg:max-w-max">
-                any situation
+                from anywhere
               </span>
             </h2>
             <p className="mt-6 text-muted dark:text-white dark:text-opacity-70 lg:text-17 lg:max-w-full max-w-75%">
-              Cards issued through us can easily be added to mobile wallets to
-              be used to buy online, in store, and in-app.
+              Download Arthwise app to trade from your smartphone, access real-time quotes, place orders, and track your portfolio performance anytime, anywhere.
             </p>
             <div className="flex flex-col gap-6 mt-16">
               {perks.map((item, index) => (

@@ -24,21 +24,21 @@ export const Heroimage = [
 export const PaymentImage = [
   {
     image: "/images/payment/user.svg",
-    title: "Create an account",
+    title: "₹10,000 Virtual Capital",
     details:
-      "Mobile app made easy check out across the web and in apps without having to enter any payment information.",
+      "Start with virtual capital to practice trading without any real financial risk. Perfect for learning market dynamics.",
   },
   {
     image: "/images/payment/user.svg",
-    title: "Verify your identity",
+    title: "Real Market Data",
     details:
-      "Mobile app made easy check out across the web and in apps without having to enter any payment information.",
+      "Access live NSE data with real-time price updates, market indices, and comprehensive financial information.",
   },
   {
     image: "/images/payment/user.svg",
-    title: "Link your bank account",
+    title: "Limit & Market Orders",
     details:
-      "Mobile app made easy check out across the web and in apps without having to enter any payment information.",
+      "Place market orders instantly or set limit orders to execute at your target price. Full order management at your fingertips.",
   },
 ];
 
@@ -46,52 +46,58 @@ export const PaymentImage = [
 export const BeneifitImage = [
   {
     image: "/images/benefit/pic.svg",
-    alt: "Trusted brand",
+    alt: "Risk-Free Learning",
     details:
-      "Stop wasteful spend and save thousands with unlimited points and insights that maximize savings.",
+      "Learn trading strategies without risking real money. Build confidence and expertise in a safe environment.",
   },
   {
     image: "/images/benefit/contact.svg",
-    alt: "Trusted brand",
-    details: "See where the company money is going in real time.",
+    alt: "Performance Tracking",
+    details: "Monitor your trading performance with detailed P&L analysis, win rate tracking, and strategy evaluation.",
   },
   {
     image: "/images/benefit/bank.svg",
-    alt: "Trusted brand",
-    details: "Powered by the free app that helps you run your whole business.",
+    alt: "Educational Resources",
+    details: "Access comprehensive courses, trading guides, and expert analysis to improve your trading skills.",
   },
   {
     image: "/images/benefit/files.svg",
-    alt: "Trusted brand",
-    details: "No more lost receipts and tedious paperwork.",
+    alt: "Trading Contests",
+    details: "Compete with other traders in exciting contests and showcase your trading prowess on leaderboards.",
   },
   {
     image: "/images/benefit/setting.svg",
-    alt: "Trusted brand",
+    alt: "Customizable Tools",
     details:
-      "It's an all-digital card designed for online, and even in-store shopping.",
+      "Create personalized watchlists, set price alerts, and customize charts to match your trading style.",
   },
 ];
 
 // Footer Links
 export const footerLinks: { link: string }[] = [
   {
-    link: "Online Payments",
+    link: "Paper Trading",
   },
   {
-    link: "Financial Projections",
+    link: "Learning Center",
   },
   {
-    link: "Bookkeeping",
+    link: "Market Analysis",
   },
   {
-    link: "Banking",
+    link: "Trading Tools",
+  },
+  {
+    link: "Trading Contests",
+  },
+  {
+    link: "Leaderboard",
+  },
+  {
+    link: "Blog",
   },
   {
     link: "Documentation",
-  },
-  {
-    link: "Integrations",
   },
   {
     link: "API Reference",
@@ -103,13 +109,10 @@ export const footerLinks: { link: string }[] = [
     link: "Help",
   },
   {
-    link: "Infrastructure",
+    link: "About Us",
   },
   {
-    link: "Certifications",
-  },
-  {
-    link: "Licenses",
+    link: "Careers",
   },
   {
     link: "Terms and conditions",
@@ -131,13 +134,13 @@ export const footerLinks: { link: string }[] = [
 // Perks
 export const perks = [
   {
-    text: "When you pay with a debit or credit card, Mobile App doesn't keep transaction information that can be tied back to you.",
+    text: "Advanced charting tools with technical indicators for in-depth market analysis.",
   },
   {
-    text: "Digital wallets are becoming more popular than ever before.",
+    text: "Real-time notifications for price changes and important market events.",
   },
   {
-    text: "You can also add your student ID card to Wallet to access places like your dorm and the library.",
+    text: "Detailed P&L tracking and performance analytics to improve your trading strategy.",
   },
 ];
 

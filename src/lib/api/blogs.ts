@@ -35,8 +35,11 @@ export interface BlogDetailResponse {
 
 export async function getBlogs(page: number = 1, limit: number = 10): Promise<BlogsResponse> {
   try {
+    const url = `${API_BASE_URL}/blog?page=${page}&limit=${limit}`;
+    console.log('Fetching blogs from:', url);
+    
     const response = await fetch(
-      `${API_BASE_URL}/blog?page=${page}&limit=${limit}`,
+      url,
       { 
         next: { revalidate: 3600 },
         headers: {
@@ -46,16 +49,18 @@ export async function getBlogs(page: number = 1, limit: number = 10): Promise<Bl
     );
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch blogs: ${response.status}`);
+      throw new Error(`Failed to fetch blogs: ${response.status} ${response.statusText}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error('Error fetching blogs:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error fetching blogs:', errorMessage);
+    console.error('API_BASE_URL:', API_BASE_URL);
     return { 
       success: false, 
       data: [], 
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: errorMessage
     };
   }
 }

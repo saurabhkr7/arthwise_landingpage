@@ -85,7 +85,7 @@ const Search = () => {
             <h2 className="text-midnight_text font-bold dark:text-white md:text-35 sm:text-28 text-24">
               Get started with
               <span className="lg:text-35 text-primary text-24">
-                ₹10,000 virtual capital
+                ₹10,00,000 virtual capital
               </span>
             </h2>
             <div className="md:max-w-75% mx-auto mt-6">

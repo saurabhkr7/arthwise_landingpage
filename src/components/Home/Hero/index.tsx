@@ -26,17 +26,16 @@ const Hero = () => {
         <div className="grid grid-cols-12 items-center">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
             <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start mb-9 lg:w-full w-3/4">
-              Quickest and easiest
+              Master the stock market
               <br />
               <span className="bg-border dark:bg-darkHeroBg  md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max">
-                online payment
+                with paper trading
               </span>
               <br />
-              platform for your product.
+              - Learn before you earn.
             </h1>
             <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75%">
-              Embed powerful financial features into your product, Build in
-              minutes, launch in weeks.
+              Practice trading with ₹10,000 virtual capital. Real-time market data, advanced charts, and portfolio tracking. Zero risk, maximum learning.
             </p>
             <div className="flex items-center mt-12 gap-11">
               <div>

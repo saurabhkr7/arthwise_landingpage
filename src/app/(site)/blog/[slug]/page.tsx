@@ -77,7 +77,7 @@ export default function Post({ params }: Props) {
 
   const imageUrl = post.image || post.coverImage || '/images/blog/default.jpg';
   const author = post.author || 'Arthwise Team';
-  const authorImage = '/images/logo/logo.svg'; // Fallback
+  const authorImage = '/images/logo/logo.png'; // Fallback
   const dateStr = post.publishedAt || post.date || new Date().toISOString();
 
   return (
