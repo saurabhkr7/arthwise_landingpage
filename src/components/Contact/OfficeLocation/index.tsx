@@ -19,7 +19,7 @@ const Location = () => {
                         <p className="sm:text-24 text-xl text-IceBlue font-normal max-w-64 leading-10 text-white text-opacity-50">4292 Mapleview Drive Greenfield Zip code 38230</p>
                     </div>
                     <div className="col-span-3">
-                        <Link href="mailto:headoffice@nicktio.com" className="sm:text-24 text-xl text-white font-medium underline">headoffice@nicktio.com</Link>
+                        <Link href="mailto:headoffice@Arthhwise.com" className="sm:text-24 text-xl text-white font-medium underline">headoffice@Arthhwise.com</Link>
                         <Link href="tel:731-621-5503" className="sm:text-24 text-xl text-white text-opacity-80 flex items-center gap-2 hover:text-opacity-100 w-fit"><span className="text-white text-opacity-40!">Call</span>731-621-5503</Link>
                     </div>
                 </div>
@@ -31,7 +31,7 @@ const Location = () => {
                         <p className="sm:text-24 text-xl text-white text-opacity-50 font-normal max-w-64 leading-10">3502 Marcus Street Geraldine Zip code 35974</p>
                     </div>
                     <div className="col-span-3">
-                        <Link href="mailto:Office@nicktio.com" className="sm:text-24 text-xl text-white font-medium underline">Office@nicktio.com</Link>
+                        <Link href="mailto:Office@Arthhwise.com" className="sm:text-24 text-xl text-white font-medium underline">Office@Arthhwise.com</Link>
                         <Link href="tel:731-235-7993" className="sm:text-24 text-white text-opacity-80 text-xl text-IceBlue flex items-center gap-2 hover:text-opacity-100 w-fit"><span className="text-white text-opacity-40!">Call</span>731-235-7993</Link>
                     </div>
                 </div>

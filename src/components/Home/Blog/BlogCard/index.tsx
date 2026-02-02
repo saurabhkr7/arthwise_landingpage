@@ -6,11 +6,13 @@ import Link from "next/link";
 
 const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
   const { title, coverImage, type, excerpt, date, slug } = blog;
+  const imageUrl = coverImage || "/images/blogs/blog_1.png";
+
   return (
     <Link href={`/blog/${slug}`} aria-label="blog cover" className="group">
-      <div className="overflow-hidden rounded-lg shrink-0 mb-6">
+      <div className="overflow-hidden rounded-lg shrink-0 mb-6 group">
         <Image
-          src={coverImage!}
+          src={imageUrl}
           alt="image"
           className="transition group-hover:scale-125"
           width={190}

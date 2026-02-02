@@ -3,7 +3,7 @@ import HeroSub from "@/components/SharedComponents/HeroSub";
 import React from "react";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Pricing | Nicktio",
+  title: "Pricing | Arthhwise",
 };
 
 const page = () => {

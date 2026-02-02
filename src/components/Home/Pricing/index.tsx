@@ -40,8 +40,8 @@ const Pricing = () => {
   const initialTabConfig: State = {
     planType: "Monthly",
     personalPrice: "Free",
-    professionalPrice: "9.00",
-    organizationPrice: "18.00",
+    professionalPrice: "Free",
+    organizationPrice: "Free",
     duration: "Monthly",
   };
 
@@ -162,7 +162,7 @@ const Pricing = () => {
                   Educational Resources
                 </p>
               </div>
-              <div className="bg-white dark:bg-midnight_text  pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
+              <div className="bg-white dark:bg-midnight_text  pt-8 px-8 rounded-lg border border-border dark:border-dark_border shadow-lg">
                 <h3 className="text-22 font-bold text-midnight_text text-center dark:text-primary">
                   Personal
                 </h3>
@@ -171,72 +171,93 @@ const Pricing = () => {
                     {tabConfig.personalPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    ₹10,000 Capital
+                    ₹10,00,000 Capital
                   </p>
                 </div>
                 <Link
-                  href="#"
-                  className="mt-6 block text-center py-2 text-17 bg-green border-2 border-green hover:bg-transparent hover:text-green duration-300 text-white rounded-lg"
+                  href="/signup"
+                  className="mt-6 block text-center py-2 text-17 bg-primary border-2 border-primary hover:bg-transparent hover:text-primary duration-300 text-white rounded-lg"
                 >
-                  Try for free
+                  Start Now
                 </Link>
                 <div className="mt-10 mb-2">
-                  <p className="pb-3 text-muted text-center border-b border-border dark:border-dark_border">
-                    ₹10,000
+                  <p className="pb-3 text-midnight_text dark:text-white dark:text-opacity-70 text-center border-b border-border dark:border-dark_border">
+                    ₹10,00,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
-                        className="text-white"
-                      />
-                    </div>
-                  </div>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Basic Charts
-                  </p>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Limit & Market
-                  </p>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Basic Portfolio
-                  </p>
-                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
-                      <Icon
-                        icon="iconamoon:close-fill"
-                        width="18"
-                        height="18"
-                        className="text-white"
-                      />
-                    </div>
-                  </div>
-                  <div className="border-b border-border dark:border-dark_border py-3 flex justify-center">
-                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
-                      <Icon
-                        icon="iconamoon:close-fill"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="iconamoon:close-fill"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">Not Included</p>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <p className="py-3 text-green text-center font-medium">Included</p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
+              <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border shadow-lg">
                 <h3 className="text-22 font-bold text-midnight_text text-center dark:text-primary">
                   Professional
                 </h3>
@@ -245,62 +266,93 @@ const Pricing = () => {
                     {tabConfig.professionalPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    ₹10,000 Capital
+                    ₹50,00,000 Capital
                   </p>
                 </div>
                 <Link
-                  href="#"
+                  href="/signup"
                   className="mt-6 text-17 block text-center bg-primary border-2 border-primary hover:bg-transparent hover:text-primary duration-300 text-white py-2 rounded-lg"
                 >
-                  Get Started
+                  Start Now
                 </Link>
                 <div className="mt-10 mb-2">
-                  <p className="pb-3 border-b dark:border-dark_border border-border text-muted text-center">
-                    ₹10,000
+                  <p className="pb-3 border-b dark:border-dark_border border-border text-midnight_text dark:text-white dark:text-opacity-70 text-center">
+                    ₹50,00,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Advanced Charts
-                  </p>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Limit & Market Orders
-                  </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Detailed Analytics
-                  </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-danger rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="iconamoon:close-fill"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">Not Included</p>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <p className="py-3 text-green text-center font-medium">Included</p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border">
+              <div className="bg-white dark:bg-midnight_text pt-8 px-8 rounded-lg border border-border dark:border-dark_border shadow-lg">
                 <h3 className="text-22 text-center font-bold text-midnight_text dark:text-primary">
                   Advanced
                 </h3>
@@ -309,59 +361,90 @@ const Pricing = () => {
                     {tabConfig.organizationPrice}
                   </p>
                   <p className="text-base text-midnight_text dark:text-white">
-                    ₹50,000 Capital
+                    ₹1,00,00,000 Capital
                   </p>
                 </div>
                 <Link
-                  href="#"
+                  href="/signup"
                   className="mt-6 text-17 block text-center bg-primary border-2 border-primary hover:bg-transparent hover:text-primary duration-300 text-white py-2 rounded-lg"
                 >
-                  Get Started
+                  Start Now
                 </Link>
                 <div className="mt-10 mb-2">
-                  <p className="pb-3 border-b dark:border-dark_border border-border text-muted text-center">
-                    ₹50,000
+                  <p className="pb-3 border-b dark:border-dark_border border-border text-midnight_text dark:text-white dark:text-opacity-70 text-center">
+                    ₹1,00,00,000
                   </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Advanced Charts
-                  </p>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Limit & Market + Algo Orders
-                  </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 border-b border-border dark:border-dark_border text-muted text-center">
-                    Advanced Analytics
-                  </p>
                   <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
                       <Icon
-                        icon="solar:unread-outline"
-                        width="18"
-                        height="18"
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
                         className="text-white"
                       />
                     </div>
                   </div>
-                  <p className="py-3 text-muted text-center">Contests Included</p>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 border-b border-border dark:border-dark_border flex justify-center">
+                    <div className="w-5 h-5 bg-green rounded-full flex items-center justify-center">
+                      <Icon
+                        icon="iconamoon:check-bold"
+                        width="14"
+                        height="14"
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                  <p className="py-3 text-green text-center font-medium">Included</p>
                 </div>
               </div>
             </div>

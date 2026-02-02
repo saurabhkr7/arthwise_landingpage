@@ -14,22 +14,35 @@ const SignUp = () => {
     e.preventDefault();
 
     setLoading(true);
-    const data = new FormData(e.currentTarget);
-    const value = Object.fromEntries(data.entries());
-    const finalData = { ...value };
+    const formData = new FormData(e.currentTarget);
+    const value = Object.fromEntries(formData.entries());
+    const email = value.email as string;
+    
+    // Map UI fields to backend fields
+    const finalData = {
+      displayname: value.name as string,
+      username: email.split('@')[0] + Math.floor(Math.random() * 1000), // Auto-generate username from email
+      email: email,
+      password: value.password as string
+    };
 
-    fetch("/api/register", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(finalData),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message || "Signup failed");
+        return result;
+      })
       .then((data) => {
-        toast.success("Successfully registered");
+        toast.success("Successfully registered! Please sign in.");
         setLoading(false);
-        router.push("/signin");
+        // Optionally trigger sign in automatically or switch to sign in modal
+        router.refresh(); 
       })
       .catch((err) => {
         toast.error(err.message);

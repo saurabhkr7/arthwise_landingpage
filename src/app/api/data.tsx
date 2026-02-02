@@ -74,7 +74,7 @@ export const BeneifitImage = [
 ];
 
 // Footer Links
-export const footerLinks: { link: string }[] = [
+export const footerLinks: { link: string, href?: string }[] = [
   {
     link: "Paper Trading",
   },
@@ -89,33 +89,47 @@ export const footerLinks: { link: string }[] = [
   },
   {
     link: "Trading Contests",
+    href: "/contests",
   },
   {
     link: "Leaderboard",
+    href: "/leaderboard",
   },
   {
     link: "Blog",
+    href: "/blog",
   },
+  // {
+  //   link: "Documentation",
+  //   href: "/documentation",
+  // },
   {
-    link: "Documentation",
-  },
-  {
-    link: "API Reference",
+    link: "Waiting List",
+    href: "/waiting-list",
   },
   {
     link: "Support",
+    href: "/support",
   },
   {
     link: "Help",
+    href: "/help",
+  },
+  {
+    link: "Feedback",
+    href: "/feedback",
   },
   {
     link: "About Us",
+    href: "/about",
   },
   {
     link: "Careers",
+    href: "/careers",
   },
   {
     link: "Terms and conditions",
+    href: "/terms",
   },
   {
     link: "Legal",

@@ -10,8 +10,10 @@ import Signin from "@/components/Auth/SignIn";
 import SignUp from "@/components/Auth/SignUp";
 import { Icon } from "@iconify/react";
 import { useTheme } from "next-themes";
+import { signOut, useSession } from "next-auth/react";
 
 const Header: React.FC = () => {
+  const { data: session } = useSession();
   const pathUrl = usePathname();
   const { theme, setTheme } = useTheme();
 
@@ -110,41 +112,63 @@ const Header: React.FC = () => {
               <path d="M16.6111 15.855C17.591 15.1394 18.3151 14.1979 18.7723 13.1623C16.4824 13.4065 14.1342 12.4631 12.6795 10.4711C11.2248 8.47905 11.0409 5.95516 11.9705 3.84818C10.8449 3.9685 9.72768 4.37162 8.74781 5.08719C5.7759 7.25747 5.12529 11.4308 7.29558 14.4028C9.46586 17.3747 13.6392 18.0253 16.6111 15.855Z" />
             </svg>
           </button>
-          <Link
-            href="#"
-            className="hidden lg:flex items-center bg-primary border border-primary hover:border-primary dark:text-white text-white px-4 py-2  gap-2 rounded-lg text-16 font-semibold hover:bg-transparent hover:text-primary dark:hover:text-primary"
-            onClick={() => {
-              setIsSignInOpen(true);
-            }}
-          >
-            Sign In
-            <Icon icon="solar:arrow-right-linear" width="24" height="24" />
-          </Link>
-          {isSignInOpen && (
-            <div
-              ref={signInRef}
-              className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50 m-0"
-            >
-              <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-lg dark:bg-midnight_text bg-white px-8 py-14 text-center">
-                <button
-                  onClick={() => setIsSignInOpen(false)}
-                  className="bg-[url('/images/icon/closed.svg')] bg-no-repeat bg-contain w-5 h-5 absolute top-0 right-0 mr-8 mt-8 dark:invert"
-                  aria-label="Close Sign In Modal"
-                ></button>
-                <Signin />
-              </div>
+          {session ? (
+            <div className="flex items-center gap-4">
+              <Link
+                href="/blog/create"
+                className="hidden lg:flex items-center bg-transparent border border-primary text-primary px-4 py-2 gap-2 rounded-lg text-16 font-semibold hover:bg-primary hover:text-white transition-all"
+              >
+                Create Blog
+              </Link>
+              <span className="text-midnight_text dark:text-white hidden xl:block font-medium">
+                {session.user?.name}
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="hidden lg:flex items-center bg-transparent border border-primary text-primary px-4 py-2 gap-2 rounded-lg text-16 font-semibold hover:bg-primary hover:text-white transition-all"
+              >
+                Sign Out
+              </button>
             </div>
+          ) : (
+            <>
+              <Link
+                href="#"
+                className="hidden lg:flex items-center bg-primary border border-primary hover:border-primary dark:text-white text-white px-4 py-2  gap-2 rounded-lg text-16 font-semibold hover:bg-transparent hover:text-primary dark:hover:text-primary"
+                onClick={() => {
+                  setIsSignInOpen(true);
+                }}
+              >
+                Sign In
+                <Icon icon="solar:arrow-right-linear" width="24" height="24" />
+              </Link>
+              {isSignInOpen && (
+                <div
+                  ref={signInRef}
+                  className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50 m-0"
+                >
+                  <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-lg dark:bg-midnight_text bg-white px-8 py-14 text-center">
+                    <button
+                      onClick={() => setIsSignInOpen(false)}
+                      className="bg-[url('/images/icon/closed.svg')] bg-no-repeat bg-contain w-5 h-5 absolute top-0 right-0 mr-8 mt-8 dark:invert"
+                      aria-label="Close Sign In Modal"
+                    ></button>
+                    <Signin />
+                  </div>
+                </div>
+              )}
+              <Link
+                href="#"
+                className="hidden lg:flex items-center border border-primary dark:hover:border-primary bg-transparent dark:text-primary text-primary  px-4 py-2  gap-2 rounded-lg text-16 font-semibold hover:bg-primary hover:text-white dark:hover:text-white"
+                onClick={() => {
+                  setIsSignUpOpen(true);
+                }}
+              >
+                Sign Up
+                <Icon icon="solar:arrow-right-linear" width="24" height="24" />
+              </Link>
+            </>
           )}
-          <Link
-            href="#"
-            className="hidden lg:flex items-center border border-primary dark:hover:border-primary bg-transparent dark:text-primary text-primary  px-4 py-2  gap-2 rounded-lg text-16 font-semibold hover:bg-primary hover:text-white dark:hover:text-white"
-            onClick={() => {
-              setIsSignUpOpen(true);
-            }}
-          >
-            Sign Up
-            <Icon icon="solar:arrow-right-linear" width="24" height="24" />
-          </Link>
           {isSignUpOpen && (
             <div
               ref={signUpRef}
@@ -208,26 +232,42 @@ const Header: React.FC = () => {
             <MobileHeaderLink key={index} item={item} />
           ))}
           <div className="mt-4 flex flex-col space-y-4 w-full">
-            <Link
-              href="#"
-              className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
-              onClick={() => {
-                setIsSignInOpen(true);
-                setNavbarOpen(false); // Close the mobile menu
-              }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="#"
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              onClick={() => {
-                setIsSignUpOpen(true);
-                setNavbarOpen(false); // Close the mobile menu
-              }}
-            >
-              Sign Up
-            </Link>
+            {session ? (
+              <>
+                <div className="px-4 py-2 font-bold text-midnight_text">
+                  Hi, {session.user?.name}
+                </div>
+                <button
+                  onClick={() => signOut()}
+                  className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white text-left"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="#"
+                  className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
+                  onClick={() => {
+                    setIsSignInOpen(true);
+                    setNavbarOpen(false); // Close the mobile menu
+                  }}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="#"
+                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  onClick={() => {
+                    setIsSignUpOpen(true);
+                    setNavbarOpen(false); // Close the mobile menu
+                  }}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </div>

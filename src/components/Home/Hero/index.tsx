@@ -25,7 +25,7 @@ const Hero = () => {
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) relative z-1 md:max-w-(--breakpoint-md) px-4">
         <div className="grid grid-cols-12 items-center">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
-            <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start mb-9 lg:w-full w-3/4">
+            <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start dark:text-white mb-9 lg:w-full w-3/4">
               Master the stock market
               <br />
               <span className="bg-border dark:bg-darkHeroBg  md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max">
@@ -40,10 +40,10 @@ const Hero = () => {
             <div className="flex items-center mt-12 gap-11">
               <div>
                 <Link
-                  href="#"
+                  href="/waiting-list"
                   className="text-17 flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
                 >
-                  Get Started
+                  Join the wait list
                   <Icon
                     icon="solar:alt-arrow-right-linear"
                     width="13"
@@ -53,10 +53,10 @@ const Hero = () => {
               </div>
               <div>
                 <Link
-                  href="#"
+                  href="/feedback"
                   className="text-17 flex gap-2 items-center text-muted dark:text-white dark:text-opacity-70 hover:text-primary"
                 >
-                  See Features
+                  Give early feedback
                   <Icon
                     icon="solar:alt-arrow-right-linear"
                     width="13"
@@ -68,9 +68,9 @@ const Hero = () => {
 
             <div className="lg:my-28 my-12">
               <p className="text-20 text-muted dark:text-white dark:text-opacity-70 text-start mb-7">
-                Trusted by
+                Trusted by Hundrads of users in testing phase
               </p>
-              <div className="flex space-x-6 justify-start w-full">
+              {/* <div className="flex space-x-6 justify-start w-full">
                 {Heroimage.map((item, index) => (
                   <Link key={index} href="/">
                     <Image
@@ -91,7 +91,7 @@ const Hero = () => {
                     />
                   </Link>
                 ))}
-              </div>
+              </div> */}
             </div>
           </motion.div>
           <motion.div

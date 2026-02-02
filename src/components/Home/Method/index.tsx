@@ -56,14 +56,14 @@ const Method = () => {
                 <div className="grid xl:grid-cols-2 xl:gap-10">
                   <div className="xl:py-14 py-8 xl:pl-9 px-9">
                     <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                      Physical & Virtual Cards
+                      Risk-Free Paper Trading
                     </h3>
                     <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                      Fully programmable, debit - credit physical & virtual
-                      cards for individuals and businesses.
+                      Experience the thrill of the stock market without losing a penny. 
+                      Trade in real-time with virtual capital and live NSE market data.
                     </p>
                     <Link
-                      href="#"
+                      href="/signup"
                       className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                     >
                       Get Started
@@ -93,17 +93,17 @@ const Method = () => {
               >
                 <div className="flex-1 pl-8 py-5">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Banking
+                    Structured Learning
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                    Fully programmable, debit credit physical & virtual cards
-                    for individuals and businesses.
+                    Master the markets with our interactive courses. From technical analysis
+                    to risk management, we cover it all.
                   </p>
                   <Link
-                    href="#"
+                    href="/documentation"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Get Started
+                    Explore Courses
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"
@@ -127,17 +127,17 @@ const Method = () => {
               >
                 <div className="flex-1 pl-8 py-5">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Payments
+                    Expert Insights
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                    Fully programmable, debit credit physical & virtual cards
-                    for individuals and businesses.
+                    Stay ahead with real-time market news, expert analysis, and a 
+                    community that helps you grow.
                   </p>
                   <Link
-                    href="#"
+                    href="/blog"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Get Started
+                    Read Blog
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"
@@ -172,17 +172,17 @@ const Method = () => {
                 </div>
                 <div className="flex-1 px-9 flex justify-center flex-col py-9">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Access $175,000 in partner rewards
+                    Performance Tracking
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                    Fully programmable, debit credit physical & virtual cards
-                    for individuals and businesses.
+                    Analyze your trades with deep metrics. Track your accuracy, 
+                    PnL, and improve your psychological discipline.
                   </p>
                   <Link
-                    href="#"
+                    href="/signup"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Get Started
+                    Start Tracking
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"

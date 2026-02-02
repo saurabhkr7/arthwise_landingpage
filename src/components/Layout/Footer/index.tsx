@@ -50,10 +50,10 @@ const Footer = () => {
               Features
             </h4>
             <ul>
-              {footerLinks.slice(0, 4).map((item, index) => (
+              {footerLinks.slice(0, 4).map((item: any, index) => (
                 <li key={index} className="pb-3">
                   <Link
-                    href="#"
+                    href={item.href || "#"}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -68,10 +68,10 @@ const Footer = () => {
               Resources
             </h4>
             <ul>
-              {footerLinks.slice(4, 9).map((item, index) => (
+              {footerLinks.slice(4, 9).map((item: any, index) => (
                 <li key={index} className="pb-3">
                   <Link
-                    href="#"
+                    href={item.href || "#"}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -86,10 +86,10 @@ const Footer = () => {
               Platform
             </h4>
             <ul>
-              {footerLinks.slice(9, 14).map((item, index) => (
+              {footerLinks.slice(9, 14).map((item: any, index) => (
                 <li key={index} className="pb-3">
                   <Link
-                    href="#"
+                    href={item.href || "#"}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -144,9 +144,12 @@ const Footer = () => {
             © Copyright 2025. All rights reserved by Arthwise.
           </p>
           <div className="flex gap-4">
-            {footerLinks.slice(14, 17).map((item, index) => (
+            {footerLinks.slice(14, 17).map((item: any, index) => (
               <div key={index} className="">
-                <Link href="#" className="text-foottext hover:text-primary">
+                <Link
+                  href={item.href || "#"}
+                  className="text-foottext hover:text-primary"
+                >
                   {item.link}
                 </Link>
               </div>

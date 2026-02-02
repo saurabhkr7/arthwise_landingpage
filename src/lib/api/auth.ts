@@ -22,23 +22,28 @@ export interface User {
 
 export async function signUp(email: string, password: string, name: string): Promise<AuthResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    const response = await fetch(`${API_BASE_URL}/user/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({
+        email,
+        password,
+        displayname: name,
+        username: email.split('@')[0] + Math.floor(Math.random() * 1000)
+      }),
     });
 
     const data = await response.json();
     
-    if (response.ok && data.success) {
+    if (response.ok && data.status === 'success') {
       // Store token
-      if (typeof window !== 'undefined' && data.data?.token) {
-        localStorage.setItem('authToken', data.data.token);
+      if (typeof window !== 'undefined' && data.accessToken) {
+        localStorage.setItem('authToken', data.accessToken);
         localStorage.setItem('user', JSON.stringify(data.data));
       }
-      return data;
+      return { success: true, data: data.data };
     }
     
     return {
@@ -55,7 +60,7 @@ export async function signUp(email: string, password: string, name: string): Pro
 
 export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+    const response = await fetch(`${API_BASE_URL}/user/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,13 +70,13 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
 
     const data = await response.json();
     
-    if (response.ok && data.success) {
+    if (response.ok && data.status === 'success') {
       // Store token
-      if (typeof window !== 'undefined' && data.data?.token) {
-        localStorage.setItem('authToken', data.data.token);
+      if (typeof window !== 'undefined' && data.accessToken) {
+        localStorage.setItem('authToken', data.accessToken);
         localStorage.setItem('user', JSON.stringify(data.data));
       }
-      return data;
+      return { success: true, data: data.data };
     }
     
     return {

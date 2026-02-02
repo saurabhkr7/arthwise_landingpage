@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.arthwise",
+      "sha256_cert_fingerprints": [
+        "1F:C0:96:80:13:60:15:EE:9D:3B:F9:19:4F:EE:EB:B9:FC:E0:0C:EE:A9:6B:EA:1A:D7:7A:F1:E5:84:33:56:D0"
+      ]
+    }
+  }
+]

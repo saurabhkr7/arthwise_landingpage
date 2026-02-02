@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Comments from "@/components/Blog/Comments";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -75,9 +76,9 @@ export default function Post({ params }: Props) {
     );
   }
 
-  const imageUrl = post.image || post.coverImage || '/images/blog/default.jpg';
-  const author = post.author || 'Arthwise Team';
-  const authorImage = '/images/logo/logo.png'; // Fallback
+  const imageUrl = post.image || post.coverImage || '/images/blogs/blog_1.png';
+  const author = post.authorName || (post.author && typeof post.author === 'object' ? post.author.name : 'Arthwise Team');
+  const authorImage = (post.author && typeof post.author === 'object' && post.author.avatar) || '/images/blogs/silicaman.png';
   const dateStr = post.publishedAt || post.date || new Date().toISOString();
 
   return (
@@ -172,6 +173,9 @@ export default function Post({ params }: Props) {
                       </div>
                     </div>
                   )}
+
+                  {/* Comments Section */}
+                  <Comments blogId={post._id} />
                 </div>
                 <div className="w-full px-4 lg:w-4/12">
                   <div>

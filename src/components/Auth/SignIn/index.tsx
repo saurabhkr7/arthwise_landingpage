@@ -66,8 +66,8 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
       <form onSubmit={handleSubmit}>
         <div className="mb-[22px]">
           <input
-            type="text"
-            placeholder="Username"
+            type="email"
+            placeholder="Email"
             required
             value={username}
             onChange={(e) => setUsername(e.target.value)}

@@ -25,7 +25,7 @@ export default function Home() {
       <Method />
       <Mobile />
       <Search />
-      <Pricing />
+      {/* <Pricing /> */}
       <Solution />
       
     </main>
