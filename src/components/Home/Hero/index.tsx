@@ -43,7 +43,7 @@ const Hero = () => {
                   href="/waiting-list"
                   className="text-17 flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
                 >
-                  Join the wait list
+                  Get Early Access
                   <Icon
                     icon="solar:alt-arrow-right-linear"
                     width="13"
@@ -100,10 +100,11 @@ const Hero = () => {
           >
             <Image
               src="/images/hero/hero-image.png"
-              alt="image"
+              alt="Arthhwise Trading Platform Mockup showing advanced charts and portfolio tracking"
               width={498}
               height={651}
-              style={{ width: "100%", height: "100%" }}
+              style={{ width: "100%", height: "auto" }}
+              priority
             />
           </motion.div>
         </div>

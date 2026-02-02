@@ -4,21 +4,27 @@ import { Blog } from "@/types/blog";
 import { format } from "date-fns";
 import Link from "next/link";
 
-const BlogCard = ({ blog }: { blog: Blog }) => {
-  const { title, coverImage, image, category, type, excerpt, date, publishedAt, slug } = blog;
+const BlogCard = ({ blog, index }: { blog: Blog; index?: number }) => {
+  const { title, coverImage, image, category, type, date, publishedAt, slug } = blog;
   
-  // Fix for blog images - handle relative paths from backend
-  const getImageUrl = (url?: string) => {
-    if (!url) return '/images/blogs/blog_1.png';
-    if (url.startsWith('http')) return url;
+  // Fresh logic to fix blog images once and for all:
+  // 1. If backend explicitly has "blog_n.png", use it locally.
+  // 2. Otherwise, use index to cycle through local images blog_1 to blog_8.
+  const getImageUrl = () => {
+    const rawUrl = coverImage || image || "";
     
-    // Assuming backend is at NEXT_PUBLIC_API_URL/.. and images are served from root
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const serverBase = apiBase.replace('/api', '');
-    return `${serverBase}${url.startsWith('/') ? '' : '/'}${url}`;
+    // Check if the backend string already contains our local pattern
+    const match = rawUrl.match(/blog_(\d+)\.png/);
+    if (match) {
+      return `/images/blogs/blog_${match[1]}.png`;
+    }
+
+    // Default to cycling through 1-8 based on index or blog ID hash
+    const imgIndex = typeof index === 'number' ? (index % 8) + 1 : 1;
+    return `/images/blogs/blog_${imgIndex}.png`;
   };
 
-  const imageUrl = getImageUrl(coverImage || image);
+  const imageUrl = getImageUrl();
   const dateStr = date || publishedAt || new Date().toISOString();
   const blogType = category || type || 'Trading';
 
@@ -26,11 +32,11 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-9 items-center group">
       <div className="relative">
         <div className="overflow-hidden rounded-lg">
-          {/* <Link
+          <Link
             href={`/blog/${slug}`}
             aria-label="blog cover"
             className="block"
-          > */}
+          >
             <div className="overflow-hidden rounded-lg shrink-0">
               <Image
                 src={imageUrl}
@@ -41,7 +47,7 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
                 style={{ width: "100%", height: "100%" }}
               />
             </div>
-          {/* </Link> */}
+          </Link>
         </div>
       </div>
       <div>
@@ -49,24 +55,20 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
           {format(new Date(dateStr), "MMMM dd, yyyy")}
         </p>
         <div className="my-4">
-          {/* <Link
+          <Link
             href={`/blog/${slug}`}
             className="text-20 sm:text-22 md:text-24 font-medium text-midnight_text dark:text-white group-hover:text-primary"
-          > */}
-            <div className="text-20 sm:text-22 md:text-24 font-medium text-midnight_text dark:text-white">
-              {title}
-            </div>
-          {/* </Link> */}
+          >
+            {title}
+          </Link>
         </div>
         <div>
-          {/* <Link
+          <Link
             href={`/blog/${slug}`}
             className="text-20 text-primary hover:text-blue-700"
-          > */}
-            <div className="text-20 text-primary">
-              {blogType}
-            </div>
-          {/* </Link> */}
+          >
+            {blogType}
+          </Link>
         </div>
       </div>
     </div>

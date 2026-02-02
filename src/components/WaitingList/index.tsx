@@ -25,13 +25,13 @@ const WaitingListForm = () => {
 
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || "Thank you for joining our waiting list!");
+        toast.success(data.message || "Thank you for requesting early access! We'll notify you soon.");
         setFormData({ name: "", email: "", comments: "" });
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
     } catch (error) {
-      console.error("Waiting List Submission Error:", error);
+      console.error("Early Access Submission Error:", error);
       toast.error("Failed to connect to server. Please try again later.");
     } finally {
       setSubmitting(false);
@@ -45,7 +45,7 @@ const WaitingListForm = () => {
           {/* Left Side: App Concept */}
           <div className="lg:col-span-5">
             <h2 className="text-32 md:text-40 font-bold mb-6 dark:text-white">
-              Why Join Arthwise?
+              Why Join Arthhwise?
             </h2>
             <div className="space-y-8">
               <div className="flex gap-4">
@@ -144,7 +144,7 @@ const WaitingListForm = () => {
                   disabled={submitting}
                   className="w-full md:w-auto bg-primary text-white font-bold py-4 px-10 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-testimonial disabled:bg-opacity-50"
                 >
-                  {submitting ? "Joining..." : "Join Waiting List"}
+                  {submitting ? "Processing..." : "Get Early Access"}
                 </button>
               </div>
             </form>

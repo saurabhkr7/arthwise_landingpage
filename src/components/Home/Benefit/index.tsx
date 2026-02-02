@@ -37,12 +37,12 @@ const Benefit = () => {
         >
           <motion.div {...TopAnimation} className="items-start">
             <h2 className="font-bold md:text-35 sm:text-28 text-24 text-midnight_text dark:text-white">
-              How will
+              How Arthhwise's
               <span className="bg-border dark:bg-darkHeroBg rounded-lg text-primary max-w-max ml-2">
-                smart trading
+                Paper Trading
               </span>
               <br />
-              platform benefit your financial skills.
+              Platform Accelerates Your Market Mastery.
             </h2>
           </motion.div>
           <div className="grid grid-cols-12 items-center mt-16 md:gap-12 sm:gap-8">
@@ -53,10 +53,10 @@ const Benefit = () => {
               <div className="xl:px-0 lg:px-20">
                 <Image
                   src="/images/benefit/benefit.png"
-                  alt="image"
+                  alt="Risk-free paper trading platform dashboard on laptop"
                   width={435}
                   height={304}
-                  style={{ width: "100%", height: "100%" }}
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
             </motion.div>

@@ -47,7 +47,7 @@ const FeedbackForm = () => {
               App Feedback
             </h2>
             <p className="text-18 text-body dark:text-white/70">
-              Your insights help us improve the Arthwise experience.
+              Your insights help us improve the Arthhwise experience.
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -77,30 +77,30 @@ const Search = () => {
             <div className="flex justify-center">
               <Image
                 src="/images/search/free.png"
-                alt="image"
+                alt="Free NSE Paper Trading Platform badge"
                 width={67}
                 height={38}
               />
             </div>
             <h2 className="text-midnight_text font-bold dark:text-white md:text-35 sm:text-28 text-24">
-              Get started with
-              <span className="lg:text-35 text-primary text-24">
-                ₹10,00,000 virtual capital
+              Practice Trading with
+              <span className="lg:text-35 text-primary text-24 pl-2">
+                ₹10,00,000 Virtual Capital
               </span>
             </h2>
             <div className="md:max-w-75% mx-auto mt-6">
               <div className="flex lg:items-center md:items-start bg-white dark:bg-darkHeroBg shadow-md rounded-2xl overflow-hidden">
                 <input
                   type="email"
-                  placeholder="Sign up to start trading"
-                  className="grow px-4 py-5 pl-6 text-white dark:text-heroBg text-17 focus:outline-hidden bg-white dark:bg-darkHeroBg hidden md:block"
+                  placeholder="Enter email for early access"
+                  className="grow px-4 py-5 pl-6 dark:text-heroBg text-17 focus:outline-hidden bg-white dark:bg-darkHeroBg hidden md:block"
                 />
                 <div className="flex lg:items-center lg:justify-start justify-center mr-4">
                   <Link
-                    href="#auth/signup"
-                    className="text-17 flex items-center bg-primary text-white py-3 px-8 rounded-lg w-36  my-2 border border-primary hover:text-primary hover:bg-transparent"
+                    href="/waiting-list"
+                    className="text-17 flex items-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-48 my-2 border border-primary hover:text-primary hover:bg-transparent"
                   >
-                    Sign Up
+                    Get Early Access
                   </Link>
                 </div>
               </div>
@@ -114,7 +114,7 @@ const Search = () => {
                   />
                 </div>
                 <p className="ml-4 text-17 text-muted dark:text-white dark:text-opacity-50">
-                  Completely free to use, no deposit required, trade with confidence
+                  Risk-free NSE simulated environment, zero deposit required.
                 </p>
               </div>
             </div>
@@ -130,21 +130,22 @@ const Search = () => {
                     <div className="mb-10">
                       <Image
                         src="/images/search/double.png"
-                        alt="image"
+                        alt="Testimonial quotation icon"
                         width={52}
                         height={39}
                       />
                     </div>
-                    <p className="text-midnight_text dark:text-white text-base mb-9">
-                      {item.text}
+                    <p className="text-midnight_text dark:text-white text-base mb-9 italic leading-relaxed">
+                      "{item.text}"
                     </p>
                     <div className="flex items-center gap-4">
                       <div>
                         <Image
                           src={item.image}
-                          alt={item.name}
+                          alt={`Portrait of ${item.name}`}
                           width={64}
                           height={64}
+                          className="rounded-full"
                         />
                       </div>
                       <div className="flex sm:items-center sm:gap-2 sm:flex-row flex-col">
@@ -171,14 +172,14 @@ const Search = () => {
                           <span className="text-midnight_text dark:text-white font-bold">
                             {item.appstorerating}
                           </span>
-                          /5 — From 1800+ ratings
+                          /5 — iOS Review (coming soon)
                         </p>
                       </div>
                       <div>
-                        <Link href="#">
+                        <Link href="/waiting-list">
                           <Image
                             src="/images/search/app.png"
-                            alt="app store"
+                            alt="Download Arthwise on Apple App Store"
                             width={130}
                             height={44}
                           />
@@ -194,14 +195,14 @@ const Search = () => {
                           <span className="text-midnight_text dark:text-white font-bold">
                             {item.gplayrating}
                           </span>
-                          /5 — From 1800+ ratings
+                          /5 — Verification by Play Store in Progress
                         </p>
                       </div>
                       <div>
-                        <Link href="/">
+                        <Link href="/waiting-list">
                           <Image
                             src="/images/search/google.png"
-                            alt="google play"
+                            alt="Get Arthwise Paper Trading App on Google Play"
                             width={130}
                             height={44}
                           />

@@ -1,0 +1,6 @@
+# Standard robots.txt for Google SEO
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://arthhwise.com/sitemap.xml

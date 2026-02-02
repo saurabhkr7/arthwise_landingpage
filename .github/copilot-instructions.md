@@ -1,7 +1,7 @@
-# Arthwise Landing Page - Copilot Instructions
+# Arthhwise Landing Page - Copilot Instructions
 
 ## Project Overview
-Arthwise is a **Next.js 15 trading education platform** with a rebranded landing page, blog system, and authentication. This is a **frontend-driven project** that integrates with external backend APIs for auth, blogs, and user data.
+Arthhwise is a **Next.js 15 trading education platform** with a rebranded landing page, blog system, and authentication. This is a **frontend-driven project** that integrates with external backend APIs for auth, blogs, and user data.
 
 **Tech Stack**: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4.0, NextAuth, Axios
 

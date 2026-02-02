@@ -62,7 +62,7 @@ const CreateBlogPage = () => {
     <>
       <HeroSub
         title="Create Blog"
-        description="Share your insights and trading experiences with the Arthwise community."
+        description="Share your insights and trading experiences with the Arthhwise community."
         breadcrumbLinks={[
           { href: "/", text: "Home" },
           { href: "/blog", text: "Blog" },

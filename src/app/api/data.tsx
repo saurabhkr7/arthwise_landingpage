@@ -104,7 +104,7 @@ export const footerLinks: { link: string, href?: string }[] = [
   //   href: "/documentation",
   // },
   {
-    link: "Waiting List",
+    link: "Early Access",
     href: "/waiting-list",
   },
   {
@@ -161,12 +161,12 @@ export const perks = [
 // review
 export const review = [
   {
-    text: "It's easy to set up and the support experience is unparalleled. every transaction the instant it happens and correct wasteful behavior. What a relief.",
-    name: "Nina B. Freeman",
-    post: "Founder at Litchi Care",
+    text: "Arthwise has completely transformed how I approach the markets. The risk-free environment combined with real-time NSE data is the perfect training ground for anyone serious about trading.",
+    name: "Saurabh Patel",
+    post: "Co-Founder at Arthhwise",
     image: "/images/search/profile.png",
-    appstorerating: "4.5",
-    gplayrating: "4.5",
+    appstorerating: "0",
+    gplayrating: "0",
   },
 ];
 

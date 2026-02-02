@@ -39,7 +39,7 @@ const BlogSmall: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
           {posts.slice(0, 3).map((blog, i) => (
             <div key={i} className="w-full">
-              <BlogCard blog={blog} />
+              <BlogCard blog={blog} index={i} />
             </div>
           ))}
         </div>

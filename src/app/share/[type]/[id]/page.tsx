@@ -39,7 +39,7 @@ export default function ShareBridgePage() {
         <div className="mb-6">
           <Image
             src="/images/logo.png"
-            alt="Arthwise Logo"
+            alt="Arthhwise Logo"
             width={120}
             height={120}
             className="mx-auto rounded-xl"
@@ -51,7 +51,7 @@ export default function ShareBridgePage() {
         </h1>
         
         <p className="text-gray-600 mb-8">
-          We're taking you to the Arthwise app to view this {type}.
+          We're taking you to the Arthhwise app to view this {type}.
         </p>
 
         <button
@@ -83,7 +83,7 @@ export default function ShareBridgePage() {
       </div>
       
       <p className="mt-8 text-xs text-gray-400">
-        &copy; 2026 Arthwise. All rights reserved.
+        &copy; 2026 Arthhwise. All rights reserved.
       </p>
     </div>
   );

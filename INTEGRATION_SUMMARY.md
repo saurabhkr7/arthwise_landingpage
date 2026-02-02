@@ -1,10 +1,10 @@
-# Arthwise Landing Page - Integration & Rebranding Complete ✅
+# Arthhwise Landing Page - Integration & Rebranding Complete ✅
 
 ## Summary of Changes
 
 We have successfully:
-1. **Integrated Arthwise Backend APIs** - Connected the premium landing page template to your existing backend services
-2. **Rebranded All Sections** - Transformed generic payment/fintech sections into trading-specific Arthwise features
+1. **Integrated Arthhwise Backend APIs** - Connected the premium landing page template to your existing backend services
+2. **Rebranded All Sections** - Transformed generic payment/fintech sections into trading-specific Arthhwise features
 3. **Added Authentication** - Implemented auth context for login/signup functionality
 4. **Integrated Blog System** - Connected the MongoDB blog API to the landing page with real-time content
 
@@ -76,7 +76,7 @@ src/context/AuthContext.tsx       - Global auth state management
 
 ### Files Modified:
 ```
-src/app/page.tsx                  - Updated metadata to Arthwise branding
+src/app/page.tsx                  - Updated metadata to Arthhwise branding
 src/app/layout.tsx                - Added AuthProvider wrapper
 src/app/(site)/blog/page.tsx      - API-driven blog listing
 src/app/(site)/blog/[slug]/page.tsx - Dynamic blog detail page with markdown
@@ -140,11 +140,11 @@ NEXT_PUBLIC_API_URL=http://localhost:8000/api
 ### Start the Application
 ```bash
 # Terminal 1: Backend services
-cd /Users/saurabhpatel/Documents/Arthwise/ArthwiseServices
+cd /Users/saurabhpatel/Documents/Arthhwise/ArthwiseServices
 pm2 start ecosystem.config.js
 
 # Terminal 2: Landing page
-cd /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage
+cd /Users/saurabhpatel/Documents/Arthhwise/arthwise_landingpage
 npm run dev
 ```
 
@@ -248,7 +248,7 @@ Landing Page (Next.js 15.1.1)
 ## 💾 Git Commits
 
 ```
-a7bc3b4 feat: Integrate Arthwise APIs, rebrand sections, add auth context and blog integration
+a7bc3b4 feat: Integrate Arthhwise APIs, rebrand sections, add auth context and blog integration
 2f2049b feat: Blog backend + newsletter + homepage enhancement
 ```
 
@@ -256,7 +256,7 @@ a7bc3b4 feat: Integrate Arthwise APIs, rebrand sections, add auth context and bl
 
 ## 📞 Support
 
-All sections maintain the original design aesthetic while being fully integrated with your Arthwise backend APIs. The blog system is production-ready with real data from MongoDB, and authentication is ready to be connected to your user management system.
+All sections maintain the original design aesthetic while being fully integrated with your Arthhwise backend APIs. The blog system is production-ready with real data from MongoDB, and authentication is ready to be connected to your user management system.
 
 **Status**: ✅ **Complete and Running Locally**
 

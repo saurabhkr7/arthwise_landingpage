@@ -39,7 +39,7 @@ const Blog: React.FC = () => {
               key={i}
               className="w-full lg:col-span-4 md:col-span-6 col-span-12"
             >
-              <BlogCard blog={blog} />
+              <BlogCard blog={blog} index={i} />
             </div>
           ))}
         </div>

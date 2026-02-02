@@ -67,9 +67,9 @@ const BlogList: React.FC = () => {
     >
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) px-4">
         <div className="lg:grid grid-cols-12 gap-x-12 gap-y-20">
-          {posts.map((blog) => (
+          {posts.map((blog, index) => (
             <div key={blog._id} className="w-full md:col-span-6 col-span-12">
-              <BlogCard blog={blog} />
+              <BlogCard blog={blog} index={index} />
             </div>
           ))}
         </div>

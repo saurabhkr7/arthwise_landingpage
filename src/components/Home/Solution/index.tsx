@@ -20,7 +20,7 @@ const Solution = () => {
                 href="/blog"
                 className="lg:text-17 flex gap-4 w-fit items-center bg-primary text-white py-2 px-4 lg:py-3 lg:px-8 rounded-lg mt-12 border border-primary hover:text-primary hover:bg-transparent"
               >
-                Learn More
+                Explore our Trading Blog
                 <Icon
                   icon="solar:alt-arrow-right-linear"
                   width="13"
@@ -31,7 +31,7 @@ const Solution = () => {
             <div className="flex justify-center">
               <Image
                 src="/images/solution/solution.png"
-                alt="image"
+                alt="Sophisticated Trading Charts and Analytics"
                 width={531}
                 height={200}
               />

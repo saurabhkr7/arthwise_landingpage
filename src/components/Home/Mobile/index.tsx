@@ -34,7 +34,7 @@ const Mobile = () => {
               </span>
             </h2>
             <p className="mt-6 text-muted dark:text-white dark:text-opacity-70 lg:text-17 lg:max-w-full max-w-75%">
-              Download Arthwise app to trade from your smartphone, access real-time quotes, place orders, and track your portfolio performance anytime, anywhere.
+              Download Arthhwise app to trade from your smartphone, access real-time quotes, place orders, and track your portfolio performance anytime, anywhere.
             </p>
             <div className="flex flex-col gap-6 mt-16">
               {perks.map((item, index) => (
@@ -71,10 +71,10 @@ const Mobile = () => {
             <div className="lg:max-w-full max-w-75% mx-auto">
               <Image
                 src="/images/mobile/mobile.png"
-                alt="image"
+                alt="Arthhwise Mobile App Interface for on-the-go trading"
                 width={555}
                 height={634}
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "auto" }}
               />
             </div>
           </motion.div>

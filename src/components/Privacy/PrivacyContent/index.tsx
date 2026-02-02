@@ -18,12 +18,12 @@ const PrivacyContent = () => {
               Introduction
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-4">
-              At Arthwise, we are committed to protecting your privacy and ensuring the security of your personal information. 
+              At Arthhwise, we are committed to protecting your privacy and ensuring the security of your personal information. 
               This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you use our paper trading 
               platform and financial education services, both on our website and mobile application.
             </p>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              By accessing or using Arthwise, you agree to the terms outlined in this Privacy Policy. If you do not agree with 
+              By accessing or using Arthhwise, you agree to the terms outlined in this Privacy Policy. If you do not agree with 
               our policies and practices, please do not use our services.
             </p>
           </div>
@@ -162,7 +162,7 @@ const PrivacyContent = () => {
               Children's Privacy
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              Arthwise is not intended for users under the age of 18. We do not knowingly collect personal information from 
+              Arthhwise is not intended for users under the age of 18. We do not knowingly collect personal information from 
               children. If you believe we have inadvertently collected data from a minor, please contact us immediately, 
               and we will take steps to delete such information.
             </p>
@@ -212,7 +212,7 @@ const PrivacyContent = () => {
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
               We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. 
               We will notify you of significant changes by posting the updated policy on this page and updating the 
-              "Last Updated" date. Your continued use of Arthwise after such changes constitutes acceptance of the updated policy.
+              "Last Updated" date. Your continued use of Arthhwise after such changes constitutes acceptance of the updated policy.
             </p>
           </div>
 
@@ -226,7 +226,7 @@ const PrivacyContent = () => {
               please contact us:
             </p>
             <div className="bg-heroBg dark:bg-search p-6 rounded-lg">
-              <p className="text-midnight_text dark:text-white font-semibold mb-2">Arthwise</p>
+              <p className="text-midnight_text dark:text-white font-semibold mb-2">Arthhwise</p>
               <p className="text-DeepOcean dark:text-white dark:text-opacity-70">
                 Email:{" "}
                 <a href="mailto:Arthhwise@gmail.com" className="text-primary hover:underline">
@@ -252,7 +252,7 @@ const PrivacyContent = () => {
               Your Consent
             </p>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              By using Arthwise's website and mobile application, you acknowledge that you have read, understood, 
+              By using Arthhwise's website and mobile application, you acknowledge that you have read, understood, 
               and agree to be bound by this Privacy Policy.
             </p>
           </div>

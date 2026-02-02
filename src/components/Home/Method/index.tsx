@@ -77,10 +77,10 @@ const Method = () => {
                   <div>
                     <Image
                       src="/images/method/card.png"
-                      alt="card"
+                      alt="NSE Real-time trading card interface showing stock prices"
                       width={459}
                       height={289}
-                      className="xl:w-full w-75% mx-auto"
+                      className="xl:w-full w-75% mx-auto h-auto"
                     />
                   </div>
                 </div>
@@ -93,17 +93,17 @@ const Method = () => {
               >
                 <div className="flex-1 pl-8 py-5">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Structured Learning
+                    Structured Stock Learning
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                    Master the markets with our interactive courses. From technical analysis
-                    to risk management, we cover it all.
+                    Master the Indian markets with our interactive trading courses. From technical analysis
+                    to professional risk management.
                   </p>
                   <Link
-                    href="/documentation"
+                    href="/waiting-list"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Explore Courses
+                    Join Learning Center
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"
@@ -114,10 +114,10 @@ const Method = () => {
                 <div className="flex-1 w-full h-full">
                   <Image
                     src="/images/method/method1.jpg"
-                    alt="image"
+                    alt="Trader analyzing candlestick charts on multiple screens"
                     width={232}
                     height={375}
-                    className="w-full h-full"
+                    className="w-full h-auto"
                   />
                 </div>
               </motion.div>
@@ -127,17 +127,17 @@ const Method = () => {
               >
                 <div className="flex-1 pl-8 py-5">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Expert Insights
+                    Professional Insights
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
-                    Stay ahead with real-time market news, expert analysis, and a 
-                    community that helps you grow.
+                    Stay ahead with real-time NSE market news, expert stock analysis, and a 
+                    supportive trading community.
                   </p>
                   <Link
                     href="/blog"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Read Blog
+                    Read Financial Blog
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"
@@ -148,10 +148,10 @@ const Method = () => {
                 <div className="flex-1 w-full h-full">
                   <Image
                     src="/images/method/method3.jpg"
-                    alt="image"
+                    alt="Financial experts discussing market trends"
                     width={232}
                     height={375}
-                    className="w-full h-full"
+                    className="w-full h-auto"
                   />
                 </div>
               </motion.div>
@@ -162,27 +162,21 @@ const Method = () => {
                 className="bg-white dark:bg-darkmode rounded-2xl overflow-hidden flex flex-col h-full"
               >
                 <div className="flex-1">
-                  <Image
-                    src="/images/method/method2.png"
-                    alt="image"
-                    width={232}
-                    height={375}
-                    className="w-full"
-                  />
+                  
                 </div>
                 <div className="flex-1 px-9 flex justify-center flex-col py-9">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
-                    Performance Tracking
+                    Advanced P&L Analytics
                   </h3>
                   <p className="text-muted dark:text-white dark:text-opacity-70 md:text-18 text-16 md:mb-14 mb-8">
                     Analyze your trades with deep metrics. Track your accuracy, 
-                    PnL, and improve your psychological discipline.
+                    PnL, and improve your psychological trading discipline.
                   </p>
                   <Link
-                    href="/signup"
+                    href="/waiting-list"
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
-                    Start Tracking
+                    Start Paper Trading
                     <Icon
                       icon="solar:alt-arrow-right-linear"
                       width="13"

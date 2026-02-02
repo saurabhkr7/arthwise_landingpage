@@ -4,9 +4,21 @@ import { Blog } from "@/types/blog";
 import { format } from "date-fns";
 import Link from "next/link";
 
-const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
-  const { title, coverImage, type, excerpt, date, slug } = blog;
-  const imageUrl = coverImage || "/images/blogs/blog_1.png";
+const BlogCard: FC<{ blog: Blog, index?: number }> = ({ blog, index }) => {
+  const { title, coverImage, type, excerpt, date, slug, image } = blog;
+  
+  // Consistent image logic
+  const getImageUrl = () => {
+    const rawUrl = coverImage || image || "";
+    const match = rawUrl.match(/blog_(\d+)\.png/);
+    if (match) {
+      return `/images/blogs/blog_${match[1]}.png`;
+    }
+    const imgIndex = typeof index === 'number' ? (index % 8) + 1 : 1;
+    return `/images/blogs/blog_${imgIndex}.png`;
+  };
+
+  const imageUrl = getImageUrl();
 
   return (
     <Link href={`/blog/${slug}`} aria-label="blog cover" className="group">

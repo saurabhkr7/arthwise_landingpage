@@ -1,9 +1,51 @@
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { footerLinks } from "@/app/api/data";
+import toast from "react-hot-toast";
 
 const Footer = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: ""
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !formData.name) return;
+
+    try {
+      setSubmitting(true);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/waiting-list/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          email: formData.email, 
+          name: formData.name, 
+          comments: "Subscribed via Footer Newsletter" 
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || "Thank you for joining our updates!");
+        setFormData({ name: "", email: "" });
+      } else {
+        toast.error(data.message || "Failed to subscribe.");
+      }
+    } catch (error) {
+      console.error("Footer Subscription Error:", error);
+      toast.error("Connection error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <footer className="pt-8 mt-14 bg-midnight_text relative after:content-[''] after:absolute after:bg-[url('/images/footer/bgline.png')] after:bg-no-repeat after:w-52 after:h-24 after:right-0 after:top-28 xl:after:block after:hidden">
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) px-2">
@@ -33,13 +75,13 @@ const Footer = () => {
             </div>
           </div>
           <div className="flex gap-4 mt-4 lg:mt-0">
-            <Link href="#" className="text-muted hover:text-primary">
+            <Link href="#" className="text-muted hover:text-primary" aria-label="Facebook">
               <Icon icon="fe:facebook" width="32" height="32" />
             </Link>
-            <Link href="#" className="text-muted hover:text-primary">
+            <Link href="#" className="text-muted hover:text-primary" aria-label="Twitter">
               <Icon icon="fa6-brands:square-twitter" width="32" height="32" />
             </Link>
-            <Link href="#" className="text-muted hover:text-primary">
+            <Link href="#" className="text-muted hover:text-primary" aria-label="LinkedIn">
               <Icon icon="fa6-brands:linkedin" width="32" height="32" />
             </Link>
           </div>
@@ -101,19 +143,39 @@ const Footer = () => {
 
           <div className="md:col-span-5 col-span-12">
             <p className="text-18 text-white font-bold">Sign up for updates</p>
-            <form className="mt-8">
+            <form onSubmit={handleSubscribe} className="mt-8 space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="Enter your name"
+                  className="bg-search placeholder:text-foottext text-white! py-3 pl-5 w-full pr-12 rounded-sm"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
               <div className="relative">
                 <input
                   type="email"
                   name="email"
-                  id="email"
+                  required
                   placeholder="Enter your email address"
-                  className="bg-search placeholder:text-foottext text-white! py-3 pl-5"
+                  className="bg-search placeholder:text-foottext text-white! py-3 pl-5 w-full pr-12 rounded-sm"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
-                <Icon
-                  icon="solar:plain-2-linear"
-                  className="text-22 text-foottext absolute right-5 top-4"
-                />
+                <button 
+                  type="submit" 
+                  disabled={submitting}
+                  className="absolute right-5 top-3.5 text-foottext hover:text-primary transition-colors disabled:opacity-50"
+                  aria-label="Submit subscriber form"
+                >
+                  <Icon
+                    icon={submitting ? "line-md:loading-twotone-loop" : "solar:plain-2-linear"}
+                    className="text-22"
+                  />
+                </button>
               </div>
             </form>
             <p className="text-18 text-white font-bold py-12">Get App</p>
@@ -141,7 +203,7 @@ const Footer = () => {
         </div>
         <div className="flex items-center sm:flex-row flex-col justify-between py-10 mt-8">
           <p className="text-16 text-foottext sm:mb-0 mb-4">
-            © Copyright 2025. All rights reserved by Arthwise.
+            © Copyright 2025. All rights reserved by Arthhwise.
           </p>
           <div className="flex gap-4">
             {footerLinks.slice(14, 17).map((item: any, index) => (

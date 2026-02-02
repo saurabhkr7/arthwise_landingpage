@@ -4,8 +4,8 @@ import PrivacyContent from "@/components/Privacy/PrivacyContent";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Arthwise",
-  description: "Learn how Arthwise protects your privacy and handles your personal data. Our commitment to transparency and data security.",
+  title: "Privacy Policy | Arthhwise",
+  description: "Learn how Arthhwise protects your privacy and handles your personal data. Our commitment to transparency and data security.",
 };
 
 const PrivacyPage = () => {

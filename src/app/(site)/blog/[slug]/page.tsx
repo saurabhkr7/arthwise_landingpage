@@ -76,8 +76,26 @@ export default function Post({ params }: Props) {
     );
   }
 
-  const imageUrl = post.image || post.coverImage || '/images/blogs/blog_1.png';
-  const author = post.authorName || (post.author && typeof post.author === 'object' ? post.author.name : 'Arthwise Team');
+  const getImageUrl = () => {
+    const rawUrl = post.image || post.coverImage || "";
+    const match = rawUrl.match(/blog_(\d+)\.png/);
+    if (match) {
+      return `/images/blogs/blog_${match[1]}.png`;
+    }
+    // For single post, we can't easily get index, so we use a hash of the slug
+    if (post.slug) {
+      let hash = 0;
+      for (let i = 0; i < post.slug.length; i++) {
+        hash = post.slug.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const imgIndex = (Math.abs(hash) % 8) + 1;
+      return `/images/blogs/blog_${imgIndex}.png`;
+    }
+    return '/images/blogs/blog_1.png';
+  };
+
+  const imageUrl = getImageUrl();
+  const author = post.authorName || (post.author && typeof post.author === 'object' ? post.author.name : 'Arthhwise Team');
   const authorImage = (post.author && typeof post.author === 'object' && post.author.avatar) || '/images/blogs/silicaman.png';
   const dateStr = post.publishedAt || post.date || new Date().toISOString();
 

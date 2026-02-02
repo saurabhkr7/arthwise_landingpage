@@ -1,6 +1,6 @@
 # Cloudflare Tunnel Deployment for Landing Page
 
-This guide covers deploying the Arthwise landing page to `arthhwise.com` using the existing Cloudflare tunnel.
+This guide covers deploying the Arthhwise landing page to `arthhwise.com` using the existing Cloudflare tunnel.
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ This guide covers deploying the Arthwise landing page to `arthhwise.com` using t
 ## Step 1: Build the Landing Page
 
 ```bash
-cd /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage
+cd /Users/saurabhpatel/Documents/Arthhwise/arthwise_landingpage
 npm run build
 ```
 
@@ -99,11 +99,11 @@ ingress:
 
 ```bash
 # Terminal 1: Start Landing Page
-cd /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage
+cd /Users/saurabhpatel/Documents/Arthhwise/arthwise_landingpage
 npm run build && npm start
 
 # Terminal 2: Start API (if not already running)
-cd /Users/saurabhpatel/Documents/Arthwise/ArthwiseServices/auth_microservice
+cd /Users/saurabhpatel/Documents/Arthhwise/ArthwiseServices/auth_microservice
 node index.js
 
 # Terminal 3: Start Cloudflare Tunnel
@@ -114,11 +114,11 @@ cloudflared tunnel --config ~/.cloudflared/config.yml run arthwise-api
 
 ```bash
 # Start all services
-pm2 start /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/ecosystem.config.js
-pm2 start /Users/saurabhpatel/Documents/Arthwise/ArthwiseServices/auth_microservice/ecosystem.config.js
+pm2 start /Users/saurabhpatel/Documents/Arthhwise/arthwise_landingpage/ecosystem.config.js
+pm2 start /Users/saurabhpatel/Documents/Arthhwise/ArthwiseServices/auth_microservice/ecosystem.config.js
 
 # Start tunnel
-cloudflared tunnel --config /Users/saurabhpatel/Documents/Arthwise/ArthwiseServices/auth_microservice/config.yml run arthwise-api
+cloudflared tunnel --config /Users/saurabhpatel/Documents/Arthhwise/ArthwiseServices/auth_microservice/config.yml run arthwise-api
 
 # Save PM2 process list
 pm2 save
