@@ -162,13 +162,7 @@ const Method = () => {
                 className="bg-white dark:bg-darkmode rounded-2xl overflow-hidden flex flex-col h-full"
               >
                 <div className="flex-1">
-                   <Image
-                    src="/images/method/method2.png"
-                    alt="Financial experts discussing market trends"
-                    width={232}
-                    height={375}
-                    className="w-full h-auto"
-                  />
+                  
                 </div>
                 <div className="flex-1 px-9 flex justify-center flex-col py-9">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">
