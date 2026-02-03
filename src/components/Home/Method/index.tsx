@@ -76,7 +76,7 @@ const Method = () => {
                   </div>
                   <div>
                     <Image
-                      src="/images/method/card.png"
+                      src="/images/method/learning_edu_1.png"
                       alt="NSE Real-time trading card interface showing stock prices"
                       width={459}
                       height={289}
@@ -113,7 +113,7 @@ const Method = () => {
                 </div>
                 <div className="flex-1 w-full h-full">
                   <Image
-                    src="/images/method/method1.jpg"
+                    src="/images/method/method1.png"
                     alt="Trader analyzing candlestick charts on multiple screens"
                     width={232}
                     height={375}
@@ -147,7 +147,7 @@ const Method = () => {
                 </div>
                 <div className="flex-1 w-full h-full">
                   <Image
-                    src="/images/method/method3.jpg"
+                    src="/images/method/method3.png"
                     alt="Financial experts discussing market trends"
                     width={232}
                     height={375}
@@ -162,7 +162,13 @@ const Method = () => {
                 className="bg-white dark:bg-darkmode rounded-2xl overflow-hidden flex flex-col h-full"
               >
                 <div className="flex-1">
-                  
+                   <Image
+                    src="/images/method/method2.png"
+                    alt="Financial experts discussing market trends"
+                    width={232}
+                    height={375}
+                    className="w-full h-auto"
+                  />
                 </div>
                 <div className="flex-1 px-9 flex justify-center flex-col py-9">
                   <h3 className="md:text-25 text-20 font-medium text-midnight_text dark:text-white mb-6">

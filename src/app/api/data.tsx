@@ -24,7 +24,7 @@ export const Heroimage = [
 export const PaymentImage = [
   {
     image: "/images/payment/user.svg",
-    title: "₹10,000 Virtual Capital",
+    title: "₹10,00,000 Virtual Capital",
     details:
       "Start with virtual capital to practice trading without any real financial risk. Perfect for learning market dynamics.",
   },

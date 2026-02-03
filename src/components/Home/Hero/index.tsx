@@ -35,7 +35,7 @@ const Hero = () => {
               - Learn before you earn.
             </h1>
             <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75%">
-              Practice trading with ₹10,000 virtual capital. Real-time market data, advanced charts, and portfolio tracking. Zero risk, maximum learning.
+              Practice trading with ₹10,00,000 virtual capital. Real-time market data, advanced charts, and portfolio tracking. Zero risk, maximum learning.
             </p>
             <div className="flex items-center mt-12 gap-11">
               <div>

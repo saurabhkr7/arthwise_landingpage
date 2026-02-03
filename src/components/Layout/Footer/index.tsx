@@ -9,7 +9,8 @@ import toast from "react-hot-toast";
 const Footer = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: ""
+    email: "",
+    device: "other"
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -27,14 +28,15 @@ const Footer = () => {
         body: JSON.stringify({ 
           email: formData.email, 
           name: formData.name, 
+          device: formData.device,
           comments: "Subscribed via Footer Newsletter" 
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || "Thank you for joining our updates!");
-        setFormData({ name: "", email: "" });
+        toast.success(data.message || "Thank you for joining our updates! Check your email.");
+        setFormData({ name: "", email: "", device: "other" });
       } else {
         toast.error(data.message || "Failed to subscribe.");
       }

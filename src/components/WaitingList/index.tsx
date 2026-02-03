@@ -7,6 +7,7 @@ const WaitingListForm = () => {
     name: "",
     email: "",
     comments: "",
+    device: "android",
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -25,8 +26,8 @@ const WaitingListForm = () => {
 
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || "Thank you for requesting early access! We'll notify you soon.");
-        setFormData({ name: "", email: "", comments: "" });
+        toast.success(data.message || "Thank you for requesting early access! Check your email.");
+        setFormData({ name: "", email: "", comments: "", device: "android" });
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
@@ -112,18 +113,34 @@ const WaitingListForm = () => {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-17 font-medium dark:text-white">
-                    App Store Email*
+                    Official Email*
                   </label>
                   <input
                     type="email"
                     id="email"
                     required
-                    placeholder="Email used on App Store"
+                    placeholder="Enter your email"
                     className="w-full text-17 px-4 py-3 rounded-lg border border-border dark:border-dark_border dark:bg-transparent dark:text-white focus:border-primary focus:outline-none transition-all"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="device" className="text-17 font-medium dark:text-white">
+                  Primary Device*
+                </label>
+                <select
+                  id="device"
+                  required
+                  className="w-full text-17 px-4 py-3 rounded-lg border border-border dark:border-dark_border dark:bg-white dark:text-black focus:border-primary focus:outline-none transition-all"
+                  value={formData.device}
+                  onChange={(e) => setFormData({ ...formData, device: e.target.value })}
+                >
+                  <option value="android">Android Phone</option>
+                  <option value="ios">iPhone / iOS Device</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="comments" className="text-17 font-medium dark:text-white">

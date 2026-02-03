@@ -13,7 +13,7 @@ import Solution from "@/components/Home/Solution";
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthhwise.com"),
   title: "Arthhwise | Smart Paper Trading & NSE Real-time Market Simulation",
-  description: "Master the Indian stock market with Arthhwise. Practice trading with ₹10,000 virtual capital, real-time NSE data, and advanced charting tools. Risk-free learning for beginners and experts.",
+  description: "Master the Indian stock market with Arthhwise. Practice trading with ₹10,00,000 virtual capital, real-time NSE data, and advanced charting tools. Risk-free learning for beginners and experts.",
   keywords: ["paper trading", "NSE", "stock market simulation", "Indian stocks", "learn trading", "virtual trading", "Arthhwise", "fintech India"],
   authors: [{ name: "Arthhwise Team" }],
   openGraph: {
