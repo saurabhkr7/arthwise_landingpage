@@ -25,12 +25,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const response = await getBlogs(1, 100); // Fetch up to 100 blogs for sitemap
     if (response.success && response.data) {
-      blogRoutes = response.data.map((blog) => ({
-        url: `${baseUrl}/blog/${blog.slug}`,
-        lastModified: new Date(blog.updatedAt || blog.publishedAt || new Date()),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6,
-      }));
+      blogRoutes = response.data.map((blog) => {
+        let lastMod = new Date();
+        if (blog.updatedAt || blog.publishedAt) {
+          const date = new Date(blog.updatedAt || blog.publishedAt);
+          if (!isNaN(date.getTime())) {
+            lastMod = date;
+          }
+        }
+        return {
+          url: `${baseUrl}/blog/${blog.slug}`,
+          lastModified: lastMod,
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+        };
+      });
     }
   } catch (error) {
     console.error('Error generating sitemap for blogs:', error);

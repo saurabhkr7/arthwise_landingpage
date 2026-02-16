@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = response.data;
   const title = `${post.title} | Arthhwise Blog`;
   const description = post.excerpt || post.title;
-  const imageUrl = post.image || post.coverImage || "/images/hero/hero-image.png";
+  const imageUrl = post.image || "/images/hero/hero-image.png";
 
   return {
     title,
@@ -76,7 +76,7 @@ export default async function Post({ params }: Props) {
   const post = response.data;
 
   const getImageUrl = () => {
-    const rawUrl = post.image || post.coverImage || "";
+    const rawUrl = post.image || "";
     const match = rawUrl.match(/blog_(\d+)\.png/);
     if (match) {
       return `/images/blogs/blog_${match[1]}.png`;
@@ -94,9 +94,9 @@ export default async function Post({ params }: Props) {
   };
 
   const imageUrl = getImageUrl();
-  const author = post.authorName || (post.author && typeof post.author === 'object' ? post.author.name : 'Arthhwise Team');
-  const authorImage = (post.author && typeof post.author === 'object' && post.author.avatar) || '/images/blogs/silicaman.png';
-  const dateStr = post.publishedAt || post.date || new Date().toISOString();
+  const author = post.author || 'Arthhwise Team';
+  const authorImage = '/images/blogs/silicaman.png';
+  const dateStr = post.publishedAt || post.createdAt || new Date().toISOString();
 
   return (
     <>
