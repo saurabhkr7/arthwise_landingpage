@@ -4,6 +4,10 @@ import HeroSub from "@/components/SharedComponents/HeroSub";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Blog | Arthhwise",
+  description: "Explore the latest insights, strategies, and updates on Indian stock market trading from the Arthhwise team.",
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
 const Page = () => {

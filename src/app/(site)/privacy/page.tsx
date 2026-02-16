@@ -6,6 +6,9 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | Arthhwise",
   description: "Learn how Arthhwise protects your privacy and handles your personal data. Our commitment to transparency and data security.",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 const PrivacyPage = () => {

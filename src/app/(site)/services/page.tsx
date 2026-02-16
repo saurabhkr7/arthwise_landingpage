@@ -5,6 +5,10 @@ import Spend from "@/components/Home/Spend";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Services | Arthhwise",
+  description: "Explore our range of trading education services, from paper trading to real-time market analysis tools.",
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 const Services = () => {

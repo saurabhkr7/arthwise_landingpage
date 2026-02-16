@@ -5,7 +5,10 @@ import FeedbackForm from "@/components/Feedback";
 
 export const metadata: Metadata = {
   title: "Feedback | Arthhwise",
-  description: "Share your thoughts and help us improve Arthhwise. We value your feedback on our Android and iOS apps.",
+  description: "Share your thoughts and help us improve Arthhwise. We value your feedback on our Indian stock market simulation platform.",
+  alternates: {
+    canonical: "/feedback",
+  },
 };
 
 const FeedbackPage = () => {

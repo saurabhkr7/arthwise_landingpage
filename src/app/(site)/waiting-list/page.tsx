@@ -5,7 +5,10 @@ import WaitingListForm from "@/components/WaitingList";
 
 export const metadata: Metadata = {
   title: "Early Access | Arthhwise",
-  description: "Request early access to Arthhwise and be the first to experience the future of paper trading.",
+  description: "Join the waiting list for Arthhwise and be the first to experience our advanced stock market simulation platform.",
+  alternates: {
+    canonical: "/waiting-list",
+  },
 };
 
 const WaitingListPage = () => {

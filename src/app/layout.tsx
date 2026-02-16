@@ -8,8 +8,13 @@ import { AuthDialogProvider } from "./context/AuthDialogContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { Metadata } from "next";
 
 const dmsans = DM_Sans({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://arthhwise.com"),
+};
 
 export default function RootLayout({
   children,

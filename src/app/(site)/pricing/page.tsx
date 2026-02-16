@@ -4,6 +4,10 @@ import React from "react";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing | Arthhwise",
+  description: "Affordable plans for mastering the stock market. Choose from our range of virtual trading accounts designed for every learning stage.",
+  alternates: {
+    canonical: "/pricing",
+  },
 };
 
 const page = () => {
