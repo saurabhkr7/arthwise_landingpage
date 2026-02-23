@@ -182,24 +182,28 @@ const Footer = () => {
             </form>
             <p className="text-18 text-white font-bold py-12">Get App</p>
             <div className="flex">
-              <a href="">
+              <Link
+                href="https://play.google.com/store/apps/details?id=com.arthwise"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Image
                   src="/images/footer/play.png"
-                  alt="Google Play"
-                  width={1000}
-                  height={1000}
+                  alt="Get it on Google Play"
+                  width={150}
+                  height={45}
                   className="w-auto h-auto mr-5"
                 />
-              </a>
-              <a href="">
+              </Link>
+              <Link href="/waiting-list">
                 <Image
                   src="/images/footer/store.png"
-                  alt="App Store"
-                  width={1000}
-                  height={1000}
+                  alt="Download on the App Store"
+                  width={150}
+                  height={45}
                   className="w-auto h-auto"
                 />
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -53,18 +53,31 @@ const Mobile = () => {
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-start">
+            <div className="flex flex-wrap items-center gap-6 mt-12">
               <Link
-                href="#"
-                className="lg:text-17 flex gap-4 items-center bg-primary text-white py-2 px-4 lg:py-3 lg:px-8 rounded-lg mt-12 border border-primary hover:text-primary hover:bg-transparent"
+                href="https://play.google.com/store/apps/details?id=com.arthwise"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lg:text-17 flex gap-4 items-center bg-primary text-white py-2 px-4 lg:py-3 lg:px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
               >
-                Get Started
+                Download on Play Store
                 <Icon
                   icon="solar:alt-arrow-right-linear"
                   width="13"
                   height="13"
                 />
               </Link>
+              <div className="flex items-center gap-3 bg-white dark:bg-darkHeroBg p-2 rounded-xl border border-grey/10 shadow-sm">
+                <Image
+                  src="/images/Arthhwise QR code.svg"
+                  alt="Scan to Download Arthwise"
+                  width={56}
+                  height={56}
+                />
+                <span className="text-14 text-muted dark:text-white dark:text-opacity-70 leading-tight font-medium">
+                  Scan to <br /> Download
+                </span>
+              </div>
             </div>
           </motion.div>
           <motion.div {...rightAnimation} className="lg:col-span-6 col-span-12">

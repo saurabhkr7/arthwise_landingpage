@@ -37,13 +37,15 @@ const Hero = () => {
             <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75%">
               Practice trading with ₹10,00,000 virtual capital. Real-time market data, advanced charts, and portfolio tracking. Zero risk, maximum learning.
             </p>
-            <div className="flex items-center mt-12 gap-11">
+            <div className="flex flex-wrap items-center mt-12 gap-6 sm:gap-11">
               <div>
                 <Link
-                  href="/waiting-list"
+                  href="https://play.google.com/store/apps/details?id=com.arthwise"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-17 flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
                 >
-                  Get Early Access
+                  Download on Play Store
                   <Icon
                     icon="solar:alt-arrow-right-linear"
                     width="13"
@@ -53,16 +55,25 @@ const Hero = () => {
               </div>
               <div>
                 <Link
-                  href="/feedback"
+                  href="/waiting-list"
                   className="text-17 flex gap-2 items-center text-muted dark:text-white dark:text-opacity-70 hover:text-primary"
                 >
-                  Give early feedback
+                  iOS Waitlist (Coming Soon)
                   <Icon
                     icon="solar:alt-arrow-right-linear"
                     width="13"
                     height="13"
                   />
                 </Link>
+              </div>
+              <div className="flex items-center gap-3 bg-white dark:bg-darkHeroBg p-2 rounded-xl shadow-sm border border-grey/10">
+                <Image
+                  src="/images/Arthhwise QR code.svg"
+                  alt="Scan to Download Arthwise on Play Store"
+                  width={256}
+                  height={256}
+                  className="rounded-lg"
+                />
               </div>
             </div>
 

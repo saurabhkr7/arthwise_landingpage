@@ -195,11 +195,15 @@ const Search = () => {
                           <span className="text-midnight_text dark:text-white font-bold">
                             {item.gplayrating}
                           </span>
-                          /5 — Verification by Play Store in Progress
+                          /5 — Available on Google Play
                         </p>
                       </div>
                       <div>
-                        <Link href="/waiting-list">
+                        <Link
+                          href="https://play.google.com/store/apps/details?id=com.arthwise"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <Image
                             src="/images/search/google.png"
                             alt="Get Arthwise Paper Trading App on Google Play"
