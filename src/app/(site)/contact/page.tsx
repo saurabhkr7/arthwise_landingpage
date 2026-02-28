@@ -21,7 +21,7 @@ const page = () => {
     <>
       <HeroSub
         title="Contact Us"
-        description="Letraset sheets containing Lorem Ipsum passages and more recently with desktop publishing Variou"
+        description="Have questions or need support? Get in touch with the Arthhwise team, and we will be happy to assist you with our paper trading platform."
         breadcrumbLinks={breadcrumbLinks}
       />
       <ContactInfo />
