@@ -7,22 +7,42 @@ import Spend from "@/components/Home/Spend";
 import Method from "@/components/Home/Method";
 import Mobile from "@/components/Home/Mobile";
 import Search from "@/components/Home/Search";
-import Pricing from "@/components/Home/Pricing";
 import Transparency from "@/components/Home/Transparency";
 import Solution from "@/components/Home/Solution";
+import StructuredData from "@/components/Home/StructuredData";
+import Features from "@/components/Home/Features";
+import SeoContent from "@/components/Home/SeoContent";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthhwise.com"),
   alternates: {
     canonical: "/",
   },
-  title: "Arthhwise | Smart Paper Trading & NSE Real-time Market Simulation",
-  description: "Master the Indian stock market with Arthhwise. Practice trading with ₹10,00,000 virtual capital, real-time NSE data, and advanced charting tools. Risk-free learning for beginners and experts.",
-  keywords: ["paper trading", "NSE", "stock market simulation", "Indian stocks", "learn trading", "virtual trading", "Arthhwise", "fintech India"],
+  title: "Arthhwise: Trading Game & Paper Trading App India",
+  description:
+    "Practice paper trading with real NSE data on Arthhwise — India's leading virtual trading app & trading simulator. Join our trading community and learn stocks. Free on Android.",
+  keywords: [
+    "trading game",
+    "paper trading",
+    "trading community",
+    "stock market learning app",
+    "virtual trading app",
+    "trading simulator India",
+    "social trading platform",
+    "NSE virtual trading",
+    "learn stock market",
+    "trading game India",
+    "paper trading app",
+    "Indian stocks",
+    "Arthhwise",
+    "fintech India",
+    "stock market simulation",
+  ],
   authors: [{ name: "Arthhwise Team" }],
   openGraph: {
-    title: "Arthhwise | Advanced Paper Trading Platform",
-    description: "Practice trading with real-time NSE market data and premium tools without risking real money.",
+    title: "Arthhwise: Trading Game & Paper Trading App India",
+    description:
+      "Practice paper trading with real NSE data — India's best virtual trading app & trading simulator. Join the trading community. Free on Android.",
     url: "https://arthhwise.com",
     siteName: "Arthhwise",
     images: [
@@ -30,7 +50,7 @@ export const metadata: Metadata = {
         url: "/images/hero/hero-image.png",
         width: 1200,
         height: 630,
-        alt: "Arthhwise Trading Interface",
+        alt: "Arthhwise Paper Trading App — Stock Market Simulator for India",
       },
     ],
     locale: "en_IN",
@@ -38,8 +58,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Arthhwise | Master the Stock Market Risk-Free",
-    description: "Start paper trading with ₹10,00,000 virtual capital and real NSE data today.",
+    title: "Arthhwise: India's #1 Trading Game & Paper Trading App",
+    description:
+      "Start paper trading with ₹10,00,000 virtual capital and real NSE data. India's best trading simulator & stock market learning app.",
     images: ["/images/hero/hero-image.png"],
   },
 };
@@ -47,17 +68,18 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main>
+      <StructuredData />
       <Hero />
       <Payment />
       <Benefit />
       <Spend />
       <Method />
+      <Features />
       <Mobile />
       <Search />
-      {/* <Pricing /> */}
       <Transparency />
       <Solution />
-
+      <SeoContent />
     </main>
   );
 }

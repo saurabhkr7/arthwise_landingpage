@@ -66,7 +66,7 @@ const Payment = () => {
                   <div className="rounded-full">
                     <Image
                       src={item.image}
-                      alt={`Brand: ${item.title}`}
+                      alt={`${item.title} - Arthhwise Paper Trading Platform Feature`}
                       width={80}
                       height={80}
                       className="rounded-full bg-white p-4 shadow-lg dark:bg-midnight_text"

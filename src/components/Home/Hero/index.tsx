@@ -26,16 +26,17 @@ const Hero = () => {
         <div className="grid grid-cols-12 items-center">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
             <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start dark:text-white mb-9 lg:w-full w-3/4">
-              Master the stock market
-              <br />
-              <span className="bg-border dark:bg-darkHeroBg  md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max">
-                with paper trading
+              India&apos;s #1
+              <span className="bg-border dark:bg-darkHeroBg md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max mx-2">
+                Trading Game
               </span>
-              <br />
-              - Learn before you earn.
+              &amp;{" "}
+              <span className="bg-border dark:bg-darkHeroBg md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max">
+                Paper Trading App
+              </span>
             </h1>
             <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75%">
-              Practice trading with ₹10,00,000 virtual capital. Real-time market data, advanced charts, and portfolio tracking. Zero risk, maximum learning.
+              Practice paper trading with ₹10,00,000 virtual capital and live NSE data. Compete in daily trading game contests, climb the leaderboard, and grow with India&apos;s most active trading community — the best stock market learning app, free on Android.
             </p>
             <div className="flex flex-wrap items-center mt-12 gap-6 sm:gap-11">
               <div>
@@ -69,10 +70,11 @@ const Hero = () => {
               <div className="flex items-center gap-3 bg-white dark:bg-darkHeroBg p-2 rounded-xl shadow-sm border border-grey/10">
                 <Image
                   src="/images/Arthhwise QR code.svg"
-                  alt="Scan to Download Arthwise on Play Store"
+                  alt="Scan QR code to download Arthhwise paper trading app on Android"
                   width={256}
                   height={256}
                   className="rounded-lg"
+                  loading="lazy"
                 />
               </div>
             </div>
