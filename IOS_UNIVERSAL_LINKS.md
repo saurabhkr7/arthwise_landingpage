@@ -43,7 +43,7 @@ Replace `TEAM_ID` with your actual Team ID:
         "paths": [
           "/post/*",
           "/contest/*",
-          "/user/*",
+          "/profile/*",
           "/course/*"
         ]
       }

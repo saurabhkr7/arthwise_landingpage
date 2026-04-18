@@ -18,7 +18,7 @@
 ```
 Posts:     https://arthhwise.com/post/123
 Contests:  https://arthhwise.com/contest/456
-Users:     https://arthhwise.com/user/789
+Profiles:  https://arthhwise.com/profile/789
 Courses:   https://arthhwise.com/course/999
 ```
 

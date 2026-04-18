@@ -36,10 +36,10 @@ Attempt Deep Link (arthwise://post/123)
 - **Deep Link:** `arthwise://contest/456`
 
 ### User Profile
-- **Path:** `/user/[id]`
-- **URL:** `https://arthhwise.com/user/789`
+- **Path:** `/profile/[id]`
+- **URL:** `https://arthhwise.com/profile/789`
 - **API:** `GET /api/user/789`
-- **Deep Link:** `arthwise://user/789`
+- **Deep Link:** `arthwise://profile/789`
 
 ### Course
 - **Path:** `/course/[id]`
@@ -124,7 +124,7 @@ console.log(metrics);
 ```
 Share on WhatsApp: https://arthhwise.com/post/123
 Share on Twitter: https://arthhwise.com/contest/456
-Share Profile: https://arthhwise.com/user/789
+Share Profile: https://arthhwise.com/profile/789
 Share Course: https://arthhwise.com/course/999
 ```
 

@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error generating sitemap for blogs:', error);
   }
 
-  // Note: Deep link routes (/post/[id], /contest/[id], /user/[id], /course/[id])
+  // Note: Deep link routes (/post/[id], /contest/[id], /profile/[id], /course/[id])
   // are accessible but not listed in sitemap as separate URLs. They will be
   // discovered via Open Graph tags when shared on social media.
   // To enable dynamic routes in sitemap: connect to actual data API endpoints

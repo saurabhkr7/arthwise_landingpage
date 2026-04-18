@@ -35,7 +35,7 @@ https://arthhwise.com/post/123     # Primary link type
 
 ### 3. **Landing Page (Fallback)**
 ```
-GET /post/123, /contest/456, /user/789, /course/101
+GET /post/123, /contest/456, /profile/789, /course/101
 ```
 - **Renders:** Content preview with OG metadata
 - **Shows:** App download CTAs
@@ -86,7 +86,7 @@ GET /post/123, /contest/456, /user/789, /course/101
 ```json
 {
   "appID": "ABC123DEF4.com.arthwise",
-  "paths": ["/post/*", "/contest/*", "/user/*", "/course/*"]
+  "paths": ["/post/*", "/contest/*", "/profile/*", "/course/*"]
 }
 ```
 - Location: `.well-known/apple-app-site-association`

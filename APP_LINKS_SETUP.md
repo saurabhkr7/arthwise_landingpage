@@ -117,7 +117,7 @@ adb shell am start -W -a android.intent.action.VIEW \
         "paths": [
           "/post/*",
           "/contest/*",
-          "/user/*",
+          "/profile/*",
           "/course/*"
         ]
       }

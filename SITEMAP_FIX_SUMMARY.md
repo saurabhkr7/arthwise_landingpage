@@ -65,7 +65,7 @@ curl https://arthhwise.com/sitemap.xml
 Your deep link landing pages are still fully functional:
 - `/post/[id]` - Generates dynamic page with OG tags
 - `/contest/[id]` - Generates dynamic contest landing
-- `/user/[id]` - Generates dynamic user profile landing
+- `/profile/[id]` - Generates dynamic user profile landing
 - `/course/[id]` - Generates dynamic course landing
 
 These pages are **not in the sitemap** (since we don't have data), but they:

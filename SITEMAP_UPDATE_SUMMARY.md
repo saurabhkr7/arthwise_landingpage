@@ -28,7 +28,7 @@ Now includes:
 ```
 /post/[id]      - Posts (0-50 URLs)
 /contest/[id]   - Contests (0-50 URLs)  
-/user/[id]      - Users (0-50 URLs)
+/profile/[id]   - User Profiles (0-50 URLs)
 /course/[id]    - Courses (0-50 URLs)
 ```
 

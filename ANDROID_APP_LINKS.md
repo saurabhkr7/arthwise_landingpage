@@ -52,7 +52,7 @@ Replace or update your MainActivity in `AndroidManifest.xml`:
       android:host="arthhwise.com"
       android:pathPrefix="/contest" />
     
-    <!-- USER paths: /user/* -->
+    <!-- PROFILE paths: /profile/* -->
     <data
       android:scheme="https"
       android:host="arthhwise.com"

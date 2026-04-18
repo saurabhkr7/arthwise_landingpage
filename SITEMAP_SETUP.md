@@ -33,7 +33,7 @@
 4. **Deep Link Routes** (Conditional - 0-200 URLs)
    - `/post/[id]` - Posts
    - `/contest/[id]` - Contests
-   - `/user/[id]` - Users
+   - `/profile/[id]` - User Profiles
    - `/course/[id]` - Courses
 
 ---
@@ -128,7 +128,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 | Type | Priority | Frequency | Source |
 |------|----------|-----------|--------|
 | /contest/[id] | 0.7 | weekly | `/contests` |
-| /user/[id] | 0.6 | monthly | `/users` |
+| /profile/[id] | 0.6 | monthly | `/api/user/:id` |
 | /course/[id] | 0.7 | monthly | `/courses` |
 
 ---

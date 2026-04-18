@@ -11,7 +11,7 @@ export const APP_CONFIG = {
   FALLBACK_TIMEOUT: 1500, // ms
 };
 
-export type DeepLinkType = "post" | "contest" | "user" | "course";
+export type DeepLinkType = "post" | "contest" | "profile" | "course";
 
 export interface DeepLinkConfig {
   type: DeepLinkType;

@@ -267,7 +267,7 @@ Location: .well-known/apple-app-site-association
 Verification: OS enforces TEAM_ID match
 ├─ Team ID: From Apple Developer account
 ├─ Bundle ID: com.arthwise
-└─ Paths: /post/*, /contest/*, /user/*, /course/*
+└─ Paths: /post/*, /contest/*, /profile/*, /course/*
 
 File must be:
 ✅ Valid JSON
@@ -285,7 +285,7 @@ File must be:
 |-------|---------|--------------|----------|---|
 | Post | `/post/123` | ✅ Yes | ✅ Yes | ✅ Yes |
 | Contest | `/contest/456` | ✅ Yes | ✅ Yes | ✅ Yes |
-| User | `/user/789` | ✅ Yes | ✅ Yes | ✅ Yes |
+| Profile | `/profile/789` | ✅ Yes | ✅ Yes | ✅ Yes |
 | Course | `/course/101` | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ### Content Sources

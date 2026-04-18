@@ -75,26 +75,27 @@ export async function fetchContestContent(id: string): Promise<ContentPreview | 
 /**
  * Fetch user profile
  */
-export async function fetchUserContent(id: string): Promise<ContentPreview | null> {
+export async function fetchProfileContent(id: string): Promise<ContentPreview | null> {
   try {
     const response = await fetch(`${API_BASE}/api/user/${id}`, {
       next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      console.warn(`Failed to fetch user ${id}:`, response.status);
+      console.warn(`Failed to fetch profile ${id}:`, response.status);
       return null;
     }
 
     const data = await response.json();
+    const userInfo = data.user || data;
     return {
-      title: data.name || "Trader",
-      description: data.bio || `${data.name}'s trading profile on Arthhwise`,
-      image: data.avatar,
-      category: "Trader",
+      title: userInfo.displayname || userInfo.username || "Trader Profile",
+      description: userInfo.description || `${userInfo.displayname || userInfo.username}'s trading profile on Arthhwise`,
+      image: userInfo.profilePicture,
+      category: "Trader Profile",
     };
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching profile:", error);
     return null;
   }
 }
@@ -139,8 +140,8 @@ export async function fetchContent(
       return fetchPostContent(id);
     case "contest":
       return fetchContestContent(id);
-    case "user":
-      return fetchUserContent(id);
+    case "profile":
+      return fetchProfileContent(id);
     case "course":
       return fetchCourseContent(id);
     default:
@@ -155,7 +156,7 @@ export function getFallbackContent(type: DeepLinkType, id: string): ContentPrevi
   const typeLabels: Record<DeepLinkType, string> = {
     post: "Post",
     contest: "Trading Contest",
-    user: "Trader Profile",
+    profile: "Trader Profile",
     course: "Trading Course",
   };
 

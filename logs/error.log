@@ -195,3 +195,41 @@
 2026-04-18 12:58:34 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
 2026-04-18 12:58:47 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
 2026-04-18 12:58:47 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 13:21:38 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 13:21:38 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 13:21:38 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 13:21:38 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 13:21:38 +05:30:  Detected additional lockfiles: 
+2026-04-18 13:21:38 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 13:21:38 +05:30: 
+2026-04-18 13:25:34 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 13:25:34 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 13:25:34 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 13:25:34 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 13:25:34 +05:30:  Detected additional lockfiles: 
+2026-04-18 13:25:34 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 13:25:34 +05:30: 
+2026-04-18 13:32:04 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 13:32:04 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 13:32:04 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 13:32:04 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 13:32:04 +05:30:  Detected additional lockfiles: 
+2026-04-18 13:32:04 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 13:32:04 +05:30: 
+2026-04-18 13:34:10 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 13:34:10 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 13:37:07 +05:30: Failed to fetch course 695aaaa4f7f1481f4d1d4d64: 404
+2026-04-18 13:37:07 +05:30: Failed to fetch course 695aaaa4f7f1481f4d1d4d64: 404
+2026-04-18 13:40:21 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 13:40:21 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 13:40:21 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 13:40:21 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 13:40:21 +05:30:  Detected additional lockfiles: 
+2026-04-18 13:40:21 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 13:40:21 +05:30: 
+2026-04-18 13:40:24 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:24 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:28 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:28 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:32 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:32 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
