@@ -133,3 +133,65 @@
 2026-04-14 16:55:06 +05:30:  Detected additional lockfiles: 
 2026-04-14 16:55:06 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
 2026-04-14 16:55:06 +05:30: 
+2026-04-17 21:04:50 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-17 21:04:50 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-17 21:04:50 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-17 21:04:50 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-17 21:04:50 +05:30:  Detected additional lockfiles: 
+2026-04-17 21:04:50 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-17 21:04:50 +05:30: 
+2026-04-18 00:30:27 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 00:30:27 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 00:30:27 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 00:30:27 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 00:30:27 +05:30:  Detected additional lockfiles: 
+2026-04-18 00:30:27 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 00:30:27 +05:30: 
+2026-04-18 00:32:19 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 00:32:19 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 00:32:19 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 00:32:19 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 00:32:19 +05:30:  Detected additional lockfiles: 
+2026-04-18 00:32:19 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 00:32:19 +05:30: 
+2026-04-18 12:28:33 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 12:28:33 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 12:28:33 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 12:28:33 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 12:28:33 +05:30:  Detected additional lockfiles: 
+2026-04-18 12:28:33 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 12:28:33 +05:30: 
+2026-04-18 12:47:53 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 12:47:53 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 12:47:53 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 12:47:53 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 12:47:53 +05:30:  Detected additional lockfiles: 
+2026-04-18 12:47:53 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 12:47:53 +05:30: 
+2026-04-18 12:48:44 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:48:44 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:52:17 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:52:17 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:53:39 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:53:39 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:53:50 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:53:50 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:55:06 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:55:06 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:55:54 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:55:54 +05:30: Failed to fetch post 69de29f98b0db1040174e124: 404
+2026-04-18 12:56:11 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:56:11 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:56:20 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:56:20 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:57:11 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 12:57:11 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 12:57:11 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 12:57:11 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 12:57:11 +05:30:  Detected additional lockfiles: 
+2026-04-18 12:57:11 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 12:57:11 +05:30: 
+2026-04-18 12:58:34 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:58:34 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:58:47 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-18 12:58:47 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
