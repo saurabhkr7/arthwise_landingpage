@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const BlogCard: FC<{ blog: Blog, index?: number }> = ({ blog, index }) => {
   const { title, coverImage, type, excerpt, date, slug, image } = blog;
+  const blogType = type || "Read More";
   
   // Consistent image logic
   const getImageUrl = () => {
@@ -33,7 +34,7 @@ const BlogCard: FC<{ blog: Blog, index?: number }> = ({ blog, index }) => {
         />
       </div>
       <div className="-mb-10">
-        <p className="text-20 text-midnight_text dark:text-white">{type}</p>
+        <p className="text-20 text-midnight_text dark:text-white">{blogType}</p>
         <div className="my-4">
           <p className="text-24 font-medium text-midnight_text dark:text-white group-hover:text-primary">
             {title}

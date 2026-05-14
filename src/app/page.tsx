@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Arthhwise: India's #1 Trading Game & Paper Trading App",
+    title: "Arthhwise: India's Trading Game & Paper Trading App",
     description:
       "Start paper trading with ₹10,00,000 virtual capital and real NSE data. India's best trading simulator & stock market learning app.",
     images: ["/images/hero/hero-image.png"],

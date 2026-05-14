@@ -36,6 +36,9 @@ export function getPostBySlug(slug: string, fields: string[] = []) {
       // You can modify the content here to include images
       items[field] = processImages(content);
     }
+    if (field === "rawContent") {
+      items[field] = content;
+    }
 
     if (field === "metadata") {
       // Include metadata, including the image information
@@ -55,7 +58,21 @@ export function getAllPosts(fields: string[] = []) {
   const posts = slugs
     .map((slug) => getPostBySlug(slug, fields))
     // sort posts by date in descending order
-    .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
+    .sort((post1, post2) => {
+      const d1 = typeof post1?.date === "string" ? new Date(post1.date).getTime() : Number.NaN;
+      const d2 = typeof post2?.date === "string" ? new Date(post2.date).getTime() : Number.NaN;
+
+      const hasD1 = Number.isFinite(d1);
+      const hasD2 = Number.isFinite(d2);
+
+      if (hasD1 && hasD2) return d2 - d1;
+      if (hasD1 && !hasD2) return -1;
+      if (!hasD1 && hasD2) return 1;
+
+      const s1 = typeof post1?.date === "string" ? post1.date : "";
+      const s2 = typeof post2?.date === "string" ? post2.date : "";
+      return s2.localeCompare(s1);
+    });
 
   return posts;
 }

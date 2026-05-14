@@ -26,7 +26,7 @@ const Hero = () => {
         <div className="grid grid-cols-12 items-center">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
             <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start dark:text-white mb-9 lg:w-full w-3/4">
-              India&apos;s #1
+              India&apos;s{" "}
               <span className="bg-border dark:bg-darkHeroBg md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max mx-2">
                 Trading Game
               </span>

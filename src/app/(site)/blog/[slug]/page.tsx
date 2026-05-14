@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import Comments from "@/components/Blog/Comments";
 import ShareButtons from "@/components/Blog/ShareButtons";
 import { Metadata } from "next";
+import { getPostBySlug } from "@/utils/markdown";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -15,16 +16,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const response = await getBlogBySlug(slug);
   
-  if (!response.success || !response.data) {
-    return {
-      title: "Blog Not Found | Arthhwise",
-    };
+  let postTitle: string | undefined;
+  let postDescription: string | undefined;
+  let postImageUrl: string | undefined;
+  let publishedTime: string | undefined;
+
+  if (response.success && response.data) {
+    postTitle = response.data.title;
+    postDescription = response.data.excerpt || response.data.title;
+    postImageUrl = response.data.image || "/images/hero/hero-image.png";
+    publishedTime = response.data.publishedAt || response.data.createdAt;
+  } else {
+    try {
+      const local = getPostBySlug(slug, [
+        "title",
+        "excerpt",
+        "description",
+        "coverImage",
+        "date",
+      ]);
+      postTitle = local.title;
+      postDescription = local.excerpt || local.description || local.title;
+      postImageUrl = local.coverImage || "/images/hero/hero-image.png";
+      publishedTime = local.date;
+    } catch {
+      return {
+        title: "Blog Not Found | Arthhwise",
+      };
+    }
   }
 
-  const post = response.data;
-  const title = `${post.title} | Arthhwise Blog`;
-  const description = post.excerpt || post.title;
-  const imageUrl = post.image || "/images/hero/hero-image.png";
+  const title = `${postTitle} | Arthhwise Blog`;
+  const description = postDescription || postTitle || "Blog post";
+  const imageUrl = postImageUrl || "/images/hero/hero-image.png";
 
   return {
     title,
@@ -37,11 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: `https://arthhwise.com/blog/${slug}`,
       type: "article",
-      publishedTime: post.publishedAt || post.createdAt,
+      publishedTime,
       images: [
         {
           url: imageUrl,
-          alt: post.title,
+          alt: postTitle || "Blog post",
         },
       ],
     },
@@ -58,25 +82,76 @@ export default async function Post({ params }: Props) {
   const { slug } = await params;
   const response = await getBlogBySlug(slug);
 
-  if (!response.success || !response.data) {
-    return (
-      <section className="relative pt-44 z-1 pb-20 dark:bg-dark dark:bg-darkmode">
-        <div className="container lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) mx-auto px-4">
-          <div className="text-center text-red-500">
-            <p>Error loading blog: {response.error || 'Not found'}</p>
-            <Link href="/blog" className="text-primary hover:underline mt-4 inline-block">
-              Back to Blog
-            </Link>
+  let post:
+    | (typeof response.data & { _source?: "api" })
+    | ({
+        title: string;
+        slug: string;
+        content: string;
+        excerpt?: string;
+        author?: string;
+        image?: string;
+        coverImage?: string;
+        keywords?: string[];
+        publishedAt?: string;
+        createdAt?: string;
+        updatedAt?: string;
+        views?: number;
+        likes?: number;
+        tags?: string[];
+        _source: "markdown";
+      });
+
+  if (response.success && response.data) {
+    post = { ...response.data, _source: "api" as const };
+  } else {
+    try {
+      const local = getPostBySlug(slug, [
+        "title",
+        "slug",
+        "rawContent",
+        "excerpt",
+        "description",
+        "coverImage",
+        "keywords",
+        "author",
+        "date",
+      ]);
+
+      post = {
+        title: local.title,
+        slug: local.slug,
+        content: local.rawContent,
+        excerpt: local.excerpt || local.description || "",
+        author: local.author || "Arthhwise Team",
+        coverImage: local.coverImage,
+        keywords: Array.isArray(local.keywords) ? (local.keywords as string[]) : [],
+        tags: Array.isArray(local.keywords) ? (local.keywords as string[]) : [],
+        publishedAt: local.date,
+        createdAt: local.date,
+        updatedAt: local.date,
+        views: 0,
+        likes: 0,
+        _source: "markdown" as const,
+      };
+    } catch {
+      return (
+        <section className="relative pt-44 z-1 pb-20 dark:bg-dark dark:bg-darkmode">
+          <div className="container lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) mx-auto px-4">
+            <div className="text-center text-red-500">
+              <p>Error loading blog: {response.error || "Not found"}</p>
+              <Link href="/blog" className="text-primary hover:underline mt-4 inline-block">
+                Back to Blog
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
-    );
+        </section>
+      );
+    }
   }
 
-  const post = response.data;
-
   const getImageUrl = () => {
-    const rawUrl = post.image || "";
+    const rawUrl = (post as any).image || (post as any).coverImage || "";
     const match = rawUrl.match(/blog_(\d+)\.png/);
     if (match) {
       return `/images/blogs/blog_${match[1]}.png`;
@@ -96,7 +171,7 @@ export default async function Post({ params }: Props) {
   const imageUrl = getImageUrl();
   const author = post.author || 'Arthhwise Team';
   const authorImage = '/images/blogs/silicaman.png';
-  const dateStr = post.publishedAt || post.createdAt || new Date().toISOString();
+  const dateStr = post.publishedAt || post.createdAt || (post as any).date || new Date().toISOString();
 
   return (
     <>
@@ -192,7 +267,7 @@ export default async function Post({ params }: Props) {
                   )}
 
                   {/* Comments Section */}
-                  <Comments blogId={post._id} />
+                  {post._source === "api" && <Comments blogId={(post as any)._id} />}
                 </div>
                 <div className="w-full px-4 lg:w-4/12">
                   <div>

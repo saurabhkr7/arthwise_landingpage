@@ -233,3 +233,272 @@
 2026-04-18 13:40:28 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
 2026-04-18 13:40:32 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
 2026-04-18 13:40:32 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:49 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:49 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:49 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:40:49 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:44:18 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 13:44:18 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 13:44:18 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 13:44:18 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 13:44:18 +05:30:  Detected additional lockfiles: 
+2026-04-18 13:44:18 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 13:44:18 +05:30: 
+2026-04-18 13:47:03 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 13:47:03 +05:30: Failed to fetch profile 692930277488fc4e6f06f904: 404
+2026-04-18 19:22:29 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 19:22:29 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 19:22:29 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 19:22:29 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 19:22:29 +05:30:  Detected additional lockfiles: 
+2026-04-18 19:22:29 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 19:22:29 +05:30: 
+2026-04-18 22:13:25 +05:30:  ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+2026-04-18 22:13:25 +05:30:  We detected multiple lockfiles and selected the directory of /Users/saurabhpatel/Documents/Arthwise/package-lock.json as the root directory.
+2026-04-18 22:13:25 +05:30:  To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+2026-04-18 22:13:25 +05:30:    See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+2026-04-18 22:13:25 +05:30:  Detected additional lockfiles: 
+2026-04-18 22:13:25 +05:30:    * /Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/package-lock.json
+2026-04-18 22:13:25 +05:30: 
+2026-04-19 15:57:10 +05:30: [next-auth][error][SIGNIN_OAUTH_ERROR] 
+2026-04-19 15:57:10 +05:30: https://next-auth.js.org/errors#signin_oauth_error client_id is required {
+2026-04-19 15:57:10 +05:30:   error: {
+2026-04-19 15:57:10 +05:30:     message: 'client_id is required',
+2026-04-19 15:57:10 +05:30:     stack: 'TypeError: client_id is required\n' +
+2026-04-19 15:57:10 +05:30:       '    at new Z (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:125705)\n' +
+2026-04-19 15:57:10 +05:30:       '    at new <anonymous> (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:22221)\n' +
+2026-04-19 15:57:10 +05:30:       '    at e (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:20:69947)\n' +
+2026-04-19 15:57:10 +05:30:       '    at h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:81846)\n' +
+2026-04-19 15:57:10 +05:30:       '    at Object.h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:40578)\n' +
+2026-04-19 15:57:10 +05:30:       '    at q (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:43255)\n' +
+2026-04-19 15:57:10 +05:30:       '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async g (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:1973)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async a.length.b (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:3414)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async rN.do (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21042)',
+2026-04-19 15:57:10 +05:30:     name: 'TypeError'
+2026-04-19 15:57:10 +05:30:   },
+2026-04-19 15:57:10 +05:30:   providerId: 'github',
+2026-04-19 15:57:10 +05:30:   message: 'client_id is required'
+2026-04-19 15:57:10 +05:30: }
+2026-04-19 15:57:10 +05:30: [next-auth][error][SIGNIN_OAUTH_ERROR] 
+2026-04-19 15:57:10 +05:30: https://next-auth.js.org/errors#signin_oauth_error client_id is required {
+2026-04-19 15:57:10 +05:30:   error: {
+2026-04-19 15:57:10 +05:30:     message: 'client_id is required',
+2026-04-19 15:57:10 +05:30:     stack: 'TypeError: client_id is required\n' +
+2026-04-19 15:57:10 +05:30:       '    at new Z (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:125705)\n' +
+2026-04-19 15:57:10 +05:30:       '    at new <anonymous> (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:22221)\n' +
+2026-04-19 15:57:10 +05:30:       '    at e (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:20:69947)\n' +
+2026-04-19 15:57:10 +05:30:       '    at h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:81846)\n' +
+2026-04-19 15:57:10 +05:30:       '    at Object.h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:40578)\n' +
+2026-04-19 15:57:10 +05:30:       '    at q (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:43255)\n' +
+2026-04-19 15:57:10 +05:30:       '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async g (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:1973)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async a.length.b (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:3414)\n' +
+2026-04-19 15:57:10 +05:30:       '    at async rN.do (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21042)',
+2026-04-19 15:57:10 +05:30:     name: 'TypeError'
+2026-04-19 15:57:10 +05:30:   },
+2026-04-19 15:57:10 +05:30:   providerId: 'github',
+2026-04-19 15:57:10 +05:30:   message: 'client_id is required'
+2026-04-19 15:57:10 +05:30: }
+2026-04-19 15:57:18 +05:30: [next-auth][error][SIGNIN_OAUTH_ERROR] 
+2026-04-19 15:57:18 +05:30: https://next-auth.js.org/errors#signin_oauth_error client_id is required {
+2026-04-19 15:57:18 +05:30:   error: {
+2026-04-19 15:57:18 +05:30:     message: 'client_id is required',
+2026-04-19 15:57:18 +05:30:     stack: 'TypeError: client_id is required\n' +
+2026-04-19 15:57:18 +05:30:       '    at new Z (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:125705)\n' +
+2026-04-19 15:57:18 +05:30:       '    at new <anonymous> (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:22221)\n' +
+2026-04-19 15:57:18 +05:30:       '    at e (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:20:69947)\n' +
+2026-04-19 15:57:18 +05:30:       '    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:81822)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async Object.h (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:40559)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async q (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:10:43247)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async g (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:1973)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async a.length.b (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/.next/server/app/api/auth/[...nextauth]/route.js:1:3414)\n' +
+2026-04-19 15:57:18 +05:30:       '    at async rN.do (/Users/saurabhpatel/Documents/Arthwise/arthwise_landingpage/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21042)',
+2026-04-19 15:57:18 +05:30:     name: 'TypeError'
+2026-04-19 15:57:18 +05:30:   },
+2026-04-19 15:57:18 +05:30:   providerId: 'google',
+2026-04-19 15:57:18 +05:30:   message: 'client_id is required'
+2026-04-19 15:57:18 +05:30: }
+2026-04-19 21:11:02 +05:30: [Error: Failed to find Server Action "5a2555e60074a6f6052e5c0ea6cd383635052a0e". This request might be from an older or newer deployment.
+2026-04-19 21:11:02 +05:30: Read more: https://nextjs.org/docs/messages/failed-to-find-server-action]
+2026-04-19 22:34:54 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:54 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:54 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:54 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:55 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:56 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:56 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:56 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:56 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:57 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:34:57 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:35:12 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 22:35:12 +05:30: Failed to fetch contest 69e1d834b171dcaf9b46998a: 404
+2026-04-19 23:05:50 +05:30: [Error: Failed to find Server Action "61225e2a03d4382f51be75f1fa72b9d89fb1db07". This request might be from an older or newer deployment.
+2026-04-19 23:05:50 +05:30: Read more: https://nextjs.org/docs/messages/failed-to-find-server-action]
+2026-04-28 10:38:03 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:03 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:03 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:03 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:03 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:03 +05:30:   errno: -48,
+2026-04-28 10:38:03 +05:30:   syscall: 'listen',
+2026-04-28 10:38:03 +05:30:   address: '::',
+2026-04-28 10:38:03 +05:30:   port: 3000
+2026-04-28 10:38:03 +05:30: }
+2026-04-28 10:38:03 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:03 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:03 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:03 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:03 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:03 +05:30:   errno: -48,
+2026-04-28 10:38:03 +05:30:   syscall: 'listen',
+2026-04-28 10:38:03 +05:30:   address: '::',
+2026-04-28 10:38:03 +05:30:   port: 3000
+2026-04-28 10:38:03 +05:30: }
+2026-04-28 10:38:03 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:03 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:03 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:03 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:03 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:03 +05:30:   errno: -48,
+2026-04-28 10:38:03 +05:30:   syscall: 'listen',
+2026-04-28 10:38:03 +05:30:   address: '::',
+2026-04-28 10:38:03 +05:30:   port: 3000
+2026-04-28 10:38:03 +05:30: }
+2026-04-28 10:38:04 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:04 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:04 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:04 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:04 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:04 +05:30:   errno: -48,
+2026-04-28 10:38:04 +05:30:   syscall: 'listen',
+2026-04-28 10:38:04 +05:30:   address: '::',
+2026-04-28 10:38:04 +05:30:   port: 3000
+2026-04-28 10:38:04 +05:30: }
+2026-04-28 10:38:04 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:04 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:04 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:04 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:04 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:04 +05:30:   errno: -48,
+2026-04-28 10:38:04 +05:30:   syscall: 'listen',
+2026-04-28 10:38:04 +05:30:   address: '::',
+2026-04-28 10:38:04 +05:30:   port: 3000
+2026-04-28 10:38:04 +05:30: }
+2026-04-28 10:38:04 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:04 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:04 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:04 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:04 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:04 +05:30:   errno: -48,
+2026-04-28 10:38:04 +05:30:   syscall: 'listen',
+2026-04-28 10:38:04 +05:30:   address: '::',
+2026-04-28 10:38:04 +05:30:   port: 3000
+2026-04-28 10:38:04 +05:30: }
+2026-04-28 10:38:04 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:04 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:04 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:04 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:04 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:04 +05:30:   errno: -48,
+2026-04-28 10:38:04 +05:30:   syscall: 'listen',
+2026-04-28 10:38:04 +05:30:   address: '::',
+2026-04-28 10:38:04 +05:30:   port: 3000
+2026-04-28 10:38:04 +05:30: }
+2026-04-28 10:38:05 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:05 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:05 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:05 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:05 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:05 +05:30:   errno: -48,
+2026-04-28 10:38:05 +05:30:   syscall: 'listen',
+2026-04-28 10:38:05 +05:30:   address: '::',
+2026-04-28 10:38:05 +05:30:   port: 3000
+2026-04-28 10:38:05 +05:30: }
+2026-04-28 10:38:05 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:05 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:05 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:05 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:05 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:05 +05:30:   errno: -48,
+2026-04-28 10:38:05 +05:30:   syscall: 'listen',
+2026-04-28 10:38:05 +05:30:   address: '::',
+2026-04-28 10:38:05 +05:30:   port: 3000
+2026-04-28 10:38:05 +05:30: }
+2026-04-28 10:38:05 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:05 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:05 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:05 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:05 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:05 +05:30:   errno: -48,
+2026-04-28 10:38:05 +05:30:   syscall: 'listen',
+2026-04-28 10:38:05 +05:30:   address: '::',
+2026-04-28 10:38:05 +05:30:   port: 3000
+2026-04-28 10:38:05 +05:30: }
+2026-04-28 10:38:05 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:05 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:05 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:05 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:05 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:05 +05:30:   errno: -48,
+2026-04-28 10:38:05 +05:30:   syscall: 'listen',
+2026-04-28 10:38:05 +05:30:   address: '::',
+2026-04-28 10:38:05 +05:30:   port: 3000
+2026-04-28 10:38:05 +05:30: }
+2026-04-28 10:38:06 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:06 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:06 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:06 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:06 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:06 +05:30:   errno: -48,
+2026-04-28 10:38:06 +05:30:   syscall: 'listen',
+2026-04-28 10:38:06 +05:30:   address: '::',
+2026-04-28 10:38:06 +05:30:   port: 3000
+2026-04-28 10:38:06 +05:30: }
+2026-04-28 10:38:06 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:06 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:06 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:06 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:06 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:06 +05:30:   errno: -48,
+2026-04-28 10:38:06 +05:30:   syscall: 'listen',
+2026-04-28 10:38:06 +05:30:   address: '::',
+2026-04-28 10:38:06 +05:30:   port: 3000
+2026-04-28 10:38:06 +05:30: }
+2026-04-28 10:38:06 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:06 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:06 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:06 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:06 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:06 +05:30:   errno: -48,
+2026-04-28 10:38:06 +05:30:   syscall: 'listen',
+2026-04-28 10:38:06 +05:30:   address: '::',
+2026-04-28 10:38:06 +05:30:   port: 3000
+2026-04-28 10:38:06 +05:30: }
+2026-04-28 10:38:06 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:06 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:06 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:06 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:06 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:06 +05:30:   errno: -48,
+2026-04-28 10:38:06 +05:30:   syscall: 'listen',
+2026-04-28 10:38:06 +05:30:   address: '::',
+2026-04-28 10:38:06 +05:30:   port: 3000
+2026-04-28 10:38:06 +05:30: }
+2026-04-28 10:38:07 +05:30:  ⨯ Failed to start server
+2026-04-28 10:38:07 +05:30: Error: listen EADDRINUSE: address already in use :::3000
+2026-04-28 10:38:07 +05:30:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2026-04-28 10:38:07 +05:30:     at new Promise (<anonymous>) {
+2026-04-28 10:38:07 +05:30:   code: 'EADDRINUSE',
+2026-04-28 10:38:07 +05:30:   errno: -48,
+2026-04-28 10:38:07 +05:30:   syscall: 'listen',
+2026-04-28 10:38:07 +05:30:   address: '::',
+2026-04-28 10:38:07 +05:30:   port: 3000
+2026-04-28 10:38:07 +05:30: }
