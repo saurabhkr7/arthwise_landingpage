@@ -129,6 +129,17 @@ export async function fetchCourseContent(id: string): Promise<ContentPreview | n
 }
 
 /**
+ * Fetch daily quiz preview content
+ */
+export async function fetchDailyQuizContent(id: string): Promise<ContentPreview | null> {
+  return {
+    title: "Daily Stock Challenge! 🧠",
+    description: "Take today's Daily Quiz Challenge on Arthwise! Test your market strategy, claim your global rank, and earn real-time points & credits! 🚀",
+    category: "Daily Quiz",
+  };
+}
+
+/**
  * Fetch content by type
  */
 export async function fetchContent(
@@ -144,6 +155,8 @@ export async function fetchContent(
       return fetchProfileContent(id);
     case "course":
       return fetchCourseContent(id);
+    case "daily_quiz":
+      return fetchDailyQuizContent(id);
     default:
       return null;
   }
@@ -158,6 +171,7 @@ export function getFallbackContent(type: DeepLinkType, id: string): ContentPrevi
     contest: "Trading Contest",
     profile: "Trader Profile",
     course: "Trading Course",
+    daily_quiz: "Daily Quiz",
   };
 
   return {

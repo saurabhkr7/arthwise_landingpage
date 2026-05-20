@@ -80,7 +80,7 @@ const DeepLinkHandler: React.FC<DeepLinkHandlerProps> = ({
             Arthhwise
           </h1>
           <p className="text-muted dark:text-white/60">
-            Open in app to see this {type}
+            Open in app to see this {type === "daily_quiz" ? "daily quiz" : type}
           </p>
         </div>
 

@@ -5,7 +5,7 @@
 
 export interface DeepLinkAnalytics {
   action: "click" | "opened" | "fallback" | "install" | "browser_continue";
-  type: "post" | "contest" | "profile" | "course";
+  type: "post" | "contest" | "profile" | "course" | "daily_quiz";
   id: string;
   timestamp: string;
   device: "mobile" | "desktop" | "tablet";
