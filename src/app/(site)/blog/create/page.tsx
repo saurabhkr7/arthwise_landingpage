@@ -1,14 +1,32 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import HeroSub from "@/components/SharedComponents/HeroSub";
 
+const TITLE_MAX_CHARS = 120;
+const CONTENT_MAX_WORDS = 2500;
+const IMAGE_URL_MAX_CHARS = 2048;
+
+function countWords(text: string) {
+  return text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
+function slugify(title: string) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
 const CreateBlogPage = () => {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,45 +36,54 @@ const CreateBlogPage = () => {
     image: "",
   });
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      toast.error("Please sign in to create a blog");
-      router.push("/");
-    }
-  }, [status, router]);
+  const wordCount = useMemo(() => countWords(formData.content), [formData.content]);
+  const slugPreview = useMemo(() => slugify(formData.title), [formData.title]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.accessToken) {
-      toast.error("Session expired. Please sign in again.");
-      return;
-    }
+
+    const title = formData.title.trim();
+    const content = formData.content.trim();
+    const image = formData.image.trim();
+
+    if (!title) return toast.error("Title is required");
+    if (title.length > TITLE_MAX_CHARS) return toast.error(`Title must be ≤ ${TITLE_MAX_CHARS} characters`);
+    if (!content) return toast.error("Content is required");
+    if (wordCount > CONTENT_MAX_WORDS) return toast.error(`Content must be ≤ ${CONTENT_MAX_WORDS} words`);
+    if (image.length > IMAGE_URL_MAX_CHARS) return toast.error(`Image URL must be ≤ ${IMAGE_URL_MAX_CHARS} characters`);
 
     setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/blog`,
-        formData,
         {
-          headers: {
-            Authorization: `Bearer ${session.accessToken}`,
-          },
+          ...formData,
+          title,
+          content,
+          image,
+          slug: slugPreview || undefined,
+        },
+        {
+          headers: { Accept: "application/json" },
         }
       );
 
       if (response.data.success) {
         toast.success("Blog created successfully!");
-        router.push("/blog");
+        router.push(response.data?.data?.slug ? `/blog/${response.data.data.slug}` : "/blog");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to create blog");
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.response?.status === 401 || error.response?.status === 403
+          ? "Backend rejected the request (auth required). Enable public blog create on the API."
+          : "Failed to create blog");
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
-
-  if (status === "loading") return <div className="pt-44 text-center">Loading...</div>;
-  if (!session) return null;
 
   return (
     <>
@@ -78,10 +105,15 @@ const CreateBlogPage = () => {
               <input
                 type="text"
                 required
+                maxLength={TITLE_MAX_CHARS}
                 className="w-full px-4 py-3 rounded-lg border border-border dark:border-dark_border dark:bg-transparent dark:text-white focus:border-primary outline-none"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
+              <div className="mt-1 text-sm text-gray-500 dark:text-gray-400 flex justify-between">
+                <span>URL preview: /blog/{slugPreview || "your-title"}</span>
+                <span>{formData.title.length}/{TITLE_MAX_CHARS}</span>
+              </div>
             </div>
 
             <div>
@@ -104,6 +136,7 @@ const CreateBlogPage = () => {
               <input
                 type="text"
                 placeholder="https://example.com/image.jpg"
+                maxLength={IMAGE_URL_MAX_CHARS}
                 className="w-full px-4 py-3 rounded-lg border border-border dark:border-dark_border dark:bg-transparent dark:text-white focus:border-primary outline-none"
                 value={formData.image}
                 onChange={(e) => setFormData({ ...formData, image: e.target.value })}
@@ -119,6 +152,9 @@ const CreateBlogPage = () => {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               ></textarea>
+              <div className="mt-1 text-sm text-gray-500 dark:text-gray-400 flex justify-end">
+                <span>{wordCount}/{CONTENT_MAX_WORDS} words</span>
+              </div>
             </div>
 
             <button

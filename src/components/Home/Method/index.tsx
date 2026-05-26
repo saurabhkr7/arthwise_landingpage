@@ -101,6 +101,7 @@ const Method = () => {
                   </p>
                   <Link
                     href="/waiting-list"
+                    prefetch={false}
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
                     Join Learning Center
@@ -174,6 +175,7 @@ const Method = () => {
                   </p>
                   <Link
                     href="/waiting-list"
+                    prefetch={false}
                     className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
                   >
                     Start Paper Trading

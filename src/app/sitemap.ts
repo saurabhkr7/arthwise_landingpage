@@ -1,55 +1,82 @@
-import { MetadataRoute } from 'next';
-import { getBlogs } from '@/lib/api/blogs';
+import type { MetadataRoute } from "next";
+import { getAllPosts } from "@/utils/markdown";
+
+const SITE_URL = "https://arthhwise.com";
+
+function toValidDate(value: unknown): Date | null {
+  if (typeof value !== "string") return null;
+  const t = Date.parse(value);
+  if (!Number.isFinite(t)) return null;
+  return new Date(t);
+}
+
+async function fetchApiBlogSlugs(): Promise<Array<{ slug: string; lastModified?: Date }>> {
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_BASE_URL ||
+    "http://localhost:8000/api";
+
+  try {
+    const res = await fetch(`${apiBase}/blog?page=1&limit=1000`, {
+      next: { revalidate: 3600 },
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return [];
+
+    const json = (await res.json()) as any;
+    const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+
+    return rows
+      .map((b) => ({
+        slug: typeof b?.slug === "string" ? b.slug : "",
+        lastModified: toValidDate(b?.updatedAt) || toValidDate(b?.publishedAt) || toValidDate(b?.createdAt) || undefined,
+      }))
+      .filter((b) => b.slug.length > 0);
+  } catch {
+    return [];
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://arthhwise.com';
+  const staticPaths = [
+    "/",
+    "/about",
+    "/blog",
+    "/careers",
+    "/contact",
+    "/contests",
+    "/delete-account",
+    "/documentation",
+    "/feedback",
+    "/leaderboard",
+    "/pricing",
+    "/privacy",
+    "/services",
+    "/terms",
+    "/waiting-list",
+  ];
 
-  // Base routes
-  const routes = [
-    { path: '', priority: 1, frequency: 'weekly' as const },
-    { path: '/blog', priority: 0.8, frequency: 'weekly' as const },
-    { path: '/contact', priority: 0.7, frequency: 'monthly' as const },
-    { path: '/pricing', priority: 0.8, frequency: 'weekly' as const },
-    { path: '/waiting-list', priority: 0.6, frequency: 'monthly' as const },
-    { path: '/feedback', priority: 0.6, frequency: 'monthly' as const },
-    { path: '/privacy', priority: 0.5, frequency: 'yearly' as const },
-    { path: '/delete-account', priority: 0.5, frequency: 'yearly' as const },
-  ].map((route) => ({
-    url: `${baseUrl}${route.path}`,
+  const staticEntries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
+    url: `${SITE_URL}${path}`,
     lastModified: new Date(),
-    changeFrequency: route.frequency,
-    priority: route.priority,
   }));
 
-  // Fetch all blogs to include in sitemap
-  let blogRoutes: any[] = [];
-  try {
-    const response = await getBlogs(1, 100); // Fetch up to 100 blogs
-    if (response.success && response.data) {
-      blogRoutes = response.data.map((blog: any) => {
-        let lastMod = new Date();
-        if (blog.updatedAt || blog.publishedAt) {
-          const date = new Date(blog.updatedAt || blog.publishedAt);
-          if (!isNaN(date.getTime())) {
-            lastMod = date;
-          }
-        }
-        return {
-          url: `${baseUrl}/blog/${blog.slug}`,
-          lastModified: lastMod,
-          changeFrequency: 'monthly' as const,
-          priority: 0.6,
-        };
-      });
-    }
-  } catch (error) {
-    console.error('Error generating sitemap for blogs:', error);
-  }
+  const markdownPosts = getAllPosts(["slug", "date"]) as Array<{ slug?: string; date?: string }>;
+  const markdownEntries: MetadataRoute.Sitemap = markdownPosts
+    .filter((p) => typeof p.slug === "string" && p.slug.length > 0)
+    .map((p) => ({
+      url: `${SITE_URL}/blog/${p.slug}`,
+      lastModified: toValidDate(p.date) || new Date(),
+    }));
 
-  // Note: Deep link routes (/post/[id], /contest/[id], /profile/[id], /course/[id])
-  // are accessible but not listed in sitemap as separate URLs. They will be
-  // discovered via Open Graph tags when shared on social media.
-  // To enable dynamic routes in sitemap: connect to actual data API endpoints
+  const apiPosts = await fetchApiBlogSlugs();
+  const apiEntries: MetadataRoute.Sitemap = apiPosts.map((p) => ({
+    url: `${SITE_URL}/blog/${p.slug}`,
+    lastModified: p.lastModified || new Date(),
+  }));
 
-  return [...routes, ...blogRoutes];
+  const byUrl = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const e of [...staticEntries, ...markdownEntries, ...apiEntries]) byUrl.set(e.url, e);
+
+  return Array.from(byUrl.values());
 }

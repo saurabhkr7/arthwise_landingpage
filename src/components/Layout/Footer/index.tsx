@@ -98,6 +98,7 @@ const Footer = () => {
                 <li key={index} className="pb-3">
                   <Link
                     href={item.href || "#"}
+                    prefetch={false}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -116,6 +117,7 @@ const Footer = () => {
                 <li key={index} className="pb-3">
                   <Link
                     href={item.href || "#"}
+                    prefetch={false}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -134,6 +136,7 @@ const Footer = () => {
                 <li key={index} className="pb-3">
                   <Link
                     href={item.href || "#"}
+                    prefetch={false}
                     className="text-foottext text-16 hover:text-primary"
                   >
                     {item.link}
@@ -195,7 +198,7 @@ const Footer = () => {
                   className="w-auto h-auto mr-5"
                 />
               </Link>
-              <Link href="/waiting-list">
+              <Link href="/waiting-list" prefetch={false}>
                 <Image
                   src="/images/footer/store.png"
                   alt="Download on the App Store"
@@ -216,6 +219,7 @@ const Footer = () => {
               <div key={index} className="">
                 <Link
                   href={item.href || "#"}
+                  prefetch={false}
                   className="text-foottext hover:text-primary"
                 >
                   {item.link}

@@ -98,6 +98,7 @@ const Search = () => {
                 <div className="flex lg:items-center lg:justify-start justify-center mr-4">
                   <Link
                     href="/waiting-list"
+                    prefetch={false}
                     className="text-17 flex items-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-48 my-2 border border-primary hover:text-primary hover:bg-transparent"
                   >
                     Get Early Access
@@ -176,7 +177,7 @@ const Search = () => {
                         </p>
                       </div>
                       <div>
-                        <Link href="/waiting-list">
+                        <Link href="/waiting-list" prefetch={false}>
                           <Image
                             src="/images/search/app.png"
                             alt="Download Arthwise on Apple App Store"

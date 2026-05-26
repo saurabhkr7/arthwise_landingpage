@@ -1,12 +1,12 @@
 import { getBlogBySlug } from "@/lib/api/blogs";
 import { format } from "date-fns";
 import Image from "next/image";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import Comments from "@/components/Blog/Comments";
 import ShareButtons from "@/components/Blog/ShareButtons";
 import { Metadata } from "next";
 import { getPostBySlug } from "@/utils/markdown";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -42,6 +42,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     } catch {
       return {
         title: "Blog Not Found | Arthhwise",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
   }
@@ -135,18 +139,7 @@ export default async function Post({ params }: Props) {
         _source: "markdown" as const,
       };
     } catch {
-      return (
-        <section className="relative pt-44 z-1 pb-20 dark:bg-dark dark:bg-darkmode">
-          <div className="container lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) mx-auto px-4">
-            <div className="text-center text-red-500">
-              <p>Error loading blog: {response.error || "Not found"}</p>
-              <Link href="/blog" className="text-primary hover:underline mt-4 inline-block">
-                Back to Blog
-              </Link>
-            </div>
-          </div>
-        </section>
-      );
+      notFound();
     }
   }
 

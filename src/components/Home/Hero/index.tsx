@@ -57,6 +57,7 @@ const Hero = () => {
               <div>
                 <Link
                   href="/waiting-list"
+                  prefetch={false}
                   className="text-17 flex gap-2 items-center text-muted dark:text-white dark:text-opacity-70 hover:text-primary"
                 >
                   iOS Waitlist (Coming Soon)
