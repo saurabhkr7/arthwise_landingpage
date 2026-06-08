@@ -8,16 +8,6 @@ const nextConfig = {
   trailingSlash: false,
   // Fixes "inferred workspace root" warning when multiple lockfiles exist.
   outputFileTracingRoot: __dirname,
-  async redirects() {
-    return [
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.arthhwise.com" }],
-        destination: "https://arthhwise.com/:path*",
-        permanent: true,
-      },
-    ];
-  },
   async headers() {
     // Prevent CDN/browser caching of HTML/RSC responses that can reference old chunk hashes
     // (common cause of ChunkLoadError after deploys behind a proxy/CDN).
