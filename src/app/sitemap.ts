@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/utils/markdown";
+import { glossaryTerms } from "@/lib/glossaryData";
 
 const SITE_URL = "https://arthhwise.com";
 
@@ -79,6 +80,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/", changeFrequency: "weekly", priority: 1.0 },
     { path: "/about", changeFrequency: "monthly", priority: 0.8 },
     { path: "/blog", changeFrequency: "daily", priority: 0.9 },
+    { path: "/learn", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/glossary", changeFrequency: "weekly", priority: 0.9 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.5 },
     { path: "/contests", changeFrequency: "daily", priority: 0.8 },
     { path: "/services", changeFrequency: "monthly", priority: 0.7 },
@@ -119,6 +122,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Glossary terms pages
+  const glossaryEntries: MetadataRoute.Sitemap = glossaryTerms.map((t) => ({
+    url: `${SITE_URL}/glossary/${t.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   // Dynamic content pages — contests, courses, posts, profiles
   const [contests, courses, posts] = await Promise.all([
     fetchDynamicIds("contest"),
@@ -153,6 +164,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticEntries,
     ...markdownEntries,
     ...apiEntries,
+    ...glossaryEntries,
     ...contestEntries,
     ...courseEntries,
     ...postEntries,
