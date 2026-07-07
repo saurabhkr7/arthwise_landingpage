@@ -12,6 +12,8 @@
   "dependencies": {
     "@iconify/icons-ion": "^1.2.10",
     "@iconify/react": "^5.0.1",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "axios": "^1.7.2",
     "date-fns": "^3.4.0",
     "gray-matter": "^4.0.3",

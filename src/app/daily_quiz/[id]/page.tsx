@@ -1,7 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
-import DeepLinkHandler from "@/components/DeepLink/DeepLinkHandler";
-import { fetchContent, getFallbackContent } from "@/lib/apiContent";
-import { generateDeepLink } from "@/lib/deeplink";
+import ContentPageLayout from "@/components/ContentPage/ContentPageLayout";
+import { fetchContent, getFallbackContent, fetchFullContent, getFullFallbackContent } from "@/lib/apiContent";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -16,7 +15,6 @@ export async function generateMetadata(
   const fallback = getFallbackContent("daily_quiz", id);
   const displayContent = content || fallback;
 
-  const deepLink = generateDeepLink("daily_quiz", id);
   const canonicalUrl = `https://arthhwise.com/daily_quiz/${id}`;
 
   return {
@@ -53,19 +51,18 @@ export async function generateMetadata(
 export default async function DailyQuizPage({ params }: Props) {
   const { id } = await params;
   
-  let content = await fetchContent("daily_quiz", id);
+  let content = await fetchFullContent("daily_quiz", id);
   
-  // Use fallback if API fails
   if (!content) {
-    content = getFallbackContent("daily_quiz", id);
+    content = getFullFallbackContent("daily_quiz", id);
   }
 
   return (
-    <DeepLinkHandler
+    <ContentPageLayout
       type="daily_quiz"
       id={id}
       content={content}
-      isLoading={false}
     />
   );
 }
+

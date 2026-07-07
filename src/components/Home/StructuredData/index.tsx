@@ -7,7 +7,7 @@ const structuredData = {
     alternateName: ["Arthwise", "Arthhwise App"],
     applicationCategory: "FinanceApplication",
     applicationSubCategory: "Trading Simulator",
-    operatingSystem: "Android",
+    operatingSystem: "Android, iOS",
     url: "https://arthhwise.com",
     downloadUrl:
         "https://play.google.com/store/apps/details?id=com.arthwise",
@@ -30,13 +30,9 @@ const structuredData = {
         availability: "https://schema.org/InStock",
         description: "Free to download and use",
     },
-    aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.5",
-        ratingCount: "500",
-        bestRating: "5",
-        worstRating: "1",
-    },
+    // NOTE: aggregateRating removed — only add when you have real,
+    // verifiable ratings from Google Play Store / App Store.
+    // Using fake numbers can trigger a Google manual action penalty.
     author: {
         "@type": "Organization",
         name: "Arthhwise",
@@ -56,3 +52,4 @@ const StructuredData = () => {
 };
 
 export default StructuredData;
+

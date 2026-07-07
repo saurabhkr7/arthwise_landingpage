@@ -1,7 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
-import DeepLinkHandler from "@/components/DeepLink/DeepLinkHandler";
-import { fetchContent, getFallbackContent } from "@/lib/apiContent";
-import { generateDeepLink } from "@/lib/deeplink";
+import ContentPageLayout from "@/components/ContentPage/ContentPageLayout";
+import { fetchContent, getFallbackContent, fetchFullContent, getFullFallbackContent } from "@/lib/apiContent";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -16,7 +15,6 @@ export async function generateMetadata(
   const fallback = getFallbackContent("post", id);
   const displayContent = content || fallback;
 
-  const deepLink = generateDeepLink("post", id);
   const canonicalUrl = `https://arthhwise.com/post/${id}`;
 
   return {
@@ -53,19 +51,18 @@ export async function generateMetadata(
 export default async function PostPage({ params }: Props) {
   const { id } = await params;
   
-  let content = await fetchContent("post", id);
+  let content = await fetchFullContent("post", id);
   
-  // Use fallback if API fails
   if (!content) {
-    content = getFallbackContent("post", id);
+    content = getFullFallbackContent("post", id);
   }
 
   return (
-    <DeepLinkHandler
+    <ContentPageLayout
       type="post"
       id={id}
       content={content}
-      isLoading={false}
     />
   );
 }
+

@@ -12,6 +12,9 @@ import Solution from "@/components/Home/Solution";
 import StructuredData from "@/components/Home/StructuredData";
 import Features from "@/components/Home/Features";
 import SeoContent from "@/components/Home/SeoContent";
+import OrganizationSchema from "@/components/Schema/OrganizationSchema";
+import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import FAQSchema from "@/components/Schema/FAQSchema";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthhwise.com"),
@@ -65,10 +68,46 @@ export const metadata: Metadata = {
   },
 };
 
+const homepageFAQs = [
+  {
+    question: "What is paper trading?",
+    answer:
+      "Paper trading is simulated stock market trading using virtual money with real market data. On Arthhwise, you get ₹10,00,000 in virtual capital and access to live NSE and BSE prices. You can buy and sell stocks just like on a real trading platform, but without risking any actual money. It's the ideal way for beginners to learn how the stock market works.",
+  },
+  {
+    question: "Is Arthhwise free to use?",
+    answer:
+      "Yes, Arthhwise is completely free to download and use. There are no hidden charges. You can practice paper trading, join trading game contests, access learning courses, and participate in our trading community — all at no cost.",
+  },
+  {
+    question: "Does Arthhwise use real market data?",
+    answer:
+      "Yes, Arthhwise uses real-time NSE (National Stock Exchange) and BSE (Bombay Stock Exchange) market data. Every stock price, index value, and market movement you see in the app reflects actual live market conditions in India.",
+  },
+  {
+    question: "Can I learn stock trading on Arthhwise?",
+    answer:
+      "Absolutely. Arthhwise is designed as a stock market learning app with structured courses covering topics from candlestick patterns to risk management. Combined with hands-on paper trading practice and a supportive community, it's the most effective way to learn trading in India.",
+  },
+  {
+    question: "What is the trading game on Arthhwise?",
+    answer:
+      "The trading game is a competitive feature where you enter daily or weekly contests, trade with virtual capital using real NSE stock prices, and compete against other traders on a leaderboard. It gamifies the learning process so you can improve your trading skills while having fun.",
+  },
+  {
+    question: "Is Arthhwise available on iOS?",
+    answer:
+      "Arthhwise is currently available on Android via Google Play Store. iOS (iPhone/iPad) support is coming soon — you can join our waitlist at arthhwise.com/waiting-list to be notified when it launches.",
+  },
+];
+
 export default function Home() {
   return (
     <main>
+      <OrganizationSchema />
       <StructuredData />
+      <BreadcrumbSchema items={[{ name: "Home", href: "/" }]} />
+      <FAQSchema faqs={homepageFAQs} />
       <Hero />
       <Payment />
       <Benefit />
@@ -83,3 +122,4 @@ export default function Home() {
     </main>
   );
 }
+

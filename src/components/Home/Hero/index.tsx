@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Icon } from "@iconify/react";
-import { Heroimage } from "@/app/api/data";
 
 const Hero = () => {
   const leftAnimation = {
@@ -19,6 +18,7 @@ const Hero = () => {
     exit: { x: "100%", opacity: 0 },
     transition: { duration: 1 },
   };
+
   return (
     <section className="relative pt-44 mb-14 bg-cover bg-center dark:bg-darkmode">
       <div className="w-full h-full absolute z-0 bg-heroBg rounded-b-[119px] -left-1/4 top-0 dark:bg-midnight_text"></div>
@@ -82,30 +82,8 @@ const Hero = () => {
 
             <div className="lg:my-28 my-12">
               <p className="text-20 text-muted dark:text-white dark:text-opacity-70 text-start mb-7">
-                Trusted by Hundrads of users in testing phase
+                Trusted by Hundreds of users in testing phase
               </p>
-              {/* <div className="flex space-x-6 justify-start w-full">
-                {Heroimage.map((item, index) => (
-                  <Link key={index} href="/">
-                    <Image
-                      src={item.lightimage}
-                      alt="image"
-                      width={115}
-                      height={30}
-                      className="block dark:hidden"
-                      style={{ width: "100%", height: "100%" }}
-                    />
-                    <Image
-                      src={item.darkimage}
-                      alt="image"
-                      width={115}
-                      height={30}
-                      className="hidden dark:block"
-                      style={{ width: "100%", height: "100%" }}
-                    />
-                  </Link>
-                ))}
-              </div> */}
             </div>
           </motion.div>
           <motion.div
@@ -118,6 +96,7 @@ const Hero = () => {
               width={498}
               height={651}
               style={{ width: "100%", height: "auto" }}
+              sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />
           </motion.div>

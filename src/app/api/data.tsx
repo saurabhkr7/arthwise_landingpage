@@ -77,15 +77,19 @@ export const BeneifitImage = [
 export const footerLinks: { link: string, href?: string }[] = [
   {
     link: "Paper Trading",
+    href: "/learn",
   },
   {
     link: "Learning Center",
+    href: "/learn",
   },
   {
     link: "Market Analysis",
+    href: "/blog",
   },
   {
     link: "Trading Tools",
+    href: "/learn",
   },
   {
     link: "Trading Contests",
@@ -133,15 +137,19 @@ export const footerLinks: { link: string, href?: string }[] = [
   },
   {
     link: "Legal",
+    href: "/terms",
   },
   {
     link: "Privacy",
+    href: "/privacy",
   },
   {
     link: "Cookies",
+    href: "/privacy",
   },
   {
     link: "Disclaimer",
+    href: "/terms",
   },
 ];
 
