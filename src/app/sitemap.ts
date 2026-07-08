@@ -14,7 +14,7 @@ function toValidDate(value: unknown): Date | null {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.API_BASE_URL ||
-  "http://localhost:8000/api";
+  "https://api.arthhwise.com/api";
 
 async function fetchApiBlogSlugs(): Promise<Array<{ slug: string; lastModified?: Date }>> {
   try {
