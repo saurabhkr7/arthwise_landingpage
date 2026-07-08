@@ -3,6 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { FullContent } from "@/lib/apiContent";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CourseSchema from "@/components/Schema/CourseSchema";
+import EventSchema from "@/components/Schema/EventSchema";
+import ProfilePageSchema from "@/components/Schema/ProfilePageSchema";
 import DeepLinkCTA from "./DeepLinkCTA";
 import { DeepLinkType } from "@/lib/deeplink";
 
@@ -36,9 +39,38 @@ const ContentPageLayout: React.FC<ContentPageLayoutProps> = ({
     { name: content.title, href: `/${type}/${id}` },
   ];
 
+  const canonicalUrl = `https://arthhwise.com/${type}/${id}`;
+
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
+
+      {type === "course" && (
+        <CourseSchema
+          name={content.title}
+          description={content.description}
+          lessons={content.curriculum || []}
+        />
+      )}
+
+      {type === "contest" && (
+        <EventSchema
+          name={content.title}
+          description={content.description}
+          startDate={content.startDate}
+          endDate={content.endDate}
+          url={canonicalUrl}
+        />
+      )}
+
+      {type === "profile" && (
+        <ProfilePageSchema
+          name={content.title}
+          description={content.description}
+          followersCount={content.stats?.followers}
+          url={canonicalUrl}
+        />
+      )}
 
       {/* Sticky App CTA Banner */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-midnight_text border-t border-grey/10 dark:border-white/10 shadow-lg px-4 py-3 lg:hidden">
