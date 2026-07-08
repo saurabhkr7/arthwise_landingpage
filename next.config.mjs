@@ -46,6 +46,35 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/course",
+        destination: "/learn",
+        permanent: true,
+      },
+      {
+        source: "/contest",
+        destination: "/contests",
+        permanent: true,
+      },
+      {
+        source: "/profile",
+        destination: "/leaderboard",
+        permanent: true,
+      },
+      {
+        source: "/post",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/daily_quiz",
+        destination: "/learn",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
