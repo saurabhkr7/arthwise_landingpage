@@ -15,6 +15,7 @@ import SeoContent from "@/components/Home/SeoContent";
 import OrganizationSchema from "@/components/Schema/OrganizationSchema";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
 import FAQSchema from "@/components/Schema/FAQSchema";
+import FAQSection from "@/components/Home/FAQ";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthhwise.com"),
@@ -75,6 +76,16 @@ const homepageFAQs = [
       "Paper trading is simulated stock market trading using virtual money with real market data. On Arthhwise, you get ₹10,00,000 in virtual capital and access to live NSE and BSE prices. You can buy and sell stocks just like on a real trading platform, but without risking any actual money. It's the ideal way for beginners to learn how the stock market works.",
   },
   {
+    question: "Is Arthhwise an Indian app? (Also searched as 'Arthwise')",
+    answer:
+      "Yes! Arthhwise (frequently searched as 'Arthwise' with a single 'h') is a proudly Indian-built stock market learning platform. It is custom-designed for Indian retail investors, featuring real-time NSE and BSE stock data, Indian market hours, and INR-denominated virtual portfolios.",
+  },
+  {
+    question: "Is Arthhwise legit and safe?",
+    answer:
+      "Absolutely. Arthhwise is a legitimate paper trading simulator and educational platform. Since you trade using ₹10,00,000 in virtual capital, there is zero actual money involved, making it 100% safe and risk-free. Your personal profile details are protected and we never sell user data to third parties.",
+  },
+  {
     question: "Is Arthhwise free to use?",
     answer:
       "Yes, Arthhwise is completely free to download and use. There are no hidden charges. You can practice paper trading, join trading game contests, access learning courses, and participate in our trading community — all at no cost.",
@@ -119,6 +130,7 @@ export default function Home() {
       <Transparency />
       <Solution />
       <SeoContent />
+      <FAQSection faqs={homepageFAQs} />
     </main>
   );
 }
