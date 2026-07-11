@@ -77,13 +77,31 @@ const Footer = () => {
             </div>
           </div>
           <div className="flex gap-4 mt-4 lg:mt-0">
-            <Link href="#" className="text-muted hover:text-primary" aria-label="Facebook">
+            <Link
+              href="https://www.facebook.com/profile.php?id=61562592606682"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-primary"
+              aria-label="Facebook"
+            >
               <Icon icon="fe:facebook" width="32" height="32" />
             </Link>
-            <Link href="#" className="text-muted hover:text-primary" aria-label="Twitter">
+            <Link
+              href="https://x.com/arthwise"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-primary"
+              aria-label="Twitter"
+            >
               <Icon icon="fa6-brands:square-twitter" width="32" height="32" />
             </Link>
-            <Link href="#" className="text-muted hover:text-primary" aria-label="LinkedIn">
+            <Link
+              href="https://www.linkedin.com/in/arthhwise-app-3a09603a6/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-primary"
+              aria-label="LinkedIn"
+            >
               <Icon icon="fa6-brands:linkedin" width="32" height="32" />
             </Link>
           </div>
