@@ -19,7 +19,7 @@ const detailedExplanations: Record<
   }
 > = {
   "paper-trading": {
-    title: "What is Paper Trading? Complete Guide for Beginners",
+    title: "What is Paper Trading? Meaning, Definition & Guide for Beginners",
     introduction: "Paper trading, also known as virtual trading or demo trading, is the practice of simulated buying and selling of securities without using real money. It allows beginner traders to practice trading stocks, options, or futures in real-time, matching live market movements, with zero financial risk.",
     howItWorks: "Paper trading applications use live or slightly delayed feeds from stock exchanges (like the NSE and BSE in India). Users are given virtual capital (e.g., ₹10,00,000 in Arthhwise) which they can use to place buy and sell orders. The application tracks the entry and exit prices, calculates profits and losses, and logs them in a virtual portfolio, mimicking real broker software.",
     whyItMatters: "For beginners, paper trading is the ultimate safety net. It allows you to learn how to navigate trading interfaces, use different order types (like limit and market orders), study market dynamics, and test out technical indicators without the fear of losing your hard-earned savings. For experienced traders, it provides a laboratory to backtest and refine new trading systems.",
@@ -36,7 +36,7 @@ const detailedExplanations: Record<
     ],
   },
   "nse": {
-    title: "National Stock Exchange (NSE) Explained: Definition & Role",
+    title: "What is National Stock Exchange (NSE)? Meaning, Definition & Role",
     introduction: "The National Stock Exchange of India Limited (NSE) is the country's leading stock exchange, located in Mumbai. Established in 1992, it was the first exchange in India to introduce a fully automated, screen-based electronic trading system, making trading accessible to investors nationwide.",
     howItWorks: "The NSE acts as a marketplace where buyers and sellers trade financial instruments like stocks, bonds, and derivatives. It operates electronically, matching orders via automated algorithms based on price and time priority. The flagship index of the NSE is the Nifty 50, which tracks the performance of the top 50 companies listed on the exchange.",
     whyItMatters: "The NSE is the engine of the Indian capital market. It provides transparency, liquidity, and security to investors. By listing on the NSE, companies can raise capital from public investors. It also hosts the largest derivatives trading volume globally, making it a critical hub for global and domestic institutional money.",
@@ -53,7 +53,7 @@ const detailedExplanations: Record<
     ],
   },
   "bse": {
-    title: "Bombay Stock Exchange (BSE) Explained: Asia's Oldest Exchange",
+    title: "What is Bombay Stock Exchange (BSE)? Meaning, Definition & History",
     introduction: "The Bombay Stock Exchange (BSE), established in 1875 as 'The Native Share & Stock Brokers' Association', is Asia's oldest stock exchange. Located in Mumbai, it has played a historic role in developing India's financial markets and capital formation.",
     howItWorks: "Similar to the NSE, the BSE is a electronic platform for trading equities, debt instruments, derivatives, and mutual funds. It lists over 5,000 companies, which is one of the highest numbers of listings on any exchange globally. Its flagship index is the BSE Sensex (Sensitivity Index), tracking the 30 largest companies.",
     whyItMatters: "The BSE represents the historical foundation of Indian corporate investing. It provides listing services, risk management, market data, and investor education. While NSE dominates derivatives volume, BSE remains highly popular for retail equity investing and mutual fund distributions through its BSE StAR MF platform.",
@@ -66,7 +66,7 @@ const detailedExplanations: Record<
     ],
   },
   "nifty-50": {
-    title: "Nifty 50 Index: What is it and How is it Calculated?",
+    title: "What is Nifty 50? Index Meaning, Calculation & Components",
     introduction: "The Nifty 50 is the benchmark index of the National Stock Exchange (NSE). It represents the weighted average of 50 of the largest and most liquid Indian corporate stocks listed on the exchange, spanning multiple sectors of the economy.",
     howItWorks: "The Nifty 50 is calculated using a free-float market capitalization weighted method. This means companies with higher market cap (excluding shares held by promoters/governments) have a higher weight in the index. Sector composition is reviewed semi-annually to ensure it reflects current economic trends.",
     whyItMatters: "The Nifty 50 is widely considered the barometer of the Indian economy. When financial news reports that the 'Indian stock market is up', they are usually referring to the Nifty 50 index rising. It is also used as a benchmark for mutual funds, index funds, ETFs, and is the basis for highly traded index futures and options contracts.",
@@ -79,7 +79,7 @@ const detailedExplanations: Record<
     ],
   },
   "sensex": {
-    title: "BSE Sensex Index: Definition, Meaning & Calculation",
+    title: "What is Sensex? Index Meaning, Calculation & History",
     introduction: "The BSE Sensex (Sensitivity Index) is the benchmark index of the Bombay Stock Exchange (BSE). Composed of 30 of the largest, most actively traded stocks representing key industrial sectors, it is India's oldest and most widely tracked market index.",
     howItWorks: "Like Nifty, the Sensex is calculated using the free-float market capitalization-weighted method. The index base year is 1978-79, with a base value of 100. It is adjusted dynamically to ensure it accurately reflects market capitalization changes and sector representation of India's blue-chip companies.",
     whyItMatters: "For decades, Sensex was the sole measure of Indian stock market health. Its milestones (crossing 10k, 50k, 70k) represent historic markers of Indian economic growth and wealth creation. Index fund managers use it to design passive investment portfolios that match the returns of the top Indian corporate giants.",
@@ -92,7 +92,7 @@ const detailedExplanations: Record<
     ],
   },
   "intraday-trading": {
-    title: "Intraday Trading Guide: Definition, Rules & Strategies",
+    title: "What is Intraday Trading? Meaning, Rules & Day Trading Strategies",
     introduction: "Intraday trading, also known as day trading, involves buying and selling stock or derivative positions within the same trading day. All positions must be squared off (closed out) before the market closes for the day at 3:30 PM.",
     howItWorks: "Intraday traders aim to profit from small, rapid price fluctuations in highly liquid stocks. To amplify returns, brokers offer leverage (margin), allowing traders to buy positions worth up to 5x of their cash balance. Any open positions that are not manually closed by the trader by 3:15 PM are automatically squared off by the broker's system.",
     whyItMatters: "Intraday trading offers the potential to make quick profits without carrying overnight risk (like negative global news affecting stock opening prices the next day). However, it requires intense discipline, deep knowledge of technical charts, and strict risk control because leverage can magnify losses just as quickly as profits.",
@@ -122,11 +122,11 @@ const detailedExplanations: Record<
     ],
   },
   "futures-and-options": {
-    title: "Futures & Options (F&O) Explained: Derivatives Guide",
+    title: "What is Futures and Options (F&O) Trading? Meaning, Examples & Guide",
     introduction: "Futures and Options (F&O) are derivative financial contracts whose values are derived from an underlying asset, such as individual stocks, indices (Nifty, Bank Nifty), or commodities. They allow traders to speculate on price directions or hedge existing portfolios.",
     howItWorks: "A Future is a binding contract to buy or sell an asset at a predetermined price on a future date. An Option gives the buyer the right (but not the obligation) to buy (Call Option) or sell (Put Option) an asset at a set price within a specific timeframe, in exchange for a fee called 'premium'. F&O contracts are traded in standardized lot sizes.",
     whyItMatters: "F&O is highly popular among active traders because it offers leverage (you can trade large positions with a small margin deposit) and allows you to profit from falling markets by short-selling or buying Put options. However, due to leverage and contract expiration, F&O carries extremely high risk.",
-    example: "You believe Nifty (currently at 22,000) will go up this week. Instead of buying individual stocks, you buy a Nifty Call Option with a strike price of 22,100 for a premium of ₹100. Since the lot size is 50, you pay ₹5,000 premium. If Nifty rises to 22,300 before expiration, the premium value increases significantly, allowing you to sell the contract for a profit.",
+    example: "You believe Nifty (currently at 22,00,000) will go up this week. Instead of buying individual stocks, you buy a Nifty Call Option with a strike price of 22,100 for a premium of ₹100. Since the lot size is 50, you pay ₹5,000 premium. If Nifty rises to 22,300 before expiration, the premium value increases significantly, allowing you to sell the contract for a profit.",
     faqs: [
       {
         question: "Why does SEBI warn about F&O trading?",
@@ -134,12 +134,12 @@ const detailedExplanations: Record<
       },
       {
         question: "Can I practice F&O trading on Arthhwise?",
-        answer: "Arthhwise focuses primarily on stock and index paper trading, helping you build the market directional skills needed before venturing into complex derivatives.",
+        answer: "Yes! The Arthhwise mobile app supports comprehensive Futures and Options (F&O) paper trading. You can practice trading with real-time options chain data (implied volatility, delta, open interest) and a professional Depth of Market (DOM) price ladder interface.",
       },
     ],
   },
   "technical-analysis": {
-    title: "Technical Analysis Guide: Charts, Indicators & Patterns",
+    title: "What is Technical Analysis in Trading? Meaning, Charts & Indicators",
     introduction: "Technical analysis is a trading discipline used to evaluate investments and identify trading opportunities by analyzing statistical trends gathered from trading activity, primarily historical price movements and volume data.",
     howItWorks: "Unlike fundamental analysts who look at financial statements, technical analysts believe that all market fundamentals are already reflected in price charts. They use tools like chart patterns (e.g., Head and Shoulders, Double Bottoms), candlestick analysis, and mathematical indicators (like Moving Averages, RSI, MACD) to predict future price directions.",
     whyItMatters: "Technical analysis tells you 'when' to enter or exit a trade. It helps identify trends, momentum, and reversal points. It provides objective entry points, profit targets, and stop-loss levels, taking emotional guesswork out of active trading decisions.",
@@ -152,7 +152,7 @@ const detailedExplanations: Record<
     ],
   },
   "fundamental-analysis": {
-    title: "Fundamental Analysis: Evaluating Stocks for Long-Term Value",
+    title: "What is Fundamental Analysis of Stocks? Meaning, Ratios & Guide",
     introduction: "Fundamental analysis is a method of evaluating a security to measure its intrinsic value by examining related economic, financial, and other qualitative and quantitative factors. It answers the question: Is this stock cheap or expensive?",
     howItWorks: "Fundamental analysts study everything that can affect the security's value, from macroeconomic factors (like interest rates and GDP growth) to company-specific metrics. They study balance sheets, profit & loss statements, cash flow statements, competitive advantages (moat), management quality, and financial ratios like P/E (Price-to-Earnings), P/B, and Debt-to-Equity.",
     whyItMatters: "Fundamental analysis is the cornerstone of long-term investing. It helps investors identify high-quality, profitable businesses that are trading below their true value. By understanding a company's financial health, investors can build conviction to hold stocks through market volatility.",
@@ -165,7 +165,7 @@ const detailedExplanations: Record<
     ],
   },
   "support-and-resistance": {
-    title: "Support & Resistance levels: How to Find and Trade Them",
+    title: "What are Support and Resistance Levels? Meaning & Chart Analysis",
     introduction: "Support and resistance are key horizontal price levels on a chart where the price of a stock tends to stop, reverse, or pause due to changes in buying and selling pressure.",
     howItWorks: "Support is the 'floor' where buying interest is strong enough to overcome selling pressure, causing a falling price to pause and bounce back up. Resistance is the 'ceiling' where selling interest is strong enough to overcome buying pressure, causing a rising price to stop and turn downward. These levels are formed by previous price highs and lows.",
     whyItMatters: "These levels are the building blocks of chart analysis. They show where market participants have previously shown consensus on value. Knowing support and resistance levels helps traders identify high-probability entry points (buying near support), target exits (selling near resistance), and place logical stop-losses (just below support).",
@@ -178,7 +178,7 @@ const detailedExplanations: Record<
     ],
   },
   "stop-loss": {
-    title: "What is a Stop Loss? How to Protect Your Trading Capital",
+    title: "What is a Stop Loss Order? Meaning, Types & Placement Guide",
     introduction: "A stop loss is an automated order placed with a stockbroker to close a trading position once the stock price reaches a specific limit. It is designed to restrict a trader's downside risk on a position.",
     howItWorks: "When you enter a trade, you define a price level where your trade thesis is proven wrong. You place a stop-loss order at that price. If the stock moves against you and hits that trigger price, the broker automatically executes a market or limit order to close your position, preventing further losses.",
     whyItMatters: "Stop loss is the single most important rule of trading survival. It ensures that a single bad trade does not wipe out your entire trading account. It removes emotional decision-making during fast market drops, forcing you to accept small losses so you can live to trade another day.",
@@ -191,7 +191,7 @@ const detailedExplanations: Record<
     ],
   },
   "target-price": {
-    title: "Target Price: Definition, Estimation & Exit Planning",
+    title: "What is a Target Price in Trading? Meaning & Estimation",
     introduction: "A target price is the projected future price level of a stock or financial instrument. In active trading, it represents the exit point where a trader plans to sell their position to lock in profits.",
     howItWorks: "Traders and research analysts estimate target prices based on technical chart patterns (like measured moves of breakouts), historical resistance levels, or fundamental valuations (like discounted cash flows or forward earnings multiples). Once the price hits the target, a profit-taking order is triggered.",
     whyItMatters: "Trading without a target price is like sailing without a destination. A defined target price allows you to calculate your Risk-to-Reward ratio (e.g., risking ₹10 to make ₹30) before entering a trade. It prevents greed from keeping you in a trade too long, ensuring you book profits before the market reverses.",
@@ -204,7 +204,7 @@ const detailedExplanations: Record<
     ],
   },
   "candlestick-chart": {
-    title: "Candlestick Charts: How to Read Patterns & Price Action",
+    title: "What is a Candlestick Chart? Meaning, Patterns & Price Action",
     introduction: "A candlestick chart is a type of financial chart used to track price movements of securities. Originating in Japan for rice trading, it displays the high, low, open, and close prices for a specific time period in a highly visual manner.",
     howItWorks: "Each 'candle' consists of a solid body and thin lines called shadows or wicks. A green (bullish) candle means the closing price was higher than the opening price. A red (bearish) candle means the close was lower than the open. The wicks represent the highest and lowest prices reached during that time period.",
     whyItMatters: "Candlestick charts are preferred by almost all active traders because they display market psychology in real-time. Single candles (like Hammer, Shooting Star) and multi-candle patterns (like Bullish Engulfing, Morning Star) signal buyers' and sellers' momentum and can predict trend reversals or continuations.",
@@ -217,7 +217,7 @@ const detailedExplanations: Record<
     ],
   },
   "risk-management": {
-    title: "Risk Management in Trading: The Secret to Long-Term Survival",
+    title: "What is Risk Management in Trading? Rules, Meaning & Strategies",
     introduction: "Risk management is the systematic process of identifying, analyzing, and mitigating capital risks in trading. It is the single most critical factor that distinguishes professional traders from gamblers.",
     howItWorks: "Risk management involves setting clear rules before you trade: deciding your maximum risk per trade (e.g., 1% of capital), using stop-losses on every trade, determining optimal position sizes, and maintaining a positive risk-to-reward ratio (at least 1:2) so your winners cover your losers.",
     whyItMatters: "No trading strategy wins 100% of the time. Without risk management, a string of consecutive losses (which happens to every trader eventually) can wipe out your entire capital. Proper risk control guarantees that you survive drawdown phases and stay profitable over the long run.",

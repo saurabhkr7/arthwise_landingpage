@@ -106,6 +106,11 @@ const homepageFAQs = [
       "The trading game is a competitive feature where you enter daily or weekly contests, trade with virtual capital using real NSE stock prices, and compete against other traders on a leaderboard. It gamifies the learning process so you can improve your trading skills while having fun.",
   },
   {
+    question: "Can I practice F&O options trading on Arthhwise?",
+    answer:
+      "Yes! The Arthhwise mobile app supports comprehensive Futures and Options (F&O) paper trading. You can practice trading with real-time options chain data (implied volatility, delta, open interest) and a professional Depth of Market (DOM) price ladder interface for options scalping.",
+  },
+  {
     question: "Is Arthhwise available on iOS?",
     answer:
       "Arthhwise is currently available on Android via Google Play Store. iOS (iPhone/iPad) support is coming soon — you can join our waitlist at arthhwise.com/waiting-list to be notified when it launches.",
