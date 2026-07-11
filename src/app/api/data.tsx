@@ -169,12 +169,34 @@ export const perks = [
 // review
 export const review = [
   {
-    text: "Arthwise has completely transformed how I approach the markets. The risk-free environment combined with real-time NSE data is the perfect training ground for anyone serious about trading.",
-    name: "Saurabh Patel",
-    post: "Co-Founder at Arthhwise",
-    image: "/images/search/profile.png",
-    appstorerating: "0",
-    gplayrating: "0",
+    text: "best app for start basic to advanced trading platform",
+    name: "Yuvraj barnwal",
+    date: "1 Jul 2026",
+    rating: 5,
+  },
+  {
+    text: "very very best for beginners",
+    name: "Komathivinoth",
+    date: "17 Jun 2026",
+    rating: 5,
+  },
+  {
+    text: "Gamification are helpful. Learned basic training🫡",
+    name: "Sumit Kumar Verma",
+    date: "5 Jun 2026",
+    rating: 5,
+  },
+  {
+    text: "Best app if u want to learn trading 😎.",
+    name: "NotXion_Short",
+    date: "3 Jun 2026",
+    rating: 5,
+  },
+  {
+    text: "Its a good app for learning!",
+    name: "Vaishnavi Singh",
+    date: "3 Jun 2026",
+    rating: 5,
   },
 ];
 

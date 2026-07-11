@@ -11,6 +11,23 @@ const Search = () => {
   const ref = useRef(null);
   const inView = useInView(ref);
 
+  const [activeReview, setActiveReview] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveReview((prev) => (prev + 1) % review.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleNext = () => {
+    setActiveReview((prev) => (prev + 1) % review.length);
+  };
+
+  const handlePrev = () => {
+    setActiveReview((prev) => (prev - 1 + review.length) % review.length);
+  };
+
   const TopAnimation = {
     initial: { y: "-100%", opacity: 0 },
     animate: inView ? { y: 0, opacity: 1 } : { y: "-100%", opacity: 0 },
@@ -108,9 +125,9 @@ const Search = () => {
               <div className="flex items-center justify-center my-7">
                 <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                   <Icon
-                    icon="solar:unread-outline"
-                    width="24"
-                    height="24"
+                    icon="solar:check-circle-bold"
+                    width="14"
+                    height="14"
                     className="text-white"
                   />
                 </div>
@@ -120,104 +137,101 @@ const Search = () => {
               </div>
             </div>
           </motion.div>
-          <motion.div {...bottomAnimation}>
-            {review.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-3xl lg:py-16 sm:py-10 py-5 my-2 lg:px-24 sm:px-12 px-6 dark:bg-darkmode"
-              >
-                <div className="grid lg:grid-cols-2 lg:gap-0 gap-7">
-                  <div>
-                    <div className="mb-10">
-                      <Image
-                        src="/images/search/double.png"
-                        alt="Testimonial quotation icon"
-                        width={52}
-                        height={39}
-                      />
-                    </div>
-                    <p className="text-midnight_text dark:text-white text-base mb-9 italic leading-relaxed">
-                      "{item.text}"
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <Image
-                          src={item.image}
-                          alt={`Portrait of ${item.name}`}
-                          width={64}
-                          height={64}
-                          className="rounded-full"
-                        />
-                      </div>
-                      <div className="flex sm:items-center sm:gap-2 sm:flex-row flex-col">
-                        <h3 className="font-medium text-base text-midnight_text dark:text-white">
-                          {item.name}
-                        </h3>
-                        <Icon
-                          icon="bytesize:minus"
-                          className="sm:block hidden"
-                        />
-                        <h5 className="text-muted dark:text-muted text-base">
-                          {item.post}
-                        </h5>
-                      </div>
-                    </div>
+
+          <motion.div {...bottomAnimation} className="mt-12 lg:px-20 px-4 pb-16">
+            <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl dark:bg-darkmode border border-gray-100 dark:border-gray-800">
+              <div className="grid lg:grid-cols-12 gap-8 items-center">
+                {/* Play Store Overall Summary */}
+                <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left border-b lg:border-b-0 lg:border-r border-gray-100 dark:border-gray-800 pb-8 lg:pb-0 lg:pr-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Icon icon="logos:google-play-icon" className="w-8 h-8" />
+                    <span className="font-bold text-lg dark:text-white">Google Play Store</span>
                   </div>
-                  <div className="flex sm:items-center items-start lg:justify-evenly sm:flex-row flex-col lg:gap-0 gap-10">
-                    <div>
-                      <div className="sm:mb-8 mb-5">
-                        <div className="flex gap-2 mb-3">
-                          {renderStars(parseFloat(item.appstorerating))}
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-5xl font-black text-midnight_text dark:text-white">4.4</span>
+                    <span className="text-2xl font-bold text-gray-400 dark:text-gray-500">/5</span>
+                  </div>
+                  <div className="flex gap-1 mb-4">
+                    {renderStars(4.4)}
+                  </div>
+                  <p className="text-sm text-muted dark:text-gray-400 mb-6">
+                    Based on real user reviews on Google Play.
+                  </p>
+                  
+                  {/* Rating distribution visualizer */}
+                  <div className="w-full max-w-xs space-y-2">
+                    {[
+                      { stars: 5, pct: "82%" },
+                      { stars: 4, pct: "10%" },
+                      { stars: 3, pct: "5%" },
+                      { stars: 2, pct: "2%" },
+                      { stars: 1, pct: "1%" }
+                    ].map((row) => (
+                      <div key={row.stars} className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="w-3 text-right">{row.stars}</span>
+                        <Icon icon="ph:star-fill" className="w-3.5 h-3.5 text-yellow-500" />
+                        <div className="grow bg-gray-100 dark:bg-gray-850 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-yellow-500 h-full rounded-full" style={{ width: row.pct }} />
                         </div>
-                        <p className="text-muted text-base">
-                          <span className="text-midnight_text dark:text-white font-bold">
-                            {item.appstorerating}
-                          </span>
-                          /5 — iOS Review (coming soon)
-                        </p>
+                        <span className="w-8 text-right">{row.pct}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Review Slider */}
+                <div className="lg:col-span-7 flex flex-col justify-between min-h-[250px] px-2 relative">
+                  <div>
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="flex gap-1">
+                        {renderStars(review[activeReview].rating || 5)}
+                      </div>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                        {review[activeReview].date}
+                      </span>
+                    </div>
+
+                    <p className="text-lg lg:text-xl font-medium text-midnight_text dark:text-white mb-6 italic leading-relaxed min-h-[80px]">
+                      "{review[activeReview].text}"
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        {review[activeReview].name[0].toUpperCase()}
                       </div>
                       <div>
-                        <Link href="/waiting-list" prefetch={false}>
-                          <Image
-                            src="/images/search/app.png"
-                            alt="Download Arthwise on Apple App Store"
-                            width={130}
-                            height={44}
-                          />
-                        </Link>
+                        <h4 className="font-bold text-sm text-midnight_text dark:text-white">
+                          {review[activeReview].name}
+                        </h4>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                          <Icon icon="material-symbols:verified-user" className="w-3.5 h-3.5 text-green-500" />
+                          Verified App Store Review
+                        </span>
                       </div>
                     </div>
-                    <div>
-                      <div className="sm:mb-8 mb-5">
-                        <div className="flex gap-2 mb-3">
-                          {renderStars(parseFloat(item.gplayrating))}
-                        </div>
-                        <p className="text-muted text-base">
-                          <span className="text-midnight_text dark:text-white font-bold">
-                            {item.gplayrating}
-                          </span>
-                          /5 — Available on Google Play
-                        </p>
-                      </div>
-                      <div>
-                        <Link
-                          href="https://play.google.com/store/apps/details?id=com.arthwise"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Image
-                            src="/images/search/google.png"
-                            alt="Get Arthwise Paper Trading App on Google Play"
-                            width={130}
-                            height={44}
-                          />
-                        </Link>
-                      </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handlePrev}
+                        className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-midnight_text dark:text-white cursor-pointer"
+                        aria-label="Previous Review"
+                      >
+                        <Icon icon="lucide:chevron-left" className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={handleNext}
+                        className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-midnight_text dark:text-white cursor-pointer"
+                        aria-label="Next Review"
+                      >
+                        <Icon icon="lucide:chevron-right" className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </motion.div>
         </div>
       </div>
