@@ -112,7 +112,7 @@ async function inspectUrl(auth, url) {
       url,
       status,
       coverageState,
-      isIndexed: status === "INDEXED",
+      isIndexed: status === "PASS" || status === "WARN",
     };
   } catch (error) {
     return {
