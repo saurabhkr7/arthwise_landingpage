@@ -1,0 +1,28 @@
+name: Arthhwise SEO Auto-Indexer
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 6:00 AM UTC (11:30 AM IST)
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  run-seo-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Write GSC credentials
+        run: |
+          echo '${{ secrets.GSC_CREDENTIALS }}' > gsc-credentials.json
+
+      - name: Run SEO Auto-Submitter
+        run: node scripts/seo-agent.js --auto-submit
