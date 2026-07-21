@@ -5,6 +5,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Careers | Arthhwise",
     description: "Join the Arthhwise team and help us build the future of trading platforms.",
+    robots: { index: false, follow: false },
 };
 
 const CareersPage = () => {

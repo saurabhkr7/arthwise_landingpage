@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/feedback",
   },
+  robots: { index: false, follow: false },
 };
 
 const FeedbackPage = () => {

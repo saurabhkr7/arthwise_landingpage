@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/services",
   },
+  robots: { index: false, follow: false },
 };
 
 const Services = () => {

@@ -71,7 +71,8 @@ async function fetchDynamicIds(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static pages worth indexing (removed delete-account, signin, signup, etc.)
+  // Only include pages intended to earn search traffic. Utility and placeholder
+  // pages stay accessible but should not consume crawler attention.
   const staticPages: Array<{
     path: string;
     changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
@@ -84,20 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/glossary", changeFrequency: "weekly", priority: 0.9 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.5 },
     { path: "/contests", changeFrequency: "daily", priority: 0.8 },
-    { path: "/services", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/careers", changeFrequency: "monthly", priority: 0.4 },
-    { path: "/documentation", changeFrequency: "monthly", priority: 0.6 },
-    { path: "/feedback", changeFrequency: "monthly", priority: 0.3 },
     { path: "/leaderboard", changeFrequency: "daily", priority: 0.7 },
-    { path: "/pricing", changeFrequency: "monthly", priority: 0.6 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.2 },
-    { path: "/waiting-list", changeFrequency: "monthly", priority: 0.5 },
   ];
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((page) => ({
     url: `${SITE_URL}${page.path}`,
-    lastModified: new Date(),
     changeFrequency: page.changeFrequency,
     priority: page.priority,
   }));
@@ -108,7 +102,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((p) => typeof p.slug === "string" && p.slug.length > 0)
     .map((p) => ({
       url: `${SITE_URL}/blog/${p.slug}`,
-      lastModified: toValidDate(p.date) || new Date(),
+      lastModified: toValidDate(p.date) || undefined,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
@@ -117,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const apiPosts = await fetchApiBlogSlugs();
   const apiEntries: MetadataRoute.Sitemap = apiPosts.map((p) => ({
     url: `${SITE_URL}/blog/${p.slug}`,
-    lastModified: p.lastModified || new Date(),
+    lastModified: p.lastModified,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
@@ -125,7 +119,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Glossary terms pages
   const glossaryEntries: MetadataRoute.Sitemap = glossaryTerms.map((t) => ({
     url: `${SITE_URL}/glossary/${t.slug}`,
-    lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
@@ -139,21 +132,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const contestEntries: MetadataRoute.Sitemap = contests.map((c) => ({
     url: `${SITE_URL}/contest/${c.id}`,
-    lastModified: c.lastModified || new Date(),
+    lastModified: c.lastModified,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
   const courseEntries: MetadataRoute.Sitemap = courses.map((c) => ({
     url: `${SITE_URL}/course/${c.id}`,
-    lastModified: c.lastModified || new Date(),
+    lastModified: c.lastModified,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
   const postEntries: MetadataRoute.Sitemap = posts.map((p) => ({
     url: `${SITE_URL}/post/${p.id}`,
-    lastModified: p.lastModified || new Date(),
+    lastModified: p.lastModified,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));

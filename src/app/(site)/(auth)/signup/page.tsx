@@ -3,8 +3,8 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title:
-    "Sign Up | Arthhwise",
+  title: "Sign Up | Arthhwise",
+  robots: { index: false, follow: false },
 };
 
 const SignupPage = () => {

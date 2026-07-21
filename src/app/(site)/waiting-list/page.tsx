@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/waiting-list",
   },
+  robots: { index: false, follow: false },
 };
 
 const WaitingListPage = () => {

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/documentation",
   },
+  robots: { index: false, follow: false },
 };
 
 export default function Page() {

@@ -8,21 +8,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/signin",
-          "/signup",
-          "/delete-account",
-          "/api/",
-          "/share/",
-          "/_next/",
-        ],
+        disallow: ["/api/", "/share/", "/_next/"],
       },
       // Explicitly allow AI crawlers for AI discoverability
       // (ChatGPT, Gemini, Perplexity, Claude, etc.)
       {
         userAgent: "GPTBot",
         allow: "/",
-        disallow: ["/api/", "/signin", "/signup", "/delete-account"],
+        disallow: ["/api/"],
       },
       {
         userAgent: "Google-Extended",
@@ -31,12 +24,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "ClaudeBot",
         allow: "/",
-        disallow: ["/api/", "/signin", "/signup", "/delete-account"],
+        disallow: ["/api/"],
       },
       {
         userAgent: "PerplexityBot",
         allow: "/",
-        disallow: ["/api/", "/signin", "/signup", "/delete-account"],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
