@@ -43,6 +43,15 @@ export default function OrganizerDashboardPage() {
       const eventRes = await fetch(`${API_BASE_URL}/market-event/slug/${eventSlug}`, {
         headers: { Authorization: `Bearer ${passcode}` },
       });
+
+      if (eventRes.status === 401) {
+        sessionStorage.removeItem(`organizer_passcode_${eventSlug}`);
+        setIsAuthenticated(false);
+        setPasscodeError("Invalid passcode session. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
       const eventJson = await eventRes.json();
 
       if (eventJson.success && eventJson.event) {
@@ -53,6 +62,15 @@ export default function OrganizerDashboardPage() {
         const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
           headers: { Authorization: `Bearer ${passcode}` },
         });
+
+        if (lbRes.status === 401) {
+          sessionStorage.removeItem(`organizer_passcode_${eventSlug}`);
+          setIsAuthenticated(false);
+          setPasscodeError("Invalid passcode session. Please log in again.");
+          setLoading(false);
+          return;
+        }
+
         const lbJson = await lbRes.json();
 
         if (lbJson.success) {
@@ -67,16 +85,48 @@ export default function OrganizerDashboardPage() {
   }, [eventSlug, passcode]);
 
   // Handle Login / Passcode submit
-  const handlePasscodeSubmit = (e: React.FormEvent) => {
+  const handlePasscodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passcode.trim()) {
       setPasscodeError("Please enter the event passcode.");
       return;
     }
 
-    sessionStorage.setItem(`organizer_passcode_${eventSlug}`, passcode.trim());
-    setIsAuthenticated(true);
+    setLoading(true);
     setPasscodeError("");
+    try {
+      const eventRes = await fetch(`${API_BASE_URL}/market-event/slug/${eventSlug}`, {
+        headers: { Authorization: `Bearer ${passcode.trim()}` },
+      });
+
+      if (eventRes.status === 401) {
+        setPasscodeError("Incorrect passcode. Access denied.");
+        return;
+      }
+
+      const eventJson = await eventRes.json();
+      if (eventJson.success && eventJson.event) {
+        sessionStorage.setItem(`organizer_passcode_${eventSlug}`, passcode.trim());
+        setIsAuthenticated(true);
+        setEventData(eventJson.event);
+
+        // Load leaderboard next
+        const eventId = eventJson.event.id;
+        const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
+          headers: { Authorization: `Bearer ${passcode.trim()}` },
+        });
+        const lbJson = await lbRes.json();
+        if (lbJson.success) {
+          setParticipants(lbJson.leaderboard || []);
+        }
+      } else {
+        setPasscodeError(eventJson.message || "Failed to load event.");
+      }
+    } catch (err) {
+      setPasscodeError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
