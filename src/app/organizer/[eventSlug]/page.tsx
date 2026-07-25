@@ -123,6 +123,7 @@ export default function OrganizerDashboardPage() {
         setPasscodeError(eventJson.message || "Failed to load event.");
       }
     } catch (err) {
+      console.error("❌ [OrganizerPortal] Passcode verification fetch error:", err);
       setPasscodeError("Network error. Please try again.");
     } finally {
       setLoading(false);
