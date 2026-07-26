@@ -229,7 +229,7 @@ export default function OrganizerDashboardPage() {
   // Passcode Auth View
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center p-4 pt-24">
         <div className="bg-[#1E293B] border border-slate-700/60 rounded-2xl p-8 max-w-md w-full shadow-2xl">
           <div className="text-center mb-6">
             <span className="text-xs font-bold tracking-widest text-sky-400 uppercase bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
@@ -265,7 +265,7 @@ export default function OrganizerDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-100 p-6 font-sans">
+    <div className="min-h-screen bg-[#0F172A] text-slate-100 p-6 pt-28 md:pt-32 font-sans">
       {/* Top Navigation Header */}
       <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-slate-800 gap-4">
         <div>
