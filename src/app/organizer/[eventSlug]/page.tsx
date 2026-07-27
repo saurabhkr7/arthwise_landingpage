@@ -25,6 +25,13 @@ export default function OrganizerDashboardPage() {
   const [tradeLogs, setTradeLogs] = useState<any[]>([]);
   const [loadingTrades, setLoadingTrades] = useState<boolean>(false);
 
+  // V2 Finalization Health & Operations States
+  const [finalizationHealth, setFinalizationHealth] = useState<any>(null);
+  const [loadingHealth, setLoadingHealth] = useState<boolean>(false);
+  const [healthError, setHealthError] = useState<string>("");
+  const [retryLoading, setRetryLoading] = useState<boolean>(false);
+  const [notifRetryLoading, setNotifRetryLoading] = useState<boolean>(false);
+
   // Check stored passcode on mount
   useEffect(() => {
     const stored = sessionStorage.getItem(`organizer_passcode_${eventSlug}`);
@@ -76,6 +83,7 @@ export default function OrganizerDashboardPage() {
         if (lbJson.success) {
           setParticipants(lbJson.leaderboard || []);
         }
+        fetchFinalizationHealth(eventId);
       }
     } catch (err) {
       console.error("Error fetching organizer dashboard data:", err);
@@ -83,6 +91,71 @@ export default function OrganizerDashboardPage() {
       setLoading(false);
     }
   }, [eventSlug, passcode]);
+
+  const fetchFinalizationHealth = useCallback(async (eventId: string) => {
+    setLoadingHealth(true);
+    setHealthError("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/finalization-health`, {
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (json.success) {
+        setFinalizationHealth(json.health);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setHealthError("Failed to load finalization health.");
+    } finally {
+      setLoadingHealth(false);
+    }
+  }, [passcode]);
+
+  const handleRetryFinalization = async () => {
+    if (!eventData?.id) return;
+    const ok = window.confirm(
+      "⚠️ WARNING: You are forcing event finalization. If the event is still running, this will close all positions early, compile final results, and restore/unlock all students' personal portfolios. This action is IRREVERSIBLE. Are you sure you want to proceed?"
+    );
+    if (!ok) return;
+
+    setRetryLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/finalization/retry`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      alert(json.message || (json.success ? "Finalization retry queued successfully." : "Could not request finalization retry."));
+      fetchFinalizationHealth(eventData.id);
+    } catch (err: any) {
+      alert("Error triggering finalization retry.");
+    } finally {
+      setRetryLoading(false);
+    }
+  };
+
+  const handleRetryNotifications = async () => {
+    if (!eventData?.id) return;
+    const ok = window.confirm(
+      "Are you sure you want to retry sending results push notifications to all participants of this event?"
+    );
+    if (!ok) return;
+
+    setNotifRetryLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/finalization/notifications/retry`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      alert(json.message || (json.success ? "Notification retry completed successfully." : "Could not retry notifications."));
+      fetchFinalizationHealth(eventData.id);
+    } catch (err: any) {
+      alert("Error triggering notification retry.");
+    } finally {
+      setNotifRetryLoading(false);
+    }
+  };
 
   // Handle Login / Passcode submit
   const handlePasscodeSubmit = async (e: React.FormEvent) => {
@@ -341,6 +414,74 @@ export default function OrganizerDashboardPage() {
             </p>
           </div>
         </div>
+
+        {/* V2 Operations Control Center */}
+        {finalizationHealth && (
+          <div className="bg-[#1E293B] border border-slate-800 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-4 border-b border-slate-800/60 mb-4">
+              <div>
+                <span className="text-[10px] font-black tracking-widest text-sky-400 uppercase bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20">
+                  V2 ENGINE OPERATIONS
+                </span>
+                <h2 className="text-lg font-bold text-white mt-1.5">Finalization lock & lease state</h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleRetryFinalization}
+                  disabled={retryLoading}
+                  className="bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 px-4 py-2 rounded-xl text-xs font-black transition"
+                >
+                  {retryLoading ? "Triggering..." : "🔄 Retry Finalization"}
+                </button>
+                <button
+                  onClick={handleRetryNotifications}
+                  disabled={notifRetryLoading}
+                  className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition"
+                >
+                  {notifRetryLoading ? "Retrying..." : "✉️ Retry Push Notifications"}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Engine Status</span>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${
+                    finalizationHealth.systemStatus === "HEALTHY"
+                      ? "bg-emerald-400 animate-pulse"
+                      : finalizationHealth.systemStatus === "RETRYING"
+                      ? "bg-amber-400 animate-pulse"
+                      : "bg-red-500 animate-pulse"
+                  }`} />
+                  <p className="text-slate-200 font-bold uppercase">{finalizationHealth.systemStatus}</p>
+                </div>
+              </div>
+
+              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Attempts Count</span>
+                <p className="text-slate-200 font-mono font-bold mt-1.5 text-sm">{finalizationHealth.finalizationAttempt}</p>
+              </div>
+
+              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60 col-span-1 md:col-span-2">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Lease Lock Valid Until</span>
+                <p className="text-slate-200 mt-1.5 font-mono font-semibold">
+                  {finalizationHealth.finalizationLeaseUntil
+                    ? new Date(finalizationHealth.finalizationLeaseUntil).toLocaleString("en-IN")
+                    : "No active execution lease lock"}
+                </p>
+              </div>
+            </div>
+
+            {finalizationHealth.finalizationError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-xs font-mono mt-4 overflow-x-auto">
+                <strong>Error details:</strong> {finalizationHealth.finalizationError}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Search & Filter Bar */}
         <div className="mb-4">
