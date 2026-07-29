@@ -117,6 +117,8 @@ const homepageFAQs = [
   },
 ];
 
+import CampusEvents from "@/components/Home/CampusEvents";
+
 export default function Home() {
   return (
     <main>
@@ -127,6 +129,7 @@ export default function Home() {
       <Hero />
       <Payment />
       <Benefit />
+      <CampusEvents />
       <Spend />
       <Method />
       <Features />
