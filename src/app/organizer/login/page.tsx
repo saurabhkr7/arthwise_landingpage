@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Icon } from "@iconify/react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -60,66 +62,74 @@ export default function OrganizerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center p-4 pt-24 font-sans">
-      <div className="bg-[#1E293B] border border-slate-700/60 rounded-2xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
-        {/* Subtle glowing effect */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white flex items-center justify-center p-4 pt-28 font-sans transition-colors duration-300">
+      <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
+        
         <div className="text-center mb-8 relative z-10">
-          <span className="text-[10px] font-black tracking-widest text-sky-400 uppercase bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-widest text-primary uppercase bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+            <Icon icon="solar:shield-user-bold" width="14" height="14" />
             EVENT ORGANIZER PORTAL
           </span>
-          <h1 className="text-3xl font-extrabold mt-4 text-white tracking-tight">Arthwise Control</h1>
-          <p className="text-slate-400 text-sm mt-2">Sign in to manage and configure your university paper trading events.</p>
+          <h1 className="text-3xl font-extrabold mt-4 text-midnight_text dark:text-white tracking-tight">Arthhwise Control</h1>
+          <p className="text-muted dark:text-white/70 text-sm mt-2">Sign in to manage and configure your university paper trading events.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase mb-2">Email Address</label>
+            <label className="block text-xs font-bold text-midnight_text dark:text-white uppercase mb-2">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="organizer@university.edu"
-              className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 transition placeholder-slate-500 text-sm"
+              className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-midnight_text dark:text-white focus:outline-none focus:border-primary transition placeholder-gray-400 text-sm"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase mb-2">Password</label>
+            <label className="block text-xs font-bold text-midnight_text dark:text-white uppercase mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 transition placeholder-slate-500 text-sm"
+              className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-midnight_text dark:text-white focus:outline-none focus:border-primary transition placeholder-gray-400 text-sm"
               required
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-xs font-semibold">
-              ⚠️ {error}
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-500 text-xs font-semibold flex items-center gap-2">
+              <Icon icon="solar:danger-triangle-bold" width="16" height="16" />
+              <span>{error}</span>
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-sky-500/10 hover:shadow-sky-500/25 active:scale-[0.98] disabled:opacity-50 text-sm flex items-center justify-center"
+            className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary/25 active:scale-[0.98] disabled:opacity-50 text-sm flex items-center justify-center gap-2"
           >
             {loading ? (
               <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                <Icon icon="line-md:loading-twotone-loop" width="18" height="18" />
                 Signing in...
               </span>
             ) : (
-              "Sign In"
+              "Sign In to Control Portal"
             )}
           </button>
         </form>
+
+        <div className="mt-6 pt-4 border-t border-grey/10 dark:border-white/10 text-center">
+          <Link
+            href="/host-event"
+            className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+          >
+            ← Back to Host Event Page
+          </Link>
+        </div>
       </div>
     </div>
   );

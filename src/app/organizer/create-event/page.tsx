@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -59,17 +60,7 @@ export default function CreateEventPage() {
     setToken(storedToken);
   }, [router]);
 
-  // Dynamic Rule Handlers
-  const addRule = () => {
-    if (!newRule.trim()) return;
-    setRules([...rules, newRule.trim()]);
-    setNewRule("");
-  };
-  const removeRule = (index: number) => {
-    setRules(rules.filter((_, i) => i !== index));
-  };
-
-  // Dynamic Custom Field Handlers
+  // Add custom verification field
   const addCustomField = () => {
     if (!newFieldKey.trim() || !newFieldLabel.trim()) return;
     setCustomFields([
@@ -78,26 +69,39 @@ export default function CreateEventPage() {
         fieldKey: newFieldKey.trim(),
         fieldLabel: newFieldLabel.trim(),
         fieldType: newFieldType,
-        isRequired: true,
-      },
+        isRequired: true
+      }
     ]);
     setNewFieldKey("");
     setNewFieldLabel("");
   };
+
   const removeCustomField = (index: number) => {
     setCustomFields(customFields.filter((_, i) => i !== index));
   };
 
-  // Form Submit
+  // Add custom rule
+  const addRule = () => {
+    if (!newRule.trim()) return;
+    setRules([...rules, newRule.trim()]);
+    setNewRule("");
+  };
+
+  const removeRule = (index: number) => {
+    setRules(rules.filter((_, i) => i !== index));
+  };
+
+  // Submit Event Creation Form
   const handleCreateEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !sponsorName || !bannerImageUrl || !joinCode || !startTime || !endTime || !passcode) {
-      setCreateError("Please fill in all required fields.");
+    setCreateError("");
+
+    if (!title || !sponsorName || !joinCode || !passcode || !startTime || !endTime) {
+      setCreateError("Please fill out all required fields marked with *.");
       return;
     }
 
     setCreateLoading(true);
-    setCreateError("");
 
     try {
       const payload = {
@@ -108,91 +112,92 @@ export default function CreateEventPage() {
         bannerTextColor,
         description,
         joinCode: joinCode.trim().toUpperCase(),
-        passcode,
-        initialCapital,
-        maxParticipants,
+        passcode: passcode.trim(),
+        initialCapital: Number(initialCapital),
+        maxParticipants: Number(maxParticipants),
         startTime: new Date(startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
         allowedAssetClasses,
-        rules,
         customVerificationFields: customFields,
+        rules
       };
 
-      const res = await fetch(`${API_BASE_URL}/market-event/organizer/create`, {
+      const res = await fetch(`${API_BASE_URL}/market-event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
       const json = await res.json();
       if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to create event.");
+        throw new Error(json.message || "Failed to create trading event.");
       }
 
-      // Redirect back to dashboard
       router.push("/organizer/dashboard");
     } catch (err: any) {
       console.error(err);
-      setCreateError(err.message || "Failed to create event. Make sure join code or slug is unique.");
+      setCreateError(err.message || "Failed to save event. Try again.");
     } finally {
       setCreateLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-100 p-6 pt-24 font-sans">
+    <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white p-6 pt-28 font-sans transition-colors duration-300">
       <div className="max-w-4xl mx-auto space-y-6">
         
-        {/* Breadcrumb Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        {/* Header Navigation */}
+        <div className="flex items-center justify-between pb-4 border-b border-grey/10 dark:border-white/10">
           <div>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => router.push("/organizer/dashboard")}
-                className="text-xs font-bold text-sky-400 hover:text-sky-300 transition uppercase"
-              >
-                ← Back to Dashboard
-              </button>
-            </div>
-            <h1 className="text-3xl font-black text-white mt-2">Create V2 Trading Event</h1>
+            <button 
+              onClick={() => router.push("/organizer/dashboard")}
+              className="text-xs font-bold text-primary hover:underline transition uppercase flex items-center gap-1"
+            >
+              <Icon icon="solar:alt-arrow-left-linear" width="14" height="14" />
+              <span>Back to Dashboard</span>
+            </button>
+            <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white mt-2">Create Paper Trading Event</h1>
           </div>
         </div>
 
         {createError && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 font-medium shadow-md">
-            ⚠️ {createError}
+          <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-500 font-medium text-sm flex items-center gap-2">
+            <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
+            <span>{createError}</span>
           </div>
         )}
 
-        <form onSubmit={handleCreateEventSubmit} className="bg-[#1E293B] border border-slate-800 rounded-2xl p-8 space-y-8 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-
+        <form onSubmit={handleCreateEventSubmit} className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl relative overflow-hidden">
+          
           {/* Section 1: Identity */}
           <div>
-            <h3 className="text-xs font-extrabold text-sky-400 uppercase tracking-widest mb-4">1. Event Branding & Identity</h3>
+            <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-4 flex items-center gap-1.5">
+              <Icon icon="solar:flag-bold" width="16" height="16" />
+              <span>1. Event Branding & Identity</span>
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">Championship Title *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Championship Title *</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. BVPIM Championship 2026"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  placeholder="e.g. National Trading Championship 2026"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">University / Sponsor Name *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">University / Sponsor Name *</label>
                 <input
                   type="text"
                   value={sponsorName}
                   onChange={(e) => setSponsorName(e.target.value)}
-                  placeholder="e.g. Uka Tarsadia University"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  placeholder="e.g. Department of Management Studies"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
@@ -201,25 +206,25 @@ export default function CreateEventPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-xs text-slate-300 font-bold mb-2">Championship Description</label>
+            <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Championship Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Short bio details visible on the mobile sign-up card..."
+              placeholder="Short details visible on the mobile join modal card..."
               rows={3}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+              className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
             />
           </div>
 
           {/* Banner Selector */}
           <div>
-            <label className="block text-xs text-slate-300 font-bold mb-2">Banner Background Image URL *</label>
+            <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Banner Background Image URL *</label>
             <input
               type="text"
               value={bannerImageUrl}
               onChange={(e) => setBannerImageUrl(e.target.value)}
               placeholder="Paste banner image URL"
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition mb-4"
+              className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition mb-4"
               required
             />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -229,7 +234,7 @@ export default function CreateEventPage() {
                   key={banner.name}
                   onClick={() => setBannerImageUrl(banner.url)}
                   className={`border rounded-xl overflow-hidden h-14 relative transition ${
-                    bannerImageUrl === banner.url ? "border-sky-500 ring-2 ring-sky-500/20" : "border-slate-800"
+                    bannerImageUrl === banner.url ? "border-primary ring-2 ring-primary/20" : "border-grey/20 dark:border-white/10"
                   }`}
                 >
                   <img src={banner.url} alt={banner.name} className="w-full h-full object-cover opacity-60" />
@@ -243,45 +248,48 @@ export default function CreateEventPage() {
 
           {/* Timing & Capital */}
           <div>
-            <h3 className="text-xs font-extrabold text-sky-400 uppercase tracking-widest mb-4">2. Timings & Capitalization</h3>
+            <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-4 flex items-center gap-1.5">
+              <Icon icon="solar:clock-circle-bold" width="16" height="16" />
+              <span>2. Timings & Capitalization</span>
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">Start Time *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Start Time *</label>
                 <input
                   type="datetime-local"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">End Time *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">End Time *</label>
                 <input
                   type="datetime-local"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">Initial Cash Capital (₹) *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Initial Cash Capital (₹) *</label>
                 <input
                   type="number"
                   value={initialCapital}
                   onChange={(e) => setInitialCapital(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-300 font-bold mb-2">Max Participant Limit *</label>
+                <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Max Participant Limit *</label>
                 <input
                   type="number"
                   value={maxParticipants}
                   onChange={(e) => setMaxParticipants(Number(e.target.value))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
                 />
               </div>
@@ -291,24 +299,24 @@ export default function CreateEventPage() {
           {/* Access Credentials */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs text-slate-300 font-bold mb-2">Student Join Code (Unique) *</label>
+              <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Student Join Code (Unique) *</label>
               <input
                 type="text"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value)}
-                placeholder="e.g. BVP2026"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                placeholder="e.g. CAMPUS2026"
+                className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-primary font-bold focus:outline-none focus:border-primary transition"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-300 font-bold mb-2">Organizer Management Passcode *</label>
+              <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Organizer Management Passcode *</label>
               <input
                 type="text"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 placeholder="e.g. secretPasscode"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 transition"
+                className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                 required
               />
             </div>
@@ -316,10 +324,10 @@ export default function CreateEventPage() {
 
           {/* Allowed asset classes */}
           <div>
-            <label className="block text-xs text-slate-300 font-bold mb-3">Allowed Asset Classes</label>
+            <label className="block text-xs font-bold text-midnight_text dark:text-white mb-3">Allowed Asset Classes</label>
             <div className="flex gap-6">
               {["EQUITY", "FNO", "CRYPTO"].map((asset) => (
-                <label key={asset} className="flex items-center gap-2.5 text-sm font-semibold cursor-pointer">
+                <label key={asset} className="flex items-center gap-2 text-xs font-bold text-midnight_text dark:text-white cursor-pointer">
                   <input
                     type="checkbox"
                     checked={allowedAssetClasses.includes(asset)}
@@ -330,7 +338,7 @@ export default function CreateEventPage() {
                         setAllowedAssetClasses(allowedAssetClasses.filter((a) => a !== asset));
                       }
                     }}
-                    className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+                    className="w-4 h-4 accent-primary rounded cursor-pointer"
                   />
                   {asset}
                 </label>
@@ -339,21 +347,24 @@ export default function CreateEventPage() {
           </div>
 
           {/* Section 3: Custom fields */}
-          <div className="border-t border-slate-800/80 pt-6">
-            <h3 className="text-xs font-extrabold text-sky-400 uppercase tracking-widest mb-2">3. Student Verification Fields</h3>
-            <p className="text-slate-400 text-xs mb-4">Define inputs required from students during enrollment (e.g. Division, Roll No).</p>
+          <div className="border-t border-grey/10 dark:border-white/10 pt-6">
+            <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <Icon icon="solar:user-id-bold" width="16" height="16" />
+              <span>3. Student Verification Fields</span>
+            </h3>
+            <p className="text-muted dark:text-white/70 text-xs mb-4">Define inputs required from students during enrollment (e.g. Division, Roll No).</p>
             
             {/* Added Fields List */}
             <div className="space-y-2 mb-4">
               {customFields.map((field, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5 text-sm">
-                  <span>
-                    <strong>{field.fieldLabel}</strong> <span className="text-xs text-slate-500">({field.fieldKey} - {field.fieldType})</span>
+                <div key={idx} className="flex justify-between items-center bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 rounded-xl p-3.5 text-sm">
+                  <span className="text-midnight_text dark:text-white">
+                    <strong>{field.fieldLabel}</strong> <span className="text-xs text-muted dark:text-white/50">({field.fieldKey} - {field.fieldType})</span>
                   </span>
                   <button
                     type="button"
                     onClick={() => removeCustomField(idx)}
-                    className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                    className="text-red-500 hover:text-red-600 text-xs font-bold transition"
                   >
                     Remove
                   </button>
@@ -368,19 +379,19 @@ export default function CreateEventPage() {
                 placeholder="Field Key (e.g. rollNo)"
                 value={newFieldKey}
                 onChange={(e) => setNewFieldKey(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500 transition flex-1"
+                className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition flex-1"
               />
               <input
                 type="text"
                 placeholder="Field Label (e.g. Roll Number)"
                 value={newFieldLabel}
                 onChange={(e) => setNewFieldLabel(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500 transition flex-1"
+                className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition flex-1"
               />
               <select
                 value={newFieldType}
                 onChange={(e) => setNewFieldType(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500 transition flex-1 h-[38px] cursor-pointer"
+                className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition flex-1 h-[38px] cursor-pointer"
               >
                 <option value="text">Text Input</option>
                 <option value="number">Number Input</option>
@@ -388,7 +399,7 @@ export default function CreateEventPage() {
               <button
                 type="button"
                 onClick={addCustomField}
-                className="bg-slate-800 hover:bg-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-200 border border-slate-700 transition"
+                className="bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 px-5 py-2.5 rounded-xl text-xs font-bold text-midnight_text dark:text-white transition"
               >
                 Add Field
               </button>
@@ -396,17 +407,20 @@ export default function CreateEventPage() {
           </div>
 
           {/* Section 4: Rules */}
-          <div className="border-t border-slate-800/80 pt-6">
-            <h3 className="text-xs font-extrabold text-sky-400 uppercase tracking-widest mb-4">4. Custom Rules & Guidelines</h3>
+          <div className="border-t border-grey/10 dark:border-white/10 pt-6">
+            <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-4 flex items-center gap-1.5">
+              <Icon icon="solar:document-text-bold" width="16" height="16" />
+              <span>4. Custom Rules & Guidelines</span>
+            </h3>
             
             <div className="space-y-2 mb-4">
               {rules.map((rule, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5 text-sm">
-                  <span>{idx + 1}. {rule}</span>
+                <div key={idx} className="flex justify-between items-center bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 rounded-xl p-3.5 text-sm">
+                  <span className="text-midnight_text dark:text-white">{idx + 1}. {rule}</span>
                   <button
                     type="button"
                     onClick={() => removeRule(idx)}
-                    className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                    className="text-red-500 hover:text-red-600 text-xs font-bold transition"
                   >
                     Remove
                   </button>
@@ -420,12 +434,12 @@ export default function CreateEventPage() {
                 placeholder="Enter competition rule text"
                 value={newRule}
                 onChange={(e) => setNewRule(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500 transition"
+                className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
               />
               <button
                 type="button"
                 onClick={addRule}
-                className="bg-slate-800 hover:bg-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-200 border border-slate-700 transition whitespace-nowrap"
+                className="bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 px-5 py-2.5 rounded-xl text-xs font-bold text-midnight_text dark:text-white transition whitespace-nowrap"
               >
                 Add Rule
               </button>
@@ -433,18 +447,18 @@ export default function CreateEventPage() {
           </div>
 
           {/* Submission buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-slate-800/80">
+          <div className="flex justify-end gap-3 pt-6 border-t border-grey/10 dark:border-white/10">
             <button
               type="button"
               onClick={() => router.push("/organizer/dashboard")}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-3 rounded-xl text-sm font-semibold border border-slate-700 transition"
+              className="bg-gray-100 dark:bg-white/10 text-midnight_text dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 px-6 py-3 rounded-xl text-sm font-semibold border border-grey/10 dark:border-white/10 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createLoading}
-              className="bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-3 rounded-xl text-sm font-black transition active:scale-[0.98] disabled:opacity-50"
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl text-sm font-extrabold transition shadow-lg shadow-primary/25 active:scale-[0.98] disabled:opacity-50"
             >
               {createLoading ? "Creating..." : "Save Event Configuration"}
             </button>

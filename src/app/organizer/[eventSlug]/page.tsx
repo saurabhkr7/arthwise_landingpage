@@ -1,121 +1,94 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
 
-// Environment or default API URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
-export default function OrganizerDashboardPage() {
+export default function EventOrganizerControlPanel() {
   const params = useParams();
-  const eventSlug = params?.eventSlug as string;
+  const router = useRouter();
+  const eventSlug = params ? (params.eventSlug as string) : "";
 
-  const [passcode, setPasscode] = useState<string>("");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [passcodeError, setPasscodeError] = useState<string>("");
-
-  const [loading, setLoading] = useState<boolean>(false);
+  const [passcode, setPasscode] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [eventData, setEventData] = useState<any>(null);
   const [participants, setParticipants] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
+  const [finalizationHealth, setFinalizationHealth] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [retryLoading, setRetryLoading] = useState(false);
+  const [notifRetryLoading, setNotifRetryLoading] = useState(false);
+  const [passcodeError, setPasscodeError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
-  // Trade Audit Modal State
+  // Selected student for detailed Trade History Audit Modal
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [tradeLogs, setTradeLogs] = useState<any[]>([]);
-  const [loadingTrades, setLoadingTrades] = useState<boolean>(false);
+  const [loadingTrades, setLoadingTrades] = useState(false);
 
-  // V2 Finalization Health & Operations States
-  const [finalizationHealth, setFinalizationHealth] = useState<any>(null);
-  const [loadingHealth, setLoadingHealth] = useState<boolean>(false);
-  const [healthError, setHealthError] = useState<string>("");
-  const [retryLoading, setRetryLoading] = useState<boolean>(false);
-  const [notifRetryLoading, setNotifRetryLoading] = useState<boolean>(false);
-
-  // Check stored passcode on mount
+  // Auto-fill passcode from dashboard session if available
   useEffect(() => {
-    const stored = sessionStorage.getItem(`organizer_passcode_${eventSlug}`);
-    if (stored) {
-      setPasscode(stored);
-      setIsAuthenticated(true);
+    const storedPasscode = sessionStorage.getItem(`organizer_passcode_${eventSlug}`);
+    if (storedPasscode) {
+      setPasscode(storedPasscode);
     }
   }, [eventSlug]);
 
-  const fetchDashboardData = useCallback(async () => {
-    if (!eventSlug) return;
-    setLoading(true);
-
+  const fetchFinalizationHealth = useCallback(async (eventId: string) => {
     try {
-      // 1. Fetch active/specific event data by slug
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/finalization/health`, {
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (json.success) {
+        setFinalizationHealth(json.data);
+      }
+    } catch (err) {
+      console.error("Error fetching finalization health:", err);
+    }
+  }, [passcode]);
+
+  // Fetch event details and real-time leaderboard rankings
+  const fetchDashboardData = useCallback(async () => {
+    if (!passcode) return;
+    try {
       const eventRes = await fetch(`${API_BASE_URL}/market-event/slug/${eventSlug}`, {
         headers: { Authorization: `Bearer ${passcode}` },
       });
 
       if (eventRes.status === 401) {
-        sessionStorage.removeItem(`organizer_passcode_${eventSlug}`);
         setIsAuthenticated(false);
-        setPasscodeError("Invalid passcode session. Please log in again.");
-        setLoading(false);
+        setPasscodeError("Passcode session expired or invalid. Please re-enter.");
         return;
       }
 
       const eventJson = await eventRes.json();
-
       if (eventJson.success && eventJson.event) {
         setEventData(eventJson.event);
+        setIsAuthenticated(true);
 
-        // 2. Fetch leaderboard data for organizer
         const eventId = eventJson.event.id;
         const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
           headers: { Authorization: `Bearer ${passcode}` },
         });
-
-        if (lbRes.status === 401) {
-          sessionStorage.removeItem(`organizer_passcode_${eventSlug}`);
-          setIsAuthenticated(false);
-          setPasscodeError("Invalid passcode session. Please log in again.");
-          setLoading(false);
-          return;
-        }
-
         const lbJson = await lbRes.json();
-
         if (lbJson.success) {
           setParticipants(lbJson.leaderboard || []);
         }
+
         fetchFinalizationHealth(eventId);
       }
     } catch (err) {
-      console.error("Error fetching organizer dashboard data:", err);
-    } finally {
-      setLoading(false);
+      console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode]);
+  }, [eventSlug, passcode, fetchFinalizationHealth]);
 
-  const fetchFinalizationHealth = useCallback(async (eventId: string) => {
-    setLoadingHealth(true);
-    setHealthError("");
-    try {
-      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/finalization-health`, {
-        headers: { Authorization: `Bearer ${passcode}` },
-      });
-      const json = await res.json();
-      if (json.success) {
-        setFinalizationHealth(json.health);
-      }
-    } catch (err: any) {
-      console.error(err);
-      setHealthError("Failed to load finalization health.");
-    } finally {
-      setLoadingHealth(false);
-    }
-  }, [passcode]);
-
+  // Retry V2 Finalization Execution
   const handleRetryFinalization = async () => {
     if (!eventData?.id) return;
-    const ok = window.confirm(
-      "⚠️ WARNING: You are forcing event finalization. If the event is still running, this will close all positions early, compile final results, and restore/unlock all students' personal portfolios. This action is IRREVERSIBLE. Are you sure you want to proceed?"
-    );
+    const ok = confirm("Are you sure you want to retry finalization for this event?");
     if (!ok) return;
 
     setRetryLoading(true);
@@ -125,7 +98,7 @@ export default function OrganizerDashboardPage() {
         headers: { Authorization: `Bearer ${passcode}` },
       });
       const json = await res.json();
-      alert(json.message || (json.success ? "Finalization retry queued successfully." : "Could not request finalization retry."));
+      alert(json.message || (json.success ? "Finalization triggered successfully." : "Failed to retry finalization."));
       fetchFinalizationHealth(eventData.id);
     } catch (err: any) {
       alert("Error triggering finalization retry.");
@@ -134,11 +107,10 @@ export default function OrganizerDashboardPage() {
     }
   };
 
+  // Retry Push Notifications Dispatch
   const handleRetryNotifications = async () => {
     if (!eventData?.id) return;
-    const ok = window.confirm(
-      "Are you sure you want to retry sending results push notifications to all participants of this event?"
-    );
+    const ok = confirm("Are you sure you want to retry sending results push notifications?");
     if (!ok) return;
 
     setNotifRetryLoading(true);
@@ -183,7 +155,6 @@ export default function OrganizerDashboardPage() {
         setIsAuthenticated(true);
         setEventData(eventJson.event);
 
-        // Load leaderboard next
         const eventId = eventJson.event.id;
         const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
           headers: { Authorization: `Bearer ${passcode.trim()}` },
@@ -196,7 +167,7 @@ export default function OrganizerDashboardPage() {
         setPasscodeError(eventJson.message || "Failed to load event.");
       }
     } catch (err) {
-      console.error("❌ [OrganizerPortal] Passcode verification fetch error:", err);
+      console.error("❌ Passcode verification error:", err);
       setPasscodeError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -238,7 +209,7 @@ export default function OrganizerDashboardPage() {
     }
   };
 
-  // CSV Export (fetches secure dataset including email addresses)
+  // CSV Export
   const exportToCSV = async () => {
     try {
       const eventId = eventData?.id;
@@ -281,7 +252,7 @@ export default function OrganizerDashboardPage() {
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `BVPIM_Leaderboard_${eventSlug}_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute("download", `Event_Leaderboard_${eventSlug}_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -302,82 +273,103 @@ export default function OrganizerDashboardPage() {
   // Passcode Auth View
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-white flex items-center justify-center p-4 pt-24">
-        <div className="bg-[#1E293B] border border-slate-700/60 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+      <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white flex items-center justify-center p-4 pt-28 font-sans transition-colors duration-300">
+        <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl">
           <div className="text-center mb-6">
-            <span className="text-xs font-bold tracking-widest text-sky-400 uppercase bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
-              FACULTY & ORGANIZER PORTAL
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-widest text-primary uppercase bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+              <Icon icon="solar:lock-keyhole-bold" width="14" height="14" />
+              EVENT PASSCODE VERIFICATION
             </span>
-            <h1 className="text-2xl font-black mt-4 text-white">BVPIM Trading Championship</h1>
-            <p className="text-slate-400 text-sm mt-1">Enter your private event passcode to access the live monitoring dashboard.</p>
+            <h1 className="text-2xl font-extrabold mt-4 text-midnight_text dark:text-white">Paper Trading Championship</h1>
+            <p className="text-muted dark:text-white/70 text-sm mt-1">Enter your private event passcode to access the live monitoring dashboard.</p>
           </div>
 
           <form onSubmit={handlePasscodeSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase mb-2">Event Passcode</label>
+              <label className="block text-xs font-bold text-midnight_text dark:text-white uppercase mb-2">Event Passcode</label>
               <input
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 placeholder="Enter passcode"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sky-500 transition"
+                className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
               />
-              {passcodeError && <p className="text-red-400 text-xs mt-2">{passcodeError}</p>}
+              {passcodeError && <p className="text-red-500 text-xs mt-2">{passcodeError}</p>}
             </div>
 
             <button
               type="submit"
-              className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold py-3 rounded-xl transition shadow-lg shadow-sky-500/20"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-primary/25 active:scale-[0.98] disabled:opacity-50 text-sm flex items-center justify-center gap-2"
             >
-              Access Dashboard
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Icon icon="line-md:loading-twotone-loop" width="18" height="18" />
+                  Verifying Passcode...
+                </span>
+              ) : (
+                "Access Event Dashboard"
+              )}
             </button>
           </form>
+
+          <div className="mt-6 pt-4 border-t border-grey/10 dark:border-white/10 text-center">
+            <button
+              onClick={() => router.push("/organizer/dashboard")}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              ← Back to Organizer Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-100 p-6 pt-28 md:pt-32 font-sans">
+    <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white p-6 pt-28 font-sans transition-colors duration-300">
       {/* Top Navigation Header */}
-      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-slate-800 gap-4">
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-grey/10 dark:border-white/10 gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-              🟢 LIVE ORGANIZER MONITOR
+            <span className="inline-flex items-center gap-1 text-xs font-extrabold tracking-widest text-green-500 uppercase bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              LIVE ORGANIZER MONITOR
             </span>
-            <span className="text-slate-500 text-sm">• Uka Tarsadia University</span>
+            <span className="text-muted dark:text-white/60 text-xs font-medium">• {eventData?.sponsorName || "Event Sponsor"}</span>
           </div>
-          <h1 className="text-3xl font-black text-white mt-1">
-            {eventData?.title || "BVPIM Paper Trading Championship 2026"}
+          <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white mt-1">
+            {eventData?.title || "Paper Trading Championship 2026"}
           </h1>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
               autoRefresh
-                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                : "bg-slate-800 text-slate-400 border-slate-700"
+                ? "bg-green-500/10 text-green-500 border-green-500/30"
+                : "bg-gray-100 dark:bg-white/10 text-muted dark:text-white/60 border-grey/10 dark:border-white/10"
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
+            <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-green-500 animate-pulse" : "bg-gray-400"}`} />
             Auto Refresh (15s): {autoRefresh ? "ON" : "OFF"}
           </button>
 
           <button
             onClick={fetchDashboardData}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-xs font-bold transition border border-slate-700"
+            className="bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-4 py-2 rounded-xl text-xs font-bold transition border border-grey/10 dark:border-white/10 flex items-center gap-1.5"
           >
-            🔄 Refresh Now
+            <Icon icon="solar:restart-bold" width="14" height="14" />
+            <span>Refresh</span>
           </button>
 
           <button
             onClick={exportToCSV}
-            className="bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-lg text-xs font-black transition shadow-md shadow-sky-500/20"
+            className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-primary/20 flex items-center gap-1.5"
           >
-            📊 Export CSV (Excel)
+            <Icon icon="solar:file-download-bold" width="14" height="14" />
+            <span>Export CSV (Excel)</span>
           </button>
         </div>
       </header>
@@ -386,102 +378,34 @@ export default function OrganizerDashboardPage() {
       <main className="max-w-7xl mx-auto mt-6">
         {/* Metric Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#1E293B] border border-slate-800 rounded-xl p-4">
-            <span className="text-xs font-bold text-slate-400 uppercase">Registered Students</span>
-            <p className="text-2xl font-black text-white mt-1">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
+            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Registered Students</span>
+            <p className="text-2xl font-extrabold text-midnight_text dark:text-white mt-1">
               {participants.length} / {eventData?.maxParticipants || 150}
             </p>
           </div>
 
-          <div className="bg-[#1E293B] border border-slate-800 rounded-xl p-4">
-            <span className="text-xs font-bold text-slate-400 uppercase">Top Return (%)</span>
-            <p className="text-2xl font-black text-emerald-400 mt-1">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
+            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Top Return (%)</span>
+            <p className="text-2xl font-extrabold text-green-500 mt-1">
               +{participants[0]?.returnPercent ? participants[0].returnPercent.toFixed(2) : "0.00"}%
             </p>
           </div>
 
-          <div className="bg-[#1E293B] border border-slate-800 rounded-xl p-4">
-            <span className="text-xs font-bold text-slate-400 uppercase">Total Trades Placed</span>
-            <p className="text-2xl font-black text-sky-400 mt-1">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
+            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Total Trades Placed</span>
+            <p className="text-2xl font-extrabold text-primary mt-1">
               {participants.reduce((sum, p) => sum + (p.totalTrades || 0), 0)}
             </p>
           </div>
 
-          <div className="bg-[#1E293B] border border-slate-800 rounded-xl p-4">
-            <span className="text-xs font-bold text-slate-400 uppercase">Starting Capital</span>
-            <p className="text-2xl font-black text-amber-400 mt-1">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
+            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Starting Capital</span>
+            <p className="text-2xl font-extrabold text-amber-500 mt-1">
               ₹{(eventData?.initialCapital || 1000000).toLocaleString("en-IN")}
             </p>
           </div>
         </div>
-
-        {/* V2 Operations Control Center */}
-        {finalizationHealth && (
-          <div className="bg-[#1E293B] border border-slate-800 rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-            
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-4 border-b border-slate-800/60 mb-4">
-              <div>
-                <span className="text-[10px] font-black tracking-widest text-sky-400 uppercase bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20">
-                  V2 ENGINE OPERATIONS
-                </span>
-                <h2 className="text-lg font-bold text-white mt-1.5">Finalization lock & lease state</h2>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleRetryFinalization}
-                  disabled={retryLoading}
-                  className="bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 px-4 py-2 rounded-xl text-xs font-black transition"
-                >
-                  {retryLoading ? "Triggering..." : "🔄 Retry Finalization"}
-                </button>
-                <button
-                  onClick={handleRetryNotifications}
-                  disabled={notifRetryLoading}
-                  className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition"
-                >
-                  {notifRetryLoading ? "Retrying..." : "✉️ Retry Push Notifications"}
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Engine Status</span>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className={`w-2.5 h-2.5 rounded-full ${
-                    finalizationHealth.systemStatus === "HEALTHY"
-                      ? "bg-emerald-400 animate-pulse"
-                      : finalizationHealth.systemStatus === "RETRYING"
-                      ? "bg-amber-400 animate-pulse"
-                      : "bg-red-500 animate-pulse"
-                  }`} />
-                  <p className="text-slate-200 font-bold uppercase">{finalizationHealth.systemStatus}</p>
-                </div>
-              </div>
-
-              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Attempts Count</span>
-                <p className="text-slate-200 font-mono font-bold mt-1.5 text-sm">{finalizationHealth.finalizationAttempt}</p>
-              </div>
-
-              <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800/60 col-span-1 md:col-span-2">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Lease Lock Valid Until</span>
-                <p className="text-slate-200 mt-1.5 font-mono font-semibold">
-                  {finalizationHealth.finalizationLeaseUntil
-                    ? new Date(finalizationHealth.finalizationLeaseUntil).toLocaleString("en-IN")
-                    : "No active execution lease lock"}
-                </p>
-              </div>
-            </div>
-
-            {finalizationHealth.finalizationError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-xs font-mono mt-4 overflow-x-auto">
-                <strong>Error details:</strong> {finalizationHealth.finalizationError}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Search & Filter Bar */}
         <div className="mb-4">
@@ -490,58 +414,58 @@ export default function OrganizerDashboardPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="🔍 Search student by name, enrollment number, or division..."
-            className="w-full bg-[#1E293B] border border-slate-700/80 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition"
+            className="w-full bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl px-4 py-3 text.midnight_text dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary transition text-sm shadow-md"
           />
         </div>
 
         {/* Leaderboard Data Table */}
-        <div className="bg-[#1E293B] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl">
           {loading && !participants.length ? (
-            <div className="p-12 text-center text-slate-400">Loading student rankings...</div>
+            <div className="p-12 text-center text-muted dark:text-white/60">Loading student rankings...</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 text-xs uppercase font-extrabold border-b border-slate-800">
-                    <th className="py-3.5 px-4">Rank</th>
-                    <th className="py-3.5 px-4">Enrollment No</th>
-                    <th className="py-3.5 px-4">Division</th>
-                    <th className="py-3.5 px-4">Student Name</th>
-                    <th className="py-3.5 px-4 text-right">Portfolio Value</th>
-                    <th className="py-3.5 px-4 text-right">Return (%)</th>
-                    <th className="py-3.5 px-4 text-right">Win Rate</th>
-                    <th className="py-3.5 px-4 text-right">Trades</th>
-                    <th className="py-3.5 px-4 text-center">Action</th>
+                  <tr className="bg-gray-50 dark:bg-slate-900/80 text-muted dark:text-white/70 text-xs uppercase font-extrabold border-b border-grey/10 dark:border-white/10">
+                    <th className="py-4 px-4">Rank</th>
+                    <th className="py-4 px-4">Enrollment No</th>
+                    <th className="py-4 px-4">Division</th>
+                    <th className="py-4 px-4">Student Name</th>
+                    <th className="py-4 px-4 text-right">Portfolio Value</th>
+                    <th className="py-4 px-4 text-right">Return (%)</th>
+                    <th className="py-4 px-4 text-right">Win Rate</th>
+                    <th className="py-4 px-4 text-right">Trades</th>
+                    <th className="py-4 px-4 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-sm">
+                <tbody className="divide-y divide-grey/10 dark:divide-white/10 text-sm">
                   {filteredParticipants.map((student) => {
                     const isGain = (student.returnPercent || 0) >= 0;
                     return (
-                      <tr key={student.userId || student.rank} className="hover:bg-slate-800/40 transition">
-                        <td className="py-3.5 px-4 font-black">
+                      <tr key={student.userId || student.rank} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                        <td className="py-3.5 px-4 font-black text-midnight_text dark:text-white">
                           {student.rank === 1 ? "🥇 1" : student.rank === 2 ? "🥈 2" : student.rank === 3 ? "🥉 3" : `#${student.rank}`}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-300">
+                        <td className="py-3.5 px-4 font-mono text-muted dark:text-white/80">
                           {student.customFieldValues?.enrollmentNo || "N/A"}
                         </td>
-                        <td className="py-3.5 px-4 text-slate-400">{student.customFieldValues?.division || "BBA"}</td>
-                        <td className="py-3.5 px-4 font-bold text-white">{student.displayName}</td>
-                        <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-200">
+                        <td className="py-3.5 px-4 text-muted dark:text-white/70">{student.customFieldValues?.division || "BBA"}</td>
+                        <td className="py-3.5 px-4 font-bold text-midnight_text dark:text-white">{student.displayName}</td>
+                        <td className="py-3.5 px-4 text-right font-mono font-bold text-midnight_text dark:text-white">
                           ₹{(student.eventValuation || 1000000).toLocaleString("en-IN")}
                         </td>
-                        <td className={`py-3.5 px-4 text-right font-mono font-extrabold ${isGain ? "text-emerald-400" : "text-red-400"}`}>
+                        <td className={`py-3.5 px-4 text-right font-mono font-extrabold ${isGain ? "text-green-500" : "text-red-500"}`}>
                           {isGain ? "+" : ""}
                           {student.returnPercent ? student.returnPercent.toFixed(2) : "0.00"}%
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono text-slate-300">
+                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">
                           {student.winRate ? student.winRate.toFixed(0) : 0}%
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono text-slate-400">{student.totalTrades || 0}</td>
+                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/70">{student.totalTrades || 0}</td>
                         <td className="py-3.5 px-4 text-center">
                           <button
                             onClick={() => openTradeAudit(student)}
-                            className="bg-slate-800 hover:bg-slate-700 text-sky-400 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-700"
+                            className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-xl text-xs font-bold transition border border-primary/20"
                           >
                             Inspect Audit
                           </button>
@@ -556,35 +480,36 @@ export default function OrganizerDashboardPage() {
         </div>
       </main>
 
-      {/* Trade Audit Log Modal */}
+      {/* Trade Audit Modal */}
       {selectedStudent && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-[#1E293B] border border-slate-700 rounded-2xl max-w-3xl w-full p-6 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex justify-between items-start pb-4 border-b border-slate-800">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-6 max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+            <div className="flex justify-between items-center pb-4 border-b border-grey/10 dark:border-white/10">
               <div>
-                <span className="text-xs font-bold text-sky-400 uppercase">TRADE AUDIT INSPECTOR</span>
-                <h3 className="text-xl font-black text-white mt-1">{selectedStudent.displayName}</h3>
-                <p className="text-slate-400 text-xs">
-                  Enrollment: {selectedStudent.customFieldValues?.enrollmentNo || "N/A"} • Division: {selectedStudent.customFieldValues?.division || "BBA"}
-                </p>
+                <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-md">
+                  STUDENT TRADE AUDIT
+                </span>
+                <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-1">
+                  {selectedStudent.displayName} ({selectedStudent.customFieldValues?.enrollmentNo || "N/A"})
+                </h3>
               </div>
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="text-slate-400 hover:text-white text-lg font-bold p-1"
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white flex items-center justify-center font-bold"
               >
                 ✕
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto my-4">
+            <div className="overflow-y-auto flex-grow my-4">
               {loadingTrades ? (
-                <div className="p-8 text-center text-slate-400">Loading student trade history...</div>
+                <div className="p-8 text-center text-muted dark:text-white/60">Loading student trade history...</div>
               ) : !tradeLogs.length ? (
-                <div className="p-8 text-center text-slate-500">No trades executed by this student yet.</div>
+                <div className="p-8 text-center text-muted dark:text-white/50">No trades executed by this student yet.</div>
               ) : (
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-900/60 text-slate-400 uppercase font-bold border-b border-slate-800">
+                    <tr className="bg-gray-50 dark:bg-slate-900 text-muted dark:text-white/70 uppercase font-bold border-b border-grey/10 dark:border-white/10">
                       <th className="py-2.5 px-3">Symbol</th>
                       <th className="py-2.5 px-3">Type</th>
                       <th className="py-2.5 px-3 text-right">Qty</th>
@@ -594,25 +519,25 @@ export default function OrganizerDashboardPage() {
                       <th className="py-2.5 px-3 text-right">Executed At</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-grey/10 dark:divide-white/10 font-mono">
                     {tradeLogs.map((trade) => {
                       const isBuy = trade.side === "BUY";
                       const isProfit = (trade.pnl || 0) >= 0;
                       return (
-                        <tr key={trade._id} className="hover:bg-slate-800/30">
-                          <td className="py-2.5 px-3 font-bold text-white">{trade.symbol}</td>
+                        <tr key={trade._id} className="hover:bg-gray-50 dark:hover:bg-white/5">
+                          <td className="py-2.5 px-3 font-bold text-midnight_text dark:text-white">{trade.symbol}</td>
                           <td className="py-2.5 px-3">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${isBuy ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${isBuy ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
                               {trade.side}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-right text-slate-200">{trade.quantity}</td>
-                          <td className="py-2.5 px-3 text-right text-slate-200">₹{trade.price}</td>
-                          <td className="py-2.5 px-3 text-right text-slate-200">₹{trade.totalValue?.toLocaleString("en-IN")}</td>
-                          <td className={`py-2.5 px-3 text-right font-bold ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">{trade.quantity}</td>
+                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.price}</td>
+                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.totalValue?.toLocaleString("en-IN")}</td>
+                          <td className={`py-2.5 px-3 text-right font-bold ${isProfit ? "text-green-500" : "text-red-500"}`}>
                             {trade.side === "SELL" ? `₹${trade.pnl?.toFixed(2)}` : "---"}
                           </td>
-                          <td className="py-2.5 px-3 text-right text-slate-400">
+                          <td className="py-2.5 px-3 text-right text-muted dark:text-white/60">
                             {trade.executedAt ? new Date(trade.executedAt).toLocaleTimeString() : "---"}
                           </td>
                         </tr>
@@ -623,10 +548,10 @@ export default function OrganizerDashboardPage() {
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-800 text-right">
+            <div className="pt-3 border-t border-grey/10 dark:border-white/10 text-right">
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-bold"
+                className="bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-5 py-2 rounded-xl text-xs font-bold transition"
               >
                 Close Audit
               </button>

@@ -1,34 +1,44 @@
+import React from "react";
+import { Metadata } from "next";
 import HeroSub from "@/components/SharedComponents/HeroSub";
+import ServicesList from "@/components/Services/ServicesList";
 import Payment from "@/components/Home/Payment";
 import Benefit from "@/components/Home/Benefit";
-import Spend from "@/components/Home/Spend";
-import { Metadata } from "next";
+
 export const metadata: Metadata = {
-  title: "Services | Arthhwise",
-  description: "Explore our range of trading education services, from paper trading to real-time market analysis tools.",
+  title: "Services & Features | Arthhwise Paper Trading App",
+  description:
+    "Explore Arthhwise services: F&O paper trading options chain, virtual crypto trading, campus event hosting, stock market courses, daily contests & quizzes.",
   alternates: {
     canonical: "/services",
   },
-  robots: { index: false, follow: false },
+  openGraph: {
+    title: "Services & Features | Arthhwise Paper Trading App",
+    description:
+      "Risk-free paper trading, F&O derivatives simulator, campus championships, stock market education courses, and daily contests.",
+    url: "https://arthhwise.com/services",
+    siteName: "Arthhwise",
+  },
 };
 
-const Services = () => {
+const ServicesPage = () => {
   const breadcrumbLinks = [
     { href: "/", text: "Home" },
     { href: "/services", text: "Services" },
   ];
+
   return (
     <>
       <HeroSub
-        title="Services"
-        description="Discover a wealth of insightful materials meticulously crafted to provide you with a comprehensive understanding of the latest trends."
+        title="Our Services & Features"
+        description="Explore the comprehensive suite of trading tools, campus event hosting engines, stock market courses, and daily games built for Indian retail investors."
         breadcrumbLinks={breadcrumbLinks}
       />
+      <ServicesList />
       <Payment />
       <Benefit />
-      <Spend />
     </>
   );
 };
 
-export default Services;
+export default ServicesPage;
