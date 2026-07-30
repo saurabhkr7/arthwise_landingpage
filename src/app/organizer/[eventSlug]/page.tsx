@@ -28,6 +28,11 @@ export default function EventOrganizerControlPanel() {
   const [tradeLogs, setTradeLogs] = useState<any[]>([]);
   const [loadingTrades, setLoadingTrades] = useState(false);
 
+  // Allowed asset classes quick-edit state
+  const [allowedEdit, setAllowedEdit] = useState<string[]>([]);
+  const [assetSaving, setAssetSaving] = useState(false);
+  const [assetSaveMsg, setAssetSaveMsg] = useState("");
+
   // Auto-fill passcode from dashboard session if available
   useEffect(() => {
     const storedPasscode = sessionStorage.getItem(`organizer_passcode_${eventSlug}`);
@@ -67,6 +72,7 @@ export default function EventOrganizerControlPanel() {
       const eventJson = await eventRes.json();
       if (eventJson.success && eventJson.event) {
         setEventData(eventJson.event);
+        setAllowedEdit(eventJson.event.allowedAssetClasses || ["EQUITY"]);
         setIsAuthenticated(true);
 
         const eventId = eventJson.event.id;
@@ -261,6 +267,36 @@ export default function EventOrganizerControlPanel() {
     }
   };
 
+  // Update allowed asset classes on the live event
+  const handleUpdateAssetClasses = async () => {
+    if (!eventData?.id || allowedEdit.length === 0) return;
+    setAssetSaving(true);
+    setAssetSaveMsg("");
+    try {
+      const orgToken = sessionStorage.getItem("organizer_token");
+      const res = await fetch(`${API_BASE_URL}/market-event/organizer/${eventData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${orgToken}`,
+        },
+        body: JSON.stringify({ allowedAssetClasses: allowedEdit }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setEventData((prev: any) => ({ ...prev, allowedAssetClasses: allowedEdit }));
+        setAssetSaveMsg("✅ Asset classes updated. Students can now place orders for enabled classes.");
+      } else {
+        setAssetSaveMsg(`❌ ${json.message || "Update failed."}`);
+      }
+    } catch (err) {
+      setAssetSaveMsg("❌ Network error. Try again.");
+    } finally {
+      setAssetSaving(false);
+      setTimeout(() => setAssetSaveMsg(""), 5000);
+    }
+  };
+
   // Filter participants by search query
   const filteredParticipants = participants.filter((p) => {
     const q = searchQuery.toLowerCase();
@@ -346,11 +382,10 @@ export default function EventOrganizerControlPanel() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
-              autoRefresh
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${autoRefresh
                 ? "bg-green-500/10 text-green-500 border-green-500/30"
                 : "bg-gray-100 dark:bg-white/10 text-muted dark:text-white/60 border-grey/10 dark:border-white/10"
-            }`}
+              }`}
           >
             <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-green-500 animate-pulse" : "bg-gray-400"}`} />
             Auto Refresh (15s): {autoRefresh ? "ON" : "OFF"}
@@ -407,7 +442,40 @@ export default function EventOrganizerControlPanel() {
           </div>
         </div>
 
-        {/* Search & Filter Bar */}
+        {/* Allowed Asset Classes Quick-Edit */}
+        <div className="bg-white dark:bg-darkHeroBg border border-amber-500/20 rounded-2xl p-5 shadow-xl mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">⚡ Allowed Trading Instruments</span>
+              <p className="text-xs text-muted dark:text-white/60 mt-0.5">Enable or disable asset classes for students in this live event.</p>
+            </div>
+            <div className="flex items-center gap-4">
+              {["EQUITY", "FNO", "CRYPTO"].map((asset) => (
+                <label key={asset} className="flex items-center gap-2 text-xs font-bold text-midnight_text dark:text-white cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={allowedEdit.includes(asset)}
+                    onChange={(e) => {
+                      if (e.target.checked) setAllowedEdit((prev) => [...prev, asset]);
+                      else setAllowedEdit((prev) => prev.filter((a) => a !== asset));
+                    }}
+                    className="w-4 h-4 accent-primary rounded cursor-pointer"
+                  />
+                  {asset}
+                </label>
+              ))}
+              <button
+                onClick={handleUpdateAssetClasses}
+                disabled={assetSaving || allowedEdit.length === 0}
+                className="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-xl text-xs font-extrabold transition disabled:opacity-50"
+              >
+                {assetSaving ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+          {assetSaveMsg && <p className="text-xs mt-3 font-semibold">{assetSaveMsg}</p>}
+        </div>
+
         <div className="mb-4">
           <input
             type="text"
@@ -449,7 +517,7 @@ export default function EventOrganizerControlPanel() {
                         <td className="py-3.5 px-4 font-mono text-muted dark:text-white/80">
                           {student.customFieldValues?.enrollmentNo || "N/A"}
                         </td>
-                        <td className="py-3.5 px-4 text-muted dark:text-white/70">{student.customFieldValues?.division || "BBA"}</td>
+                        <td className="py-3.5 px-4 text-muted dark:text-white/70">{student.customFieldValues?.division || ""}</td>
                         <td className="py-3.5 px-4 font-bold text-midnight_text dark:text-white">{student.displayName}</td>
                         <td className="py-3.5 px-4 text-right font-mono font-bold text-midnight_text dark:text-white">
                           ₹{(student.eventValuation || 1000000).toLocaleString("en-IN")}
