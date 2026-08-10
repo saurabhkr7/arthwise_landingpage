@@ -26,6 +26,7 @@ Commands:
   --inspect       Fetch sitemap.xml and inspect indexed URLs
   --list-sites    List Search Console properties available to the service account
   --report        Create a rolling 28-day report from complete Search Console data
+  --submit <url>  Request indexing of a new or updated URL using the Google Indexing API
   --help          Show this help menu
 `);
 }
@@ -40,7 +41,10 @@ function getGoogleAuth() {
   return new google.auth.JWT({
     email: credentials.client_email,
     key: credentials.private_key,
-    scopes: ["https://www.googleapis.com/auth/webmasters"],
+    scopes: [
+      "https://www.googleapis.com/auth/webmasters",
+      "https://www.googleapis.com/auth/indexing"
+    ],
   });
 }
 
@@ -189,6 +193,30 @@ async function run() {
 
   if (command === "--report") {
     await queryPerformanceReport(auth);
+    return;
+  }
+
+  if (command === "--submit") {
+    const urlsToSubmit = args.slice(1);
+    if (urlsToSubmit.length === 0) {
+      console.log("Usage: node scripts/seo-agent.js --submit <url1> [url2] ...");
+      return;
+    }
+    const indexing = google.indexing({ version: "v3", auth });
+    for (const url of urlsToSubmit) {
+      try {
+        console.log(`[Info] Submitting ${url} to Google Indexing API...`);
+        const res = await indexing.urlNotifications.publish({
+          requestBody: {
+            url: url,
+            type: "URL_UPDATED"
+          }
+        });
+        console.log(`[Success] Submitted ${url}. Notification ID: ${res.data.urlNotificationMetadata?.latestUpdate?.notificationId || "unknown"}`);
+      } catch (err) {
+        console.error(`[Error] Failed to submit ${url}:`, err.message);
+      }
+    }
     return;
   }
 

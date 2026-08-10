@@ -30,7 +30,7 @@ export default function CreateEventPage() {
   const [maxParticipants, setMaxParticipants] = useState(150);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY"]);
+  const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO"]);
   
   // Custom Verification Fields
   const [customFields, setCustomFields] = useState<any[]>([
@@ -122,7 +122,7 @@ export default function CreateEventPage() {
         rules
       };
 
-      const res = await fetch(`${API_BASE_URL}/market-event`, {
+      const res = await fetch(`${API_BASE_URL}/market-event/organizer/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,6 +132,11 @@ export default function CreateEventPage() {
       });
 
       const json = await res.json();
+      if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again") || json.message.includes("Invalid token")))) {
+        sessionStorage.clear();
+        router.push("/organizer/login");
+        return;
+      }
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to create trading event.");
       }
