@@ -160,6 +160,7 @@ export default function EventOrganizerControlPanel() {
         sessionStorage.setItem(`organizer_passcode_${eventSlug}`, passcode.trim());
         setIsAuthenticated(true);
         setEventData(eventJson.event);
+        setAllowedEdit(eventJson.event.allowedAssetClasses || ["EQUITY"]);
 
         const eventId = eventJson.event.id;
         const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
