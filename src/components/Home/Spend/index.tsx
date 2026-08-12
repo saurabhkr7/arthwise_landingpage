@@ -66,6 +66,7 @@ const Spend: FC = () => {
               <button
                 className="text-midnight_text absolute z-1 top-40% md:left-1/2 left-45% rounded-full hover:text-primary py-4 px-3 bg-white"
                 onClick={openModal}
+                aria-label="Play video demonstration"
               >
                 <Icon icon="solar:play-bold" width="24" height="16" />
               </button>
@@ -79,12 +80,13 @@ const Spend: FC = () => {
                       <button
                         onClick={closeModal}
                         className="bg-[url('/images/icon/closed.svg')] bg-no-repeat bg-contain w-5 h-5 inline-block dark:invert"
+                        aria-label="Close video modal"
                       ></button>
                     </div>
                     <iframe
                       height="400"
                       className="p-4 md:w-50 w-full"
-                      src="https://www.youtube.com/embed/lfJkuZQfy9I"
+                      src="https://www.youtube.com/embed/G28xvzccX90"
                       title="YouTube video player"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
