@@ -86,6 +86,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/contact", changeFrequency: "monthly", priority: 0.5 },
     { path: "/contests", changeFrequency: "daily", priority: 0.8 },
     { path: "/leaderboard", changeFrequency: "daily", priority: 0.7 },
+    { path: "/host-event", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/trading-events", changeFrequency: "daily", priority: 0.95 },
+    { path: "/organize-college-trading-contest", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/corporate-stock-leagues", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/organizer-toolkit", changeFrequency: "monthly", priority: 0.9 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.2 },
   ];
