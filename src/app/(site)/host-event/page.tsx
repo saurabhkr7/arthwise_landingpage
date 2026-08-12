@@ -204,6 +204,94 @@ const HostEventPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Navigation to Specific Target Pages */}
+          <div className="mb-20">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-midnight_text dark:text-white text-center mb-10">
+              Explore Our Custom Solutions &amp; Event Toolkits
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Link
+                href="/organize-college-trading-contest"
+                className="p-6 rounded-3xl bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 shadow-xl hover:border-primary/40 hover:shadow-2xl transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                    <Icon icon="solar:diploma-bold" width="20" height="20" />
+                  </div>
+                  <h3 className="text-base font-bold text-midnight_text dark:text-white mb-2">
+                    College Championships
+                  </h3>
+                  <p className="text-xs text-muted dark:text-white/60 leading-relaxed mb-4">
+                    Turn-key solutions for Finance Clubs, Management fests, and campus E-Summits.
+                  </p>
+                </div>
+                <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 duration-200">
+                  Read college guide &rarr;
+                </span>
+              </Link>
+
+              <Link
+                href="/corporate-stock-leagues"
+                className="p-6 rounded-3xl bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 shadow-xl hover:border-primary/40 hover:shadow-2xl transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                    <Icon icon="solar:buildings-bold" width="20" height="20" />
+                  </div>
+                  <h3 className="text-base font-bold text-midnight_text dark:text-white mb-2">
+                    Corporate Leagues
+                  </h3>
+                  <p className="text-xs text-muted dark:text-white/60 leading-relaxed mb-4">
+                    Gamify financial literacy programs, L&amp;D exercises, and internal office leagues.
+                  </p>
+                </div>
+                <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 duration-200">
+                  Read corporate guide &rarr;
+                </span>
+              </Link>
+
+              <Link
+                href="/organizer-toolkit"
+                className="p-6 rounded-3xl bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 shadow-xl hover:border-primary/40 hover:shadow-2xl transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                    <Icon icon="solar:folder-with-files-bold" width="20" height="20" />
+                  </div>
+                  <h3 className="text-base font-bold text-midnight_text dark:text-white mb-2">
+                    Free Organizer Toolkit
+                  </h3>
+                  <p className="text-xs text-muted dark:text-white/60 leading-relaxed mb-4">
+                    Download rulebook templates, intraday guidelines, Sharpe scoring guides, and promos.
+                  </p>
+                </div>
+                <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 duration-200">
+                  Access free toolkit &rarr;
+                </span>
+              </Link>
+
+              <Link
+                href="/trading-events"
+                className="p-6 rounded-3xl bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 shadow-xl hover:border-primary/40 hover:shadow-2xl transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                    <Icon icon="solar:cup-star-bold" width="20" height="20" />
+                  </div>
+                  <h3 className="text-base font-bold text-midnight_text dark:text-white mb-2">
+                    Live Championships
+                  </h3>
+                  <p className="text-xs text-muted dark:text-white/60 leading-relaxed mb-4">
+                    See live, upcoming, and past virtual stock market tournaments active on the platform.
+                  </p>
+                </div>
+                <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 duration-200">
+                  Browse championships &rarr;
+                </span>
+              </Link>
+            </div>
+          </div>
+
           {/* Inquiry Form Anchor Section */}
           <div id="inquiry-form" className="max-w-3xl mx-auto">
             <InquiryForm />

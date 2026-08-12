@@ -80,6 +80,10 @@ export const footerLinks: { link: string, href?: string }[] = [
     href: "/learn",
   },
   {
+    link: "Championships",
+    href: "/trading-events",
+  },
+  {
     link: "Learning Center",
     href: "/learn",
   },
@@ -88,28 +92,24 @@ export const footerLinks: { link: string, href?: string }[] = [
     href: "/blog",
   },
   {
-    link: "Trading Tools",
-    href: "/learn",
+    link: "College Contests",
+    href: "/organize-college-trading-contest",
   },
   {
-    link: "Trading Contests",
-    href: "/contests",
+    link: "Corporate Leagues",
+    href: "/corporate-stock-leagues",
+  },
+  {
+    link: "Organizer Toolkit",
+    href: "/organizer-toolkit",
   },
   {
     link: "Leaderboard",
     href: "/leaderboard",
   },
   {
-    link: "Blog",
-    href: "/blog",
-  },
-  // {
-  //   link: "Documentation",
-  //   href: "/documentation",
-  // },
-  {
-    link: "Early Access",
-    href: "/waiting-list",
+    link: "Host Event",
+    href: "/host-event",
   },
   {
     link: "Support",
