@@ -4,20 +4,20 @@ export const headerData: HeaderItem[] = [
   { label: "Home", href: "/" },
   { label: "Learn", href: "/learn" },
   { label: "Glossary", href: "/glossary" },
-  { label: "Services", href: "/services" },
-  { label: "Host Event", href: "/host-event" },
-  // { label: " Pricing", href: "/pricing" },
+  {
+    label: "Host Event",
+    href: "/host-event",
+    submenu: [
+      { label: "Request Event Setup", href: "/host-event" },
+      { label: "College Trading Contests", href: "/organize-college-trading-contest" },
+      { label: "Corporate Stock Leagues", href: "/corporate-stock-leagues" },
+      { label: "Free Organizer Toolkit", href: "/organizer-toolkit" },
+    ],
+  },
+  { label: "Championships", href: "/trading-events" },
   {
     label: "Blog",
     href: "/blog",
-    /*
-    submenu: [
-      { label: " BlogList", href: "/blog" },
-      { label: "Blog Details", href: "/blog/blog_1" },
-    ],
-    */
   },
   { label: "Contact", href: "/contact" },
-  { label: "Privacy Policy", href: "/privacy" },
-  // { label: "Docs", href: "/documentation#version" },
 ];

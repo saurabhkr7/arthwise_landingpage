@@ -18,13 +18,24 @@ const servicesData = [
   },
   {
     icon: "solar:cup-star-bold",
-    title: "Campus & Corporate Trading Events",
-    badge: "For Colleges & Organizations",
+    title: "Campus Trading Championships",
+    badge: "For Colleges & Clubs",
     badgeColor: "bg-primary/10 text-primary border-primary/20",
     description:
-      "Host private stock market championships for your college fest, Finance Club, E-Summit, or corporate team. Turn-key platform with co-branded app banners, private join codes, live leaderboards, and PDF certificates.",
-    link: "/host-event",
-    linkText: "Host an Event (100% Free)",
+      "Host private paper trading fests, E-Summit challenges, and Finance club contests in under 24 hours. Features live leaderboard rankings, student audit exports, and co-branded certificates.",
+    link: "/organize-college-trading-contest",
+    linkText: "College Events Guide",
+    isExternal: false,
+  },
+  {
+    icon: "solar:buildings-bold",
+    title: "Corporate Stock Leagues",
+    badge: "For Companies & Teams",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
+    description:
+      "Gamify financial literacy programs, L&D workshops, and employee engagement leagues with real live market simulations. Compliant, risk-free, and setup in under 24 hours.",
+    link: "/corporate-stock-leagues",
+    linkText: "Corporate Leagues Guide",
     isExternal: false,
   },
   {
