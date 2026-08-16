@@ -32,6 +32,16 @@ export default function EventOrganizerControlPanel() {
   const [allowedEdit, setAllowedEdit] = useState<string[]>([]);
   const [assetSaving, setAssetSaving] = useState(false);
   const [assetSaveMsg, setAssetSaveMsg] = useState("");
+  const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
+  const [announcementTitle, setAnnouncementTitle] = useState("");
+  const [announcementDescription, setAnnouncementDescription] = useState("");
+  const [announcementSending, setAnnouncementSending] = useState(false);
+  const [announcementMessage, setAnnouncementMessage] = useState("");
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [announcementRetryId, setAnnouncementRetryId] = useState<string | null>(null);
+
+  const ANNOUNCEMENT_TITLE_LIMIT = 80;
+  const ANNOUNCEMENT_DESCRIPTION_LIMIT = 500;
 
   // Auto-fill passcode from dashboard session if available
   useEffect(() => {
@@ -85,11 +95,70 @@ export default function EventOrganizerControlPanel() {
         }
 
         fetchFinalizationHealth(eventId);
+        const announcementRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/announcements?limit=10`, {
+          headers: { Authorization: `Bearer ${passcode}` },
+        });
+        const announcementJson = await announcementRes.json();
+        if (announcementJson.success) setAnnouncements(announcementJson.data || []);
       }
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
   }, [eventSlug, passcode, fetchFinalizationHealth]);
+
+  const handleSendAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventData?.id) return;
+    if (!announcementTitle.trim() || !announcementDescription.trim()) {
+      setAnnouncementMessage("Please enter both a title and a description.");
+      return;
+    }
+
+    setAnnouncementSending(true);
+    setAnnouncementMessage("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/announcements`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${passcode}`,
+        },
+        body: JSON.stringify({ title: announcementTitle.trim(), description: announcementDescription.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setAnnouncementMessage(json.message || "Could not queue the announcement.");
+        return;
+      }
+      setAnnouncementMessage(`Queued for ${json.data?.queuedCount || 0} participants. ${json.data?.skippedCount || 0} have no push token.`);
+      setAnnouncementTitle("");
+      setAnnouncementDescription("");
+      setAnnouncementModalOpen(false);
+      fetchDashboardData();
+    } catch (err) {
+      setAnnouncementMessage("Network error while sending the announcement.");
+    } finally {
+      setAnnouncementSending(false);
+    }
+  };
+
+  const handleRetryAnnouncement = async (announcementId: string) => {
+    if (!eventData?.id) return;
+    setAnnouncementRetryId(announcementId);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/announcements/${announcementId}/retry`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) alert(json.message || "Could not retry this announcement.");
+      else fetchDashboardData();
+    } catch (err) {
+      alert("Network error while retrying the announcement.");
+    } finally {
+      setAnnouncementRetryId(null);
+    }
+  };
 
   // Retry V2 Finalization Execution
   const handleRetryFinalization = async () => {
@@ -384,8 +453,8 @@ export default function EventOrganizerControlPanel() {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${autoRefresh
-                ? "bg-green-500/10 text-green-500 border-green-500/30"
-                : "bg-gray-100 dark:bg-white/10 text-muted dark:text-white/60 border-grey/10 dark:border-white/10"
+              ? "bg-green-500/10 text-green-500 border-green-500/30"
+              : "bg-gray-100 dark:bg-white/10 text-muted dark:text-white/60 border-grey/10 dark:border-white/10"
               }`}
           >
             <span className={`w-2 h-2 rounded-full ${autoRefresh ? "bg-green-500 animate-pulse" : "bg-gray-400"}`} />
@@ -406,6 +475,15 @@ export default function EventOrganizerControlPanel() {
           >
             <Icon icon="solar:file-download-bold" width="14" height="14" />
             <span>Export CSV (Excel)</span>
+          </button>
+
+          <button
+            onClick={() => { setAnnouncementMessage(""); setAnnouncementModalOpen(true); }}
+            disabled={!['UPCOMING', 'LIVE'].includes(eventData?.status)}
+            className="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-amber-500/20 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Icon icon="solar:bell-bing-bold" width="14" height="14" />
+            <span>Notify Participants</span>
           </button>
         </div>
       </header>
@@ -476,6 +554,42 @@ export default function EventOrganizerControlPanel() {
           </div>
           {assetSaveMsg && <p className="text-xs mt-3 font-semibold">{assetSaveMsg}</p>}
         </div>
+
+        {/* Event announcement history */}
+        {announcements.length > 0 && (
+          <div className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">📣 Participant Announcements</span>
+                <p className="text-xs text-muted dark:text-white/60 mt-0.5">Delivery status for messages sent to this event only.</p>
+              </div>
+              <button onClick={() => setAnnouncementModalOpen(true)} className="text-xs font-bold text-primary hover:underline">Send another</button>
+            </div>
+            <div className="space-y-2">
+              {announcements.map((announcement) => (
+                <div key={announcement._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl bg-gray-50 dark:bg-white/5 px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold truncate">{announcement.title}</p>
+                    <p className="text-xs text-muted dark:text-white/60 truncate">{announcement.description}</p>
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px] whitespace-nowrap">
+                    <span className={`font-extrabold ${announcement.status === "FAILED" || announcement.status === "PARTIAL" ? "text-amber-500" : "text-green-500"}`}>{announcement.status}</span>
+                    <span className="text-muted dark:text-white/60">✓ {announcement.sentCount || 0} · ⏭ {announcement.skippedCount || 0} · ✕ {announcement.failedCount || 0}</span>
+                    {(announcement.status === "FAILED" || announcement.status === "PARTIAL") && (
+                      <button
+                        onClick={() => handleRetryAnnouncement(announcement._id)}
+                        disabled={announcementRetryId === announcement._id}
+                        className="text-primary font-bold hover:underline disabled:opacity-50"
+                      >
+                        {announcementRetryId === announcement._id ? "Retrying..." : "Retry"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mb-4">
           <input
@@ -625,6 +739,59 @@ export default function EventOrganizerControlPanel() {
                 Close Audit
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Organizer announcement composer */}
+      {announcementModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-darkHeroBg border border-amber-500/20 rounded-3xl p-6 max-w-xl w-full shadow-2xl">
+            <div className="flex justify-between items-start pb-4 border-b border-grey/10 dark:border-white/10">
+              <div>
+                <span className="text-[10px] font-extrabold text-amber-500 uppercase tracking-wider bg-amber-500/10 px-2.5 py-0.5 rounded-md">PARTICIPANT ANNOUNCEMENT</span>
+                <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-2">Notify event participants</h3>
+                <p className="text-xs text-muted dark:text-white/60 mt-1">Only registered participants of this event will receive this message.</p>
+              </div>
+              <button onClick={() => setAnnouncementModalOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <form onSubmit={handleSendAnnouncement} className="space-y-4 mt-5">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-bold uppercase">Title</label>
+                  <span className="text-[11px] text-muted dark:text-white/60">{announcementTitle.length}/{ANNOUNCEMENT_TITLE_LIMIT}</span>
+                </div>
+                <input
+                  value={announcementTitle}
+                  onChange={(e) => setAnnouncementTitle(e.target.value)}
+                  maxLength={ANNOUNCEMENT_TITLE_LIMIT}
+                  placeholder="Event starts in 30 minutes"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-bold uppercase">Description</label>
+                  <span className="text-[11px] text-muted dark:text-white/60">{announcementDescription.length}/{ANNOUNCEMENT_DESCRIPTION_LIMIT}</span>
+                </div>
+                <textarea
+                  value={announcementDescription}
+                  onChange={(e) => setAnnouncementDescription(e.target.value)}
+                  maxLength={ANNOUNCEMENT_DESCRIPTION_LIMIT}
+                  rows={5}
+                  placeholder="Please be ready on the Market tab before the opening bell."
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary resize-none"
+                />
+              </div>
+              {announcementMessage && <p className="text-xs font-semibold text-amber-500">{announcementMessage}</p>}
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setAnnouncementModalOpen(false)} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/10">Cancel</button>
+                <button type="submit" disabled={announcementSending || !announcementTitle.trim() || !announcementDescription.trim()} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-white disabled:opacity-50">
+                  {announcementSending ? "Queuing..." : "Send to participants"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
