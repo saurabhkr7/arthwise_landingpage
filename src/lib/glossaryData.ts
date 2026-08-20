@@ -96,4 +96,65 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition: "The process of identifying, analyzing, and accepting or mitigating uncertainty in investment decisions.",
     category: "Risk",
   },
+  {
+    term: "Option Chain",
+    slug: "option-chain",
+    definition: "A structured table showing all available options contracts (calls and puts) for a specific underlying stock or index, including strike prices, premiums, open interest, and implied volatility.",
+    category: "Instruments",
+  },
+  {
+    term: "Open Interest (OI)",
+    slug: "open-interest",
+    definition: "The total number of active, outstanding derivative contracts (such as options or futures) that have not yet been closed, exercised, or expired.",
+    category: "Analysis",
+  },
+  {
+    term: "Implied Volatility (IV)",
+    slug: "implied-volatility",
+    definition: "A metric that represents the market's expectation of the future volatility of an underlying stock's price, serving as a primary driver of option premium pricing.",
+    category: "Analysis",
+  },
+  {
+    term: "Call Option",
+    slug: "call-option",
+    definition: "A derivative contract giving the buyer the right, but not the obligation, to buy an underlying asset at a specified strike price before its expiration date.",
+    category: "Instruments",
+  },
+  {
+    term: "Put Option",
+    slug: "put-option",
+    definition: "A derivative contract giving the buyer the right, but not the obligation, to sell an underlying asset at a specified strike price before its expiration date.",
+    category: "Instruments",
+  },
+  {
+    term: "Strike Price",
+    slug: "strike-price",
+    definition: "The pre-determined price at which the buyer of an option can choose to buy (for a call option) or sell (for a put option) the underlying security.",
+    category: "Instruments",
+  },
+  {
+    term: "Option Premium",
+    slug: "option-premium",
+    definition: "The market price paid by the option buyer to the option seller (writer) to acquire the rights of the option contract.",
+    category: "Instruments",
+  },
+  {
+    term: "In the Money (ITM)",
+    slug: "in-the-money",
+    definition: "An option contract that has intrinsic value. For a call, the stock price is above the strike price. For a put, the stock price is below the strike price.",
+    category: "Trading",
+  },
+  {
+    term: "Out of the Money (OTM)",
+    slug: "out-of-the-money",
+    definition: "An option contract that has zero intrinsic value and consists only of time value. For a call, the stock price is below the strike price. For a put, it is above the strike price.",
+    category: "Trading",
+  },
+  {
+    term: "At the Money (ATM)",
+    slug: "at-the-money",
+    definition: "An option contract where the strike price is equal or extremely close to the current market price of the underlying asset.",
+    category: "Trading",
+  },
 ];
+
