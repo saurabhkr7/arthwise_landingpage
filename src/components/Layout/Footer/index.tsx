@@ -202,7 +202,7 @@ const Footer = () => {
               </div>
             </form>
             <p className="text-18 text-white font-bold py-12">Get App</p>
-            <div className="flex">
+            <div className="flex mb-8">
               <Link
                 href="https://play.google.com/store/apps/details?id=com.arthwise"
                 target="_blank"
@@ -225,6 +225,14 @@ const Footer = () => {
                   className="w-auto h-auto"
                 />
               </Link>
+            </div>
+            
+            <div className="pt-6 border-t border-dark_border">
+              <p className="text-xs font-bold text-foottext uppercase tracking-widest mb-3">Cloud Infrastructure</p>
+              <div className="flex items-center gap-2">
+                <Icon icon="logos:aws" width="36" height="22" className="opacity-90 grayscale hover:grayscale-0 transition duration-300" />
+                <span className="text-14 font-medium text-foottext">Supported by AWS Activate</span>
+              </div>
             </div>
           </div>
         </div>
