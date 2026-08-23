@@ -3,9 +3,11 @@
  * Tracks all deep link interactions for conversion optimization
  */
 
+import { DeepLinkType } from "./deeplink";
+
 export interface DeepLinkAnalytics {
   action: "click" | "opened" | "fallback" | "install" | "browser_continue";
-  type: "post" | "contest" | "profile" | "course" | "daily_quiz";
+  type: DeepLinkType;
   id: string;
   timestamp: string;
   device: "mobile" | "desktop" | "tablet";

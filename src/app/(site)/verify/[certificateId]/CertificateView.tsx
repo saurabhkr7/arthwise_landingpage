@@ -39,10 +39,16 @@ export default function CertificateView({ certificate }: { certificate: Certific
   const shareOnLinkedIn = () => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
     window.open(url, "_blank", "noopener,noreferrer");
+    navigator.clipboard.writeText(shareCaption).then(() => {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 3000);
+    }).catch(() => undefined);
   };
 
+  const pdfDownloadUrl = `${process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api"}/market-event/certificate/file/${encodeURIComponent(certificate.certificateId)}`;
+
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900 dark:bg-slate-950 dark:text-white sm:px-8">
+    <main className="min-h-screen bg-slate-100 px-4 pb-10 pt-32 text-slate-900 dark:bg-slate-950 dark:text-white sm:px-8 sm:pt-36">
       <div className="mx-auto max-w-5xl">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div>
@@ -54,10 +60,11 @@ export default function CertificateView({ certificate }: { certificate: Certific
               {copied ? "Caption copied" : "Copy share caption"}
             </button>
             <button type="button" onClick={shareOnLinkedIn} className="rounded-full bg-[#0a66c2] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#084f96]">
-              Share on LinkedIn
+              {copied ? "Caption copied - paste on LinkedIn" : "Copy caption & Share on LinkedIn"}
             </button>
-            <button type="button" onClick={printCertificate} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 dark:bg-white dark:text-slate-900">
-              Print / Save PDF
+            <a href={pdfDownloadUrl} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 dark:bg-white dark:text-slate-900">Download PDF</a>
+            <button type="button" onClick={printCertificate} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold shadow-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900">
+              Print preview
             </button>
           </div>
         </div>
@@ -96,7 +103,7 @@ export default function CertificateView({ certificate }: { certificate: Certific
             </div>
 
             <div className="flex w-full items-end justify-between gap-6 text-left text-sm text-slate-500">
-              <div><div className="mb-2 h-px w-36 bg-slate-300" /><p>Arthhwise Event Team</p></div>
+              <div><p className="mb-2 font-black tracking-[0.18em] text-slate-800">ARTHHWISE</p><div className="mb-2 h-px w-36 bg-slate-300" /><p>Arthhwise Event Team</p></div>
               <div className="text-right"><div className="mb-2 ml-auto h-px w-36 bg-slate-300" /><p>Issued {new Date(certificate.issuedAt).toLocaleDateString("en-IN")}</p><p className="mt-1 font-semibold text-emerald-600">✓ Verified online</p></div>
             </div>
           </div>
@@ -109,7 +116,7 @@ export default function CertificateView({ certificate }: { certificate: Certific
         @media print {
           html, body { background: #fff !important; }
           body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-          header, footer, .print\\:hidden { display: none !important; }
+          header, footer, #site-footer, .print\\:hidden { display: none !important; }
           main { min-height: auto !important; padding: 0 !important; background: #fff !important; }
           .certificate-sheet { min-height: 190mm !important; border-radius: 0 !important; box-shadow: none !important; }
         }

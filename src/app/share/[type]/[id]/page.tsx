@@ -47,11 +47,11 @@ export default function ShareBridgePage() {
         </div>
 
         <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Opening {type === 'contest' ? 'Contest' : 'Content'}...
+          Opening {type === 'contest' ? 'Contest' : type === 'market_event' || type === 'market-event' ? 'Trading Championship' : type === 'course' ? 'Trading Course' : type === 'daily_quiz' ? 'Daily Quiz' : type === 'post' ? 'Post' : 'Content'}...
         </h1>
         
         <p className="text-gray-600 mb-8">
-          We're taking you to the Arthhwise app to view this {type}.
+          We're taking you to the Arthhwise app to view this {type === 'market_event' || type === 'market-event' ? 'trading championship' : type}.
         </p>
 
         <button

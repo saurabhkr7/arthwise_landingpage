@@ -39,9 +39,25 @@ export default function EventOrganizerControlPanel() {
   const [announcementMessage, setAnnouncementMessage] = useState("");
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [announcementRetryId, setAnnouncementRetryId] = useState<string | null>(null);
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [certificateLoading, setCertificateLoading] = useState(false);
+  const [certificateMessage, setCertificateMessage] = useState("");
 
   const ANNOUNCEMENT_TITLE_LIMIT = 80;
   const ANNOUNCEMENT_DESCRIPTION_LIMIT = 500;
+
+  const fetchCertificates = useCallback(async (eventId: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/certificates`, {
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (res.ok && json.success) setCertificates(json.certificates || []);
+      else if (json.code !== "CERTIFICATES_NOT_READY") setCertificateMessage(json.message || "Could not load certificates.");
+    } catch (err) {
+      setCertificateMessage("Network error while loading certificates.");
+    }
+  }, [passcode]);
 
   // Auto-fill passcode from dashboard session if available
   useEffect(() => {
@@ -95,6 +111,7 @@ export default function EventOrganizerControlPanel() {
         }
 
         fetchFinalizationHealth(eventId);
+        fetchCertificates(eventId);
         const announcementRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/announcements?limit=10`, {
           headers: { Authorization: `Bearer ${passcode}` },
         });
@@ -104,7 +121,30 @@ export default function EventOrganizerControlPanel() {
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode, fetchFinalizationHealth]);
+  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates]);
+
+  const handleGenerateCertificates = async () => {
+    if (!eventData?.id || eventData.status !== "COMPLETED") return;
+    setCertificateLoading(true);
+    setCertificateMessage("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/certificates/generate`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setCertificateMessage(json.message || "Could not generate certificates.");
+        return;
+      }
+      setCertificateMessage(`Certificates ready: ${json.stats?.generated || 0} generated, ${json.stats?.existing || 0} already issued.`);
+      await fetchCertificates(eventData.id);
+    } catch (err) {
+      setCertificateMessage("Network error while generating certificates.");
+    } finally {
+      setCertificateLoading(false);
+    }
+  };
 
   const handleSendAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -520,6 +560,55 @@ export default function EventOrganizerControlPanel() {
             </p>
           </div>
         </div>
+
+        {/* Certificate generation and downloads */}
+        <section className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-primary uppercase tracking-widest">🏆 Certificates</span>
+              <p className="text-xs text-muted dark:text-white/60 mt-1">
+                Generate immutable PDFs after final rankings are completed. Participants can verify and print them publicly.
+              </p>
+            </div>
+            <button
+              onClick={handleGenerateCertificates}
+              disabled={certificateLoading || eventData?.status !== "COMPLETED"}
+              className="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-xl text-xs font-extrabold transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              {certificateLoading ? "Generating PDFs..." : eventData?.status === "COMPLETED" ? "Generate / Refresh Certificates" : `Available after completion (${eventData?.status || "..."})`}
+            </button>
+          </div>
+          {certificateMessage && <p className="text-xs mt-3 font-semibold text-primary">{certificateMessage}</p>}
+          {eventData?.status === "COMPLETED" && certificates.length > 0 ? (
+            <div className="mt-4 overflow-x-auto rounded-xl border border-grey/10 dark:border-white/10">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-gray-50 dark:bg-slate-900 text-muted dark:text-white/70 uppercase font-bold">
+                  <tr>
+                    <th className="px-3 py-2.5">Rank</th>
+                    <th className="px-3 py-2.5">Participant</th>
+                    <th className="px-3 py-2.5">Type</th>
+                    <th className="px-3 py-2.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-grey/10 dark:divide-white/10">
+                  {certificates.map((certificate) => (
+                    <tr key={certificate.certificateId}>
+                      <td className="px-3 py-2.5 font-bold">#{certificate.rank}</td>
+                      <td className="px-3 py-2.5 font-semibold">{certificate.userName}</td>
+                      <td className="px-3 py-2.5 text-muted dark:text-white/60">{certificate.certificateType}</td>
+                      <td className="px-3 py-2.5 text-right space-x-3">
+                        <a className="text-primary font-bold hover:underline" href={certificate.verificationUrl} target="_blank" rel="noreferrer">View</a>
+                        {certificate.downloadUrl ? <a className="text-primary font-bold hover:underline" href={certificate.downloadUrl} download>Download PDF</a> : <span className="text-muted">PDF pending</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : eventData?.status === "COMPLETED" ? (
+            <p className="text-xs mt-4 text-muted dark:text-white/60">No certificates generated yet.</p>
+          ) : null}
+        </section>
 
         {/* Allowed Asset Classes Quick-Edit */}
         <div className="bg-white dark:bg-darkHeroBg border border-amber-500/20 rounded-2xl p-5 shadow-xl mb-6">

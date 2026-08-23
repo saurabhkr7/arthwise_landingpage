@@ -353,6 +353,73 @@ export async function fetchFullDailyQuizContent(id: string): Promise<FullContent
 }
 
 /**
+ * Fetch market event content (preview)
+ */
+export async function fetchMarketEventContent(id: string): Promise<ContentPreview | null> {
+  try {
+    const response = await fetch(`${API_BASE}/api/market-event/public/${id}`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      console.warn(`Failed to fetch market event ${id}:`, response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const event = data.event || data;
+    return {
+      title: event.title || "Trading Championship",
+      description: event.description || `Join ${event.title} on Arthhwise! Compete with live virtual cash.`,
+      image: event.bannerImageUrl || event.sponsorLogoUrl,
+      category: "Trading Championship",
+      author: event.sponsorName,
+      createdAt: event.startTime,
+    };
+  } catch (error) {
+    console.error("Error fetching market event:", error);
+    return null;
+  }
+}
+
+/**
+ * Fetch full market event content for SEO page
+ */
+export async function fetchFullMarketEventContent(id: string): Promise<FullContent | null> {
+  try {
+    const response = await fetch(`${API_BASE}/api/market-event/public/${id}`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const event = data.event || data;
+    const rulesText = Array.isArray(event.rules) && event.rules.length > 0
+      ? `\n\nCompetition Rules:\n${event.rules.map((r: string, i: number) => `${i + 1}. ${r}`).join('\n')}`
+      : '';
+    return {
+      title: event.title || "Trading Championship",
+      description: event.description || `Join ${event.title} on Arthhwise! Compete with live virtual cash.`,
+      body: (event.description || "Compete in this trading championship with virtual cash on Arthhwise.") + rulesText,
+      image: event.bannerImageUrl || event.sponsorLogoUrl,
+      category: "Trading Championship",
+      author: event.sponsorName || "Arthhwise",
+      createdAt: event.startTime,
+      startDate: event.startTime,
+      endDate: event.endTime,
+      status: event.status || "UPCOMING",
+      participants: event.participantCount || event.maxParticipants || 0,
+      tags: ["PaperTrading", "NSE", "StockMarket", "TradingChampionship"].concat(
+        event.sponsorName ? [event.sponsorName.replace(/\s+/g, '')] : []
+      ),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Fetch content by type (preview — used for metadata)
  */
 export async function fetchContent(
@@ -370,6 +437,8 @@ export async function fetchContent(
       return fetchCourseContent(id);
     case "daily_quiz":
       return fetchDailyQuizContent(id);
+    case "market_event":
+      return fetchMarketEventContent(id);
     default:
       return null;
   }
@@ -393,6 +462,8 @@ export async function fetchFullContent(
       return fetchFullCourseContent(id);
     case "daily_quiz":
       return fetchFullDailyQuizContent(id);
+    case "market_event":
+      return fetchFullMarketEventContent(id);
     default:
       return null;
   }
@@ -408,6 +479,7 @@ export function getFallbackContent(type: DeepLinkType, id: string): ContentPrevi
     profile: "Trader Profile",
     course: "Trading Course",
     daily_quiz: "Daily Quiz",
+    market_event: "Trading Championship",
   };
 
   return {
@@ -446,6 +518,11 @@ export function getFullFallbackContent(type: DeepLinkType, id: string): FullCont
       title: "Daily Stock Market Quiz on Arthhwise",
       description: "Take today's daily quiz challenge on Arthhwise. Test your market knowledge, earn points, and climb the global leaderboard.",
       body: "The Arthhwise Daily Quiz challenges you with questions about stock markets, trading strategies, and financial concepts. Answer correctly to earn points, climb the leaderboard, and track your learning progress. New questions every day — download the app to take today's challenge.",
+    },
+    market_event: {
+      title: "Trading Championship on Arthhwise",
+      description: "Compete in university and sponsored paper trading championships with live NSE data on Arthhwise.",
+      body: "Arthhwise trading championships allow students and traders to test their market skills using virtual cash with real-time NSE prices. Build your portfolio, follow your strategy, and compete for top ranks on the live leaderboard. Download the Arthhwise app to join the competition.",
     },
   };
 

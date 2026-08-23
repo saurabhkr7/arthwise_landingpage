@@ -31,6 +31,7 @@ const ContentPageLayout: React.FC<ContentPageLayoutProps> = ({
     profile: "Trader Profile",
     course: "Trading Course",
     daily_quiz: "Daily Quiz",
+    market_event: "Trading Championship",
   };
 
   const breadcrumbs = [
@@ -53,7 +54,7 @@ const ContentPageLayout: React.FC<ContentPageLayoutProps> = ({
         />
       )}
 
-      {type === "contest" && (
+      {(type === "contest" || type === "market_event") && (
         <EventSchema
           name={content.title}
           description={content.description}
@@ -196,8 +197,8 @@ const ContentPageLayout: React.FC<ContentPageLayoutProps> = ({
                 </div>
               )}
 
-              {/* Contest-specific: Dates & Participants */}
-              {type === "contest" && (
+              {/* Contest & Market Event-specific: Dates & Participants */}
+              {(type === "contest" || type === "market_event") && (
                 <div className="grid sm:grid-cols-3 gap-4 mb-8">
                   {content.startDate && (
                     <div className="bg-heroBg dark:bg-midnight_text rounded-xl p-4">
