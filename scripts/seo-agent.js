@@ -23,11 +23,12 @@ Usage:
   node scripts/seo-agent.js <command>
 
 Commands:
-  --inspect       Fetch sitemap.xml and inspect indexed URLs
-  --list-sites    List Search Console properties available to the service account
-  --report        Create a rolling 28-day report from complete Search Console data
-  --submit <url>  Request indexing of a new or updated URL using the Google Indexing API
-  --help          Show this help menu
+  --inspect           Fetch sitemap.xml and inspect indexed URLs
+  --list-sites        List Search Console properties available to the service account
+  --report            Create a rolling 28-day report from complete Search Console data
+  --submit <url>      Request indexing of a new or updated URL using the Google Indexing API
+  --submit-sitemap    Fetch all sitemap.xml URLs and batch submit them for indexation
+  --help              Show this help menu
 `);
 }
 
@@ -213,6 +214,32 @@ async function run() {
           }
         });
         console.log(`[Success] Submitted ${url}. Notification ID: ${res.data.urlNotificationMetadata?.latestUpdate?.notificationId || "unknown"}`);
+      } catch (err) {
+        console.error(`[Error] Failed to submit ${url}:`, err.message);
+      }
+    }
+    return;
+  }
+
+  if (command === "--submit-sitemap") {
+    const urls = await fetchSitemapUrls();
+    if (urls.length === 0) {
+      console.log("[Error] No URLs found in sitemap to submit.");
+      return;
+    }
+    const indexing = google.indexing({ version: "v3", auth });
+    for (const url of urls) {
+      try {
+        console.log(`[Info] Submitting ${url} to Google Indexing API...`);
+        const res = await indexing.urlNotifications.publish({
+          requestBody: {
+            url: url,
+            type: "URL_UPDATED"
+          }
+        });
+        console.log(`[Success] Submitted ${url}. Notification ID: ${res.data.urlNotificationMetadata?.latestUpdate?.notificationId || "unknown"}`);
+        // Small rate limit delay to avoid hitting daily quotas too aggressively
+        await new Promise((resolve) => setTimeout(resolve, 300));
       } catch (err) {
         console.error(`[Error] Failed to submit ${url}:`, err.message);
       }
