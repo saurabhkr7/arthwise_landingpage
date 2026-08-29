@@ -30,7 +30,7 @@ export default function CreateEventPage() {
   const [maxParticipants, setMaxParticipants] = useState(150);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO"]);
+  const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO", "COMMODITY"]);
   
   // Custom Verification Fields
   const [customFields, setCustomFields] = useState<any[]>([
@@ -331,7 +331,7 @@ export default function CreateEventPage() {
           <div>
             <label className="block text-xs font-bold text-midnight_text dark:text-white mb-3">Allowed Asset Classes</label>
             <div className="flex gap-6">
-              {["EQUITY", "FNO", "CRYPTO"].map((asset) => (
+              {["EQUITY", "FNO", "CRYPTO", "COMMODITY"].map((asset) => (
                 <label key={asset} className="flex items-center gap-2 text-xs font-bold text-midnight_text dark:text-white cursor-pointer">
                   <input
                     type="checkbox"

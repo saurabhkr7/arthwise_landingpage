@@ -66,6 +66,7 @@ function EventCard({ event }: { event: TradingEvent }) {
   const hasEquity = event.allowedAssetClasses.includes("EQUITY");
   const hasFno = event.allowedAssetClasses.includes("FNO");
   const hasCrypto = event.allowedAssetClasses.includes("CRYPTO");
+  const hasCommodity = event.allowedAssetClasses.includes("COMMODITY");
 
   return (
     <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl overflow-hidden flex flex-col shadow-xl hover:border-primary/40 hover:shadow-2xl transition-all duration-300 group">
@@ -153,6 +154,7 @@ function EventCard({ event }: { event: TradingEvent }) {
             <AssetTag label="Delivery" enabled={hasEquity} />
             <AssetTag label="F&O" enabled={hasFno} />
             <AssetTag label="Crypto" enabled={hasCrypto} />
+            <AssetTag label="Commodities" enabled={hasCommodity} />
           </div>
         </div>
 
