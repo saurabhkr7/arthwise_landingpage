@@ -42,9 +42,27 @@ export default function EventOrganizerControlPanel() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [certificateLoading, setCertificateLoading] = useState(false);
   const [certificateMessage, setCertificateMessage] = useState("");
+  const [groupByField, setGroupByField] = useState("");
+  const [groupAnalytics, setGroupAnalytics] = useState<any[]>([]);
+  const [groupLoading, setGroupLoading] = useState(false);
 
   const ANNOUNCEMENT_TITLE_LIMIT = 80;
   const ANNOUNCEMENT_DESCRIPTION_LIMIT = 500;
+
+  const fetchGroupAnalytics = useCallback(async (eventId: string, fieldKey: string) => {
+    if (!fieldKey) { setGroupAnalytics([]); return; }
+    setGroupLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/group-analytics?field=${encodeURIComponent(fieldKey)}`, {
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (res.ok && json.success) setGroupAnalytics(json.groups || []);
+      else setGroupAnalytics([]);
+    } finally {
+      setGroupLoading(false);
+    }
+  }, [passcode]);
 
   const fetchCertificates = useCallback(async (eventId: string) => {
     try {
@@ -109,6 +127,7 @@ export default function EventOrganizerControlPanel() {
         if (lbJson.success) {
           setParticipants(lbJson.leaderboard || []);
         }
+        if (groupByField) fetchGroupAnalytics(eventId, groupByField);
 
         fetchFinalizationHealth(eventId);
         fetchCertificates(eventId);
@@ -121,7 +140,20 @@ export default function EventOrganizerControlPanel() {
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates]);
+  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, groupByField, fetchGroupAnalytics]);
+
+  const removeParticipant = async (student: any) => {
+    if (!eventData?.id || !student?.userId) return;
+    if (!confirm(`Remove ${student.displayName || "this participant"} from the event? Their audit history will be retained.`)) return;
+    const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/participants/${student.userId}/remove`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${passcode}` },
+      body: JSON.stringify({ reason: "REMOVED_BY_ORGANIZER" }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) alert(json.message || "Could not remove participant.");
+    else fetchDashboardData();
+  };
 
   const handleGenerateCertificates = async () => {
     if (!eventData?.id || eventData.status !== "COMPLETED") return;
@@ -696,6 +728,24 @@ export default function EventOrganizerControlPanel() {
           />
         </div>
 
+        {eventData?.customVerificationFields?.length > 0 && (
+          <section className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">Group performance</span>
+                <p className="text-xs text-muted dark:text-white/60 mt-1">Compare combined event portfolio performance by a verification field.</p>
+              </div>
+              <select value={groupByField} onChange={(e) => { setGroupByField(e.target.value); if (e.target.value) fetchGroupAnalytics(eventData.id, e.target.value); }} className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white">
+                <option value="">Select group field</option>
+                {eventData.customVerificationFields.map((field: any) => <option key={field.fieldKey} value={field.fieldKey}>{field.fieldLabel || field.fieldKey}</option>)}
+              </select>
+            </div>
+            {groupByField && (groupLoading ? <p className="text-xs mt-4 text-muted">Loading group totals...</p> : (
+              <div className="overflow-x-auto mt-4"><table className="w-full text-left text-xs"><thead><tr className="text-muted dark:text-white/60 uppercase"><th className="py-2">#</th><th>Group</th><th className="text-right">Participants</th><th className="text-right">Portfolio Value</th><th className="text-right">Return</th><th className="text-right">P&L</th><th className="text-right">Holdings</th><th className="text-right">Trades</th></tr></thead><tbody className="divide-y divide-grey/10 dark:divide-white/10">{groupAnalytics.map((group, index) => <tr key={group.groupValue}><td className="py-2 font-bold">{index + 1}</td><td className="font-semibold">{group.groupValue}</td><td className="text-right">{group.participantCount}</td><td className="text-right">₹{Number(group.totalPortfolioValue || 0).toLocaleString("en-IN")}</td><td className={`text-right font-bold ${group.aggregateReturnPercent >= 0 ? "text-green-500" : "text-red-500"}`}>{group.aggregateReturnPercent >= 0 ? "+" : ""}{Number(group.aggregateReturnPercent || 0).toFixed(2)}%</td><td className="text-right">₹{Number(group.totalNetPnl || 0).toLocaleString("en-IN")}</td><td className="text-right">{group.totalOpenHoldings}</td><td className="text-right">{group.totalTrades}</td></tr>)}</tbody></table></div>
+            ))}
+          </section>
+        )}
+
         {/* Leaderboard Data Table */}
         <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl">
           {loading && !participants.length ? (
@@ -750,6 +800,12 @@ export default function EventOrganizerControlPanel() {
                             className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-xl text-xs font-bold transition border border-primary/20"
                           >
                             Inspect Audit
+                          </button>
+                          <button
+                            onClick={() => removeParticipant(student)}
+                            className="ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 rounded-xl text-xs font-bold transition border border-red-500/20"
+                          >
+                            Remove
                           </button>
                         </td>
                       </tr>

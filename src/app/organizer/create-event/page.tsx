@@ -39,6 +39,7 @@ export default function CreateEventPage() {
   const [newFieldKey, setNewFieldKey] = useState("");
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldType, setNewFieldType] = useState("text");
+  const [newFieldOptions, setNewFieldOptions] = useState("");
 
   // Rules list
   const [rules, setRules] = useState<string[]>([
@@ -69,11 +70,15 @@ export default function CreateEventPage() {
         fieldKey: newFieldKey.trim(),
         fieldLabel: newFieldLabel.trim(),
         fieldType: newFieldType,
-        isRequired: true
+        isRequired: true,
+        ...(newFieldType === "select" ? {
+          options: newFieldOptions.split(/\r?\n/).map((value) => value.trim()).filter(Boolean).map((value) => ({ value, label: value }))
+        } : {})
       }
     ]);
     setNewFieldKey("");
     setNewFieldLabel("");
+    setNewFieldOptions("");
   };
 
   const removeCustomField = (index: number) => {
@@ -400,7 +405,16 @@ export default function CreateEventPage() {
               >
                 <option value="text">Text Input</option>
                 <option value="number">Number Input</option>
+                <option value="select">Dropdown Select</option>
               </select>
+              {newFieldType === "select" && (
+                <textarea
+                  placeholder="Dropdown options, one per line"
+                  value={newFieldOptions}
+                  onChange={(e) => setNewFieldOptions(e.target.value)}
+                  className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition flex-1 min-h-[38px]"
+                />
+              )}
               <button
                 type="button"
                 onClick={addCustomField}
