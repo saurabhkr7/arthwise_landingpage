@@ -337,12 +337,15 @@ export default function EventOrganizerControlPanel() {
       const json = await res.json();
       if (!json.success || !json.data) return;
 
+      const customFieldColumns = (eventData?.customVerificationFields || []).filter((field: any) =>
+        participants.some((participant: any) => String(participant.customFieldValues?.[field.fieldKey] || '').trim())
+      );
       const headers = [
         "Rank",
-        "Enrollment Number",
-        "Division",
+        ...customFieldColumns.map((field: any) => field.fieldLabel || field.fieldKey),
         "Student Name",
         "Email Address",
+        "Open Holdings",
         "Net Portfolio Valuation (INR)",
         "Return (%)",
         "Win Rate (%)",
@@ -351,10 +354,10 @@ export default function EventOrganizerControlPanel() {
 
       const rows = json.data.map((p: any) => [
         p.rank,
-        `"${p.enrollmentNo}"`,
-        `"${p.division}"`,
+        ...customFieldColumns.map((field: any) => `"${p.customFieldValues?.[field.fieldKey] || ""}"`),
         `"${p.name}"`,
         `"${p.email}"`,
+        p.openHoldingsCount || 0,
         p.eventValuation,
         p.returnPercent ? p.returnPercent.toFixed(2) : "0.00",
         p.winRate ? p.winRate.toFixed(1) : "0",
@@ -411,10 +414,13 @@ export default function EventOrganizerControlPanel() {
   const filteredParticipants = participants.filter((p) => {
     const q = searchQuery.toLowerCase();
     const name = (p.displayName || "").toLowerCase();
-    const enroll = (p.customFieldValues?.enrollmentNo || "").toLowerCase();
-    const div = (p.customFieldValues?.division || "").toLowerCase();
-    return name.includes(q) || enroll.includes(q) || div.includes(q);
+    const customValues = Object.values(p.customFieldValues || {}).join(" ").toLowerCase();
+    return name.includes(q) || customValues.includes(q);
   });
+
+  const visibleCustomFields = (eventData?.customVerificationFields || []).filter((field: any) =>
+    participants.some((participant: any) => String(participant.customFieldValues?.[field.fieldKey] || '').trim())
+  );
 
   // Passcode Auth View
   if (!isAuthenticated) {
@@ -700,9 +706,11 @@ export default function EventOrganizerControlPanel() {
                 <thead>
                   <tr className="bg-gray-50 dark:bg-slate-900/80 text-muted dark:text-white/70 text-xs uppercase font-extrabold border-b border-grey/10 dark:border-white/10">
                     <th className="py-4 px-4">Rank</th>
-                    <th className="py-4 px-4">Enrollment No</th>
-                    <th className="py-4 px-4">Division</th>
+                    {visibleCustomFields.map((field: any) => (
+                      <th key={field.fieldKey} className="py-4 px-4">{field.fieldLabel || field.fieldKey}</th>
+                    ))}
                     <th className="py-4 px-4">Student Name</th>
+                    <th className="py-4 px-4 text-right">Open Holdings</th>
                     <th className="py-4 px-4 text-right">Portfolio Value</th>
                     <th className="py-4 px-4 text-right">Return (%)</th>
                     <th className="py-4 px-4 text-right">Win Rate</th>
@@ -718,11 +726,13 @@ export default function EventOrganizerControlPanel() {
                         <td className="py-3.5 px-4 font-black text-midnight_text dark:text-white">
                           {student.rank === 1 ? "🥇 1" : student.rank === 2 ? "🥈 2" : student.rank === 3 ? "🥉 3" : `#${student.rank}`}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-muted dark:text-white/80">
-                          {student.customFieldValues?.enrollmentNo || "N/A"}
-                        </td>
-                        <td className="py-3.5 px-4 text-muted dark:text-white/70">{student.customFieldValues?.division || ""}</td>
+                        {visibleCustomFields.map((field: any) => (
+                          <td key={field.fieldKey} className="py-3.5 px-4 text-muted dark:text-white/70">
+                            {student.customFieldValues?.[field.fieldKey] || ""}
+                          </td>
+                        ))}
                         <td className="py-3.5 px-4 font-bold text-midnight_text dark:text-white">{student.displayName}</td>
+                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">{student.openHoldingsCount || 0}</td>
                         <td className="py-3.5 px-4 text-right font-mono font-bold text-midnight_text dark:text-white">
                           ₹{(student.eventValuation || 1000000).toLocaleString("en-IN")}
                         </td>
