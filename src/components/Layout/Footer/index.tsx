@@ -216,10 +216,14 @@ const Footer = () => {
                   className="w-auto h-auto mr-5"
                 />
               </Link>
-              <Link href="/waiting-list" prefetch={false}>
+              <Link
+                href="https://testflight.apple.com/join/5wJveEYm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Image
                   src="/images/footer/store.png"
-                  alt="Download on the App Store"
+                  alt="Download on the App Store (iOS TestFlight Beta)"
                   width={150}
                   height={45}
                   className="w-auto h-auto"

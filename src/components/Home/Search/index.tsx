@@ -114,11 +114,12 @@ const Search = () => {
                 />
                 <div className="flex lg:items-center lg:justify-start justify-center mr-4">
                   <Link
-                    href="/waiting-list"
-                    prefetch={false}
-                    className="text-17 flex items-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-48 my-2 border border-primary hover:text-primary hover:bg-transparent"
+                    href="https://testflight.apple.com/join/5wJveEYm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-17 flex items-center justify-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-48 my-2 border border-primary hover:text-primary hover:bg-transparent font-bold transition-all"
                   >
-                    Get Early Access
+                    Get iOS Beta
                   </Link>
                 </div>
               </div>

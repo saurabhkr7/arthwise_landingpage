@@ -100,9 +100,9 @@ const Method = () => {
                     to professional risk management.
                   </p>
                   <Link
-                    href="/waiting-list"
+                    href="/learn"
                     prefetch={false}
-                    className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
+                    className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary font-semibold"
                   >
                     Join Learning Center
                     <Icon
@@ -174,9 +174,9 @@ const Method = () => {
                     PnL, and improve your psychological trading discipline.
                   </p>
                   <Link
-                    href="/waiting-list"
+                    href="/services"
                     prefetch={false}
-                    className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary "
+                    className="text-17 flex gap-2 items-center hover:text-blue-700 text-primary font-semibold"
                   >
                     Start Paper Trading
                     <Icon

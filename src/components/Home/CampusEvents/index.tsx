@@ -72,7 +72,7 @@ const CampusEvents: React.FC = () => {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 mb-6">
               <Link
                 href="/host-event"
                 className="px-6 py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-primary/25 flex items-center gap-2"
@@ -90,6 +90,26 @@ const CampusEvents: React.FC = () => {
                 <Icon icon="logos:whatsapp-icon" width="18" height="18" />
                 <span>Chat on WhatsApp</span>
               </a>
+            </div>
+
+            {/* Sub-Solution Quick Links */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-white/50 font-bold mr-1">Explore formats:</span>
+              <Link href="/college-stock-market-competition" className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 border border-white/10 transition">
+                College Fests
+              </Link>
+              <Link href="/corporate-stock-market-game" className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 border border-white/10 transition">
+                Corporate Games
+              </Link>
+              <Link href="/trading-assessment-platform" className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 border border-white/10 transition">
+                Hiring Assessments
+              </Link>
+              <Link href="/mba-stock-market-competition" className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 border border-white/10 transition">
+                MBA Challenges
+              </Link>
+              <Link href="/stock-market-championship" className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 border border-white/10 transition">
+                National League
+              </Link>
             </div>
           </div>
 

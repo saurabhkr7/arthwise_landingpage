@@ -25,65 +25,66 @@ const Hero = () => {
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) relative z-1 md:max-w-(--breakpoint-md) px-4">
         <div className="grid grid-cols-12 items-center">
           <motion.div {...leftAnimation} className="lg:col-span-6 col-span-12">
-            <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start dark:text-white mb-9 lg:w-full w-3/4">
-              India&apos;s{" "}
-              <span className="bg-border dark:bg-darkHeroBg md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max mx-2">
-                Trading Game
-              </span>
-              &amp;{" "}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-extrabold uppercase tracking-wider mb-6">
+              <Icon icon="solar:cup-star-bold" width="16" height="16" />
+              <span>India&apos;s Stock Market Championship &amp; Paper Trading Platform</span>
+            </div>
+            <h1 className="md:text-50 sm:text-40 text-28 text-midnight_text lg:text-start dark:text-white mb-6 lg:w-full w-3/4 leading-tight">
+              Run Professional{" "}
               <span className="bg-border dark:bg-darkHeroBg md:text-50 text-36 rounded-lg lg:text-start text-primary max-w-max">
-                Paper Trading App
-              </span>
+                Trading Championships
+              </span>{" "}
+              &amp; Paper Trade Risk-Free
             </h1>
-            <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75%">
-              Practice paper trading with ₹10,00,000 virtual capital and live NSE data. Compete in daily trading game contests, climb the leaderboard, and grow with India&apos;s most active trading community — the best stock market learning app, free on Android.
+            <p className="sm:text-19 text-16 text-muted dark:text-white dark:text-opacity-70 text-start lg:max-w-full sm:max-w-75% mb-4">
+              Host turnkey stock market competitions for your college fest, corporate team, or investment society with live NSE/BSE data, 7 scoring formats, and instant certificates. Or practice individually with ₹10 Lakh virtual capital.
             </p>
-            <div className="flex flex-wrap items-center mt-12 gap-6 sm:gap-11">
+            <div className="flex flex-wrap items-center mt-8 gap-4 sm:gap-6">
               <div>
                 <Link
                   href="https://play.google.com/store/apps/details?id=com.arthwise"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-17 flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
+                  className="text-16 flex gap-2 items-center bg-primary text-white py-3 px-6 rounded-lg border border-primary hover:text-primary hover:bg-transparent font-bold transition-all shadow-md shadow-primary/20"
                 >
-                  Download on Play Store
-                  <Icon
-                    icon="solar:alt-arrow-right-linear"
-                    width="13"
-                    height="13"
-                  />
+                  <Icon icon="logos:google-play-icon" width="18" height="18" />
+                  <span>Download on Android</span>
                 </Link>
               </div>
               <div>
                 <Link
-                  href="/waiting-list"
-                  prefetch={false}
-                  className="text-17 flex gap-2 items-center text-muted dark:text-white dark:text-opacity-70 hover:text-primary"
+                  href="https://testflight.apple.com/join/5wJveEYm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-16 flex gap-2 items-center bg-white dark:bg-darkHeroBg text-midnight_text dark:text-white py-3 px-6 rounded-lg border border-grey/20 dark:border-white/10 hover:border-primary hover:text-primary font-bold shadow-sm transition-all"
                 >
-                  iOS Waitlist (Coming Soon)
+                  <Icon icon="solar:apple-bold" width="20" height="20" />
+                  <span>iOS Beta (TestFlight)</span>
+                </Link>
+              </div>
+              <div>
+                <Link
+                  href="/host-event"
+                  className="text-16 flex gap-2 items-center text-primary font-bold hover:underline py-2"
+                >
+                  <span>Host a Championship</span>
                   <Icon
                     icon="solar:alt-arrow-right-linear"
-                    width="13"
-                    height="13"
+                    width="14"
+                    height="14"
                   />
                 </Link>
               </div>
               <div className="flex items-center gap-3 bg-white dark:bg-darkHeroBg p-2 rounded-xl shadow-sm border border-grey/10">
                 <Image
                   src="/images/Arthhwise QR code.svg"
-                  alt="Scan QR code to download Arthhwise paper trading app on Android"
+                  alt="Scan QR code to download Arthhwise paper trading app on Android or iOS"
                   width={256}
                   height={256}
                   className="rounded-lg"
                   loading="lazy"
                 />
               </div>
-            </div>
-
-            <div className="lg:my-28 my-12">
-              <p className="text-20 text-muted dark:text-white dark:text-opacity-70 text-start mb-7">
-                Trusted by Hundreds of users in testing phase
-              </p>
             </div>
           </motion.div>
           <motion.div
