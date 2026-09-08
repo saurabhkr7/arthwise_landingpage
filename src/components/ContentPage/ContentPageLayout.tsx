@@ -302,14 +302,23 @@ const ContentPageLayout: React.FC<ContentPageLayoutProps> = ({
                     Get the full experience with real-time data, interactive features, and more.
                   </p>
                   <DeepLinkCTA type={type} id={id} fullWidth />
-                  <div className="mt-4 flex justify-center">
+                  <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-2">
+                    <Link
+                      href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-muted dark:text-white/50 hover:text-primary transition"
+                    >
+                      App Store (iOS) →
+                    </Link>
+                    <span className="text-muted/40 hidden sm:inline">•</span>
                     <Link
                       href="https://play.google.com/store/apps/details?id=com.arthwise"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-muted dark:text-white/50 hover:text-primary transition"
                     >
-                      Download on Google Play →
+                      Google Play (Android) →
                     </Link>
                   </div>
                 </div>

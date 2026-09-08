@@ -113,7 +113,7 @@ const homepageFAQs = [
   {
     question: "Is Arthhwise available on iOS?",
     answer:
-      "Arthhwise is currently available on Android via Google Play Store. iOS (iPhone/iPad) support is coming soon — you can join our waitlist at arthhwise.com/waiting-list to be notified when it launches.",
+      "Yes! Arthhwise is officially live and available on the Apple App Store for iPhone and iPad. You can download it directly from the App Store to practice paper trading equities, F&O options chains, and crypto with ₹10,00,000 virtual capital.",
   },
 ];
 

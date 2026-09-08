@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Icon } from "@iconify/react";
 import { glossaryTerms, GlossaryTerm } from "@/lib/glossaryData";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
 import FAQSchema from "@/components/Schema/FAQSchema";
@@ -421,13 +422,26 @@ export default async function GlossaryTermPage({ params }: Props) {
                   <p className="text-sm opacity-90 leading-relaxed">
                     Practice trading stocks with live NSE/BSE market prices and ₹10,00,000 in virtual capital on Arthhwise.
                   </p>
-                  <Link
-                    href="https://play.google.com/store/apps/details?id=com.arthwise"
-                    target="_blank"
-                    className="block w-full bg-white text-primary py-3.5 rounded-xl font-bold hover:bg-opacity-95 transition active:scale-[0.98]"
-                  >
-                    Download Free Android App
-                  </Link>
+                  <div className="space-y-3">
+                    <Link
+                      href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-slate-900 hover:bg-black text-white py-3 rounded-xl font-bold transition active:scale-[0.98] shadow-md text-sm"
+                    >
+                      <Icon icon="ri:apple-fill" width="16" height="16" />
+                      <span>Download on App Store</span>
+                    </Link>
+                    <Link
+                      href="https://play.google.com/store/apps/details?id=com.arthwise"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-white text-primary py-3 rounded-xl font-bold hover:bg-opacity-95 transition active:scale-[0.98] shadow-md text-sm"
+                    >
+                      <Icon icon="logos:google-play-icon" width="14" height="14" />
+                      <span>Get on Google Play</span>
+                    </Link>
+                  </div>
                 </div>
 
                 {relatedTerms.length > 0 && (

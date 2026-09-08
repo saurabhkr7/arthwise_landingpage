@@ -114,12 +114,12 @@ const Search = () => {
                 />
                 <div className="flex lg:items-center lg:justify-start justify-center mr-4">
                   <Link
-                    href="https://testflight.apple.com/join/5wJveEYm"
+                    href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-17 flex items-center justify-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-48 my-2 border border-primary hover:text-primary hover:bg-transparent font-bold transition-all"
+                    className="text-17 flex items-center justify-center bg-primary text-white py-3 px-8 rounded-lg w-full md:w-56 my-2 border border-primary hover:text-primary hover:bg-transparent font-bold transition-all"
                   >
-                    Get iOS Beta
+                    Get on App Store
                   </Link>
                 </div>
               </div>

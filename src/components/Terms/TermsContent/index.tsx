@@ -116,7 +116,7 @@ const TermsContent = () => {
               For urgent safety reports, copyright claims, or EULA inquiries, please contact our moderation team directly:
             </p>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              Email: <a href="mailto:support@arthhwise.com" className="text-primary underline">support@arthhwise.com</a><br />
+              Email: <a href="mailto:hello@arthhwise.com" className="text-primary underline">hello@arthhwise.com</a><br />
               Website: <a href="https://arthhwise.com" className="text-primary underline">https://arthhwise.com</a>
             </p>
           </div>

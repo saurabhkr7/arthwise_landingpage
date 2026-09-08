@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
+import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
 import { glossaryTerms } from "@/lib/glossaryData";
 
@@ -84,19 +85,30 @@ export default function LearnHubPage() {
           <p className="text-lg text-muted dark:text-white/70 max-w-2xl mx-auto mb-8">
             Whether you want to learn the basics of Indian stocks or practice advanced chart analysis, our structured learning categories are here to guide you.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-wrap justify-center items-center gap-4">
+            <Link
+              href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-midnight_text dark:bg-white text-white dark:text-midnight_text px-6 py-3.5 rounded-xl font-bold hover:opacity-90 transition flex items-center gap-2 shadow-sm"
+            >
+              <Icon icon="ri:apple-fill" width="18" height="18" />
+              <span>App Store</span>
+            </Link>
             <Link
               href="https://play.google.com/store/apps/details?id=com.arthwise"
               target="_blank"
-              className="bg-primary text-white px-8 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition"
+              rel="noopener noreferrer"
+              className="bg-primary text-white px-6 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition flex items-center gap-2 shadow-md shadow-primary/20"
             >
-              Start Free Paper Trading
+              <Icon icon="logos:google-play-icon" width="16" height="16" />
+              <span>Google Play</span>
             </Link>
             <Link
               href="/glossary"
-              className="bg-white dark:bg-search border border-grey/10 text-midnight_text dark:text-white px-8 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition"
+              className="bg-white dark:bg-search border border-grey/10 text-midnight_text dark:text-white px-6 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition flex items-center gap-1.5"
             >
-              Browse Dictionary
+              <span>Browse Dictionary</span>
             </Link>
           </div>
         </div>
@@ -156,7 +168,7 @@ export default function LearnHubPage() {
                 Interactive stock learning in the palm of your hand
               </h2>
               <p className="text-muted dark:text-white/70 leading-relaxed mb-6">
-                Reading articles is only half the battle. To build real investing confidence, you need hands-on practice. The Arthhwise Android app combines structured interactive courses, daily market quizzes, trading game contests, and virtual stock trading in one unified learning experience.
+                Reading articles is only half the battle. To build real investing confidence, you need hands-on practice. The Arthhwise mobile app combines structured interactive courses, daily market quizzes, trading game contests, and virtual stock trading in one unified learning experience.
               </p>
               <ul className="space-y-3 mb-8">
                 {["100% Free interactive courses", "Daily Quiz challenges with rank leaderboards", "Weekly paper trading contests with virtual rewards"].map((item) => (
@@ -166,13 +178,26 @@ export default function LearnHubPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="https://play.google.com/store/apps/details?id=com.arthwise"
-                target="_blank"
-                className="inline-flex bg-primary text-white px-8 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition"
-              >
-                Download on Google Play
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-midnight_text dark:bg-white text-white dark:text-midnight_text px-6 py-3.5 rounded-xl font-bold hover:opacity-90 transition shadow-sm text-sm"
+                >
+                  <Icon icon="ri:apple-fill" width="18" height="18" />
+                  <span>Download on App Store</span>
+                </Link>
+                <Link
+                  href="https://play.google.com/store/apps/details?id=com.arthwise"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-md shadow-primary/20 text-sm"
+                >
+                  <Icon icon="logos:google-play-icon" width="16" height="16" />
+                  <span>Get on Google Play</span>
+                </Link>
+              </div>
             </div>
             <div className="relative h-96 w-full lg:block hidden rounded-3xl overflow-hidden shadow-lg border border-grey/10">
               <img

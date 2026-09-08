@@ -93,7 +93,7 @@ const faqs = [
   },
   {
     q: "Do all participating students need to download an application?",
-    a: "Participants can trade via Android (Google Play) or iOS (TestFlight Beta). Furthermore, our zero-install Web Terminal (Coming Soon) allows participants to scan a QR code and trade directly inside any laptop or mobile browser.",
+    a: "Participants can trade natively via Android (Google Play Store) or iOS (Apple App Store). Furthermore, our zero-install Web Terminal (Coming Soon) allows participants to scan a QR code and trade directly inside any laptop or mobile browser.",
   },
   {
     q: "How do we prevent cheating or price manipulation?",

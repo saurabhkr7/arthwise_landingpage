@@ -9,8 +9,10 @@ const structuredData = {
     applicationSubCategory: "Trading Simulator",
     operatingSystem: "Android, iOS",
     url: "https://arthhwise.com",
-    downloadUrl:
+    downloadUrl: [
+        "https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616",
         "https://play.google.com/store/apps/details?id=com.arthwise",
+    ],
     description:
         "Arthhwise is India's leading paper trading app and stock market learning platform. Practice virtual trading with real NSE data, compete in trading game contests, join a trading community, and master the stock market — risk-free.",
     featureList: [

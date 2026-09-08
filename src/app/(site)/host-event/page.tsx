@@ -178,7 +178,7 @@ const HostEventPage: React.FC = () => {
                 Android & iOS App Execution
               </h3>
               <p className="text-sm text-muted dark:text-white/70 leading-relaxed">
-                100% feature parity across devices. Android users trade natively via Google Play Store, while iOS users execute via TestFlight or web fallback.
+                100% feature parity across devices. Native mobile apps available for all participants on both Google Play Store and the Apple App Store.
               </p>
             </div>
           </div>

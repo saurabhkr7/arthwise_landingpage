@@ -91,7 +91,7 @@ const ChampionshipPage: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs text-muted dark:text-white/60">
-                  Instant browser trading terminal with multi-window charts. Native Android and iOS TestFlight apps available today.
+                  Instant browser trading terminal with multi-window charts. Native Android and iOS apps available on Google Play and Apple App Store.
                 </p>
               </div>
             </div>
@@ -104,11 +104,11 @@ const ChampionshipPage: React.FC = () => {
                 Android App
               </Link>
               <Link
-                href="https://testflight.apple.com/join/5wJveEYm"
+                href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
                 target="_blank"
                 className="px-4 py-2 rounded-lg bg-white dark:bg-darkHeroBg border border-grey/20 dark:border-white/10 text-xs font-bold hover:border-primary transition"
               >
-                iOS Beta
+                Apple App Store
               </Link>
             </div>
           </div>

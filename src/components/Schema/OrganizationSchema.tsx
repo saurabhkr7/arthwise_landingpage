@@ -22,6 +22,7 @@ const organizationSchema = {
     },
   ],
   sameAs: [
+    "https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616",
     "https://play.google.com/store/apps/details?id=com.arthwise",
   ],
   contactPoint: {

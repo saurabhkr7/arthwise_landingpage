@@ -220,14 +220,26 @@ const EventCard: React.FC<{ event: MarketEvent }> = ({ event }) => {
             <span>Leaderboard Finalized</span>
           </div>
         ) : (
-          <Link
-            href="https://play.google.com/store/apps/details?id=com.arthwise"
-            target="_blank"
-            className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2.5 rounded-xl text-center text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-primary/10"
-          >
-            <Icon icon="solar:login-bold" width="14" height="14" />
-            <span>Join League in App</span>
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-midnight_text dark:bg-white hover:opacity-90 text-white dark:text-midnight_text font-bold py-2.5 rounded-xl text-center text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <Icon icon="ri:apple-fill" width="14" height="14" />
+              <span>iOS</span>
+            </Link>
+            <Link
+              href="https://play.google.com/store/apps/details?id=com.arthwise"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2.5 rounded-xl text-center text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-primary/10"
+            >
+              <Icon icon="logos:google-play-icon" width="13" height="13" />
+              <span>Android</span>
+            </Link>
+          </div>
         )}
       </div>
 

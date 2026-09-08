@@ -217,13 +217,13 @@ const Footer = () => {
                 />
               </Link>
               <Link
-                href="https://testflight.apple.com/join/5wJveEYm"
+                href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <Image
                   src="/images/footer/store.png"
-                  alt="Download on the App Store (iOS TestFlight Beta)"
+                  alt="Download on the Apple App Store"
                   width={150}
                   height={45}
                   className="w-auto h-auto"

@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.arthwise";
+const APP_STORE_URL = "https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616";
 
 interface TradingEvent {
   id: string;
@@ -182,19 +183,30 @@ function EventCard({ event }: { event: TradingEvent }) {
             Create New Championship
           </Link>
         ) : (
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md ${
-              isUpcoming
-                ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sky-500/20"
-                : "bg-primary hover:bg-primary/90 text-white shadow-primary/20"
-            }`}
-          >
-            <Icon icon="logos:google-play-icon" width="14" height="14" />
-            {isUpcoming ? "Join Event on App" : "Trade Now — Download App"}
-          </a>
+          <div className="grid grid-cols-2 gap-2">
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-bold transition-all bg-midnight_text dark:bg-white text-white dark:text-midnight_text hover:opacity-90 shadow-sm"
+            >
+              <Icon icon="ri:apple-fill" width="14" height="14" />
+              <span>App Store</span>
+            </a>
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-bold transition-all text-white shadow-sm ${
+                isUpcoming
+                  ? "bg-sky-500 hover:bg-sky-600 shadow-sky-500/20"
+                  : "bg-primary hover:bg-primary/90 shadow-primary/20"
+              }`}
+            >
+              <Icon icon="logos:google-play-icon" width="13" height="13" />
+              <span>Google Play</span>
+            </a>
+          </div>
         )}
       </div>
     </div>
@@ -300,15 +312,26 @@ export default function TradingEventsClient() {
             </div>
             <h3 className="text-lg font-bold mb-2">Could not load events</h3>
             <p className="text-sm text-muted dark:text-white/60 mb-6">{error}</p>
-            <a
-              href={PLAY_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold text-sm"
-            >
-              <Icon icon="logos:google-play-icon" width="16" height="16" />
-              Download Arthhwise App
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={APP_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-midnight_text dark:bg-white text-white dark:text-midnight_text font-bold text-sm hover:opacity-90 transition shadow-sm"
+              >
+                <Icon icon="ri:apple-fill" width="16" height="16" />
+                iOS App Store
+              </a>
+              <a
+                href={PLAY_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 transition shadow-md"
+              >
+                <Icon icon="logos:google-play-icon" width="16" height="16" />
+                Google Play
+              </a>
+            </div>
           </div>
         ) : filtered.length === 0 ? (
           <div className="max-w-lg mx-auto py-20 text-center">

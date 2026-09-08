@@ -18,12 +18,12 @@ const PrivacyContent = () => {
               Introduction
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-4">
-              At Arthhwise, we are committed to protecting your privacy and ensuring the security of your personal information. 
-              This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you use our paper trading 
+              At Arthhwise, we are committed to protecting your privacy and ensuring the security of your personal information.
+              This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you use our paper trading
               platform and financial education services, both on our website and mobile application.
             </p>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              By accessing or using Arthhwise, you agree to the terms outlined in this Privacy Policy. If you do not agree with 
+              By accessing or using Arthhwise, you agree to the terms outlined in this Privacy Policy. If you do not agree with
               our policies and practices, please do not use our services.
             </p>
           </div>
@@ -33,7 +33,7 @@ const PrivacyContent = () => {
             <h2 className="text-3xl font-bold text-midnight_text dark:text-white mb-6">
               Information We Collect
             </h2>
-            
+
             <h3 className="text-xl font-semibold text-midnight_text dark:text-white mb-3">
               1. Personal Information
             </h3>
@@ -127,7 +127,7 @@ const PrivacyContent = () => {
               <li>Employee training on data protection practices</li>
             </ul>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mt-4">
-              However, no method of transmission over the Internet is 100% secure. While we strive to protect your data, 
+              However, no method of transmission over the Internet is 100% secure. While we strive to protect your data,
               we cannot guarantee absolute security.
             </p>
           </div>
@@ -162,8 +162,8 @@ const PrivacyContent = () => {
               Children's Privacy
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              Arthhwise is not intended for users under the age of 18. We do not knowingly collect personal information from 
-              children. If you believe we have inadvertently collected data from a minor, please contact us immediately, 
+              Arthhwise is not intended for users under the age of 13. We do not knowingly collect personal information from
+              children. If you believe we have inadvertently collected data from a minor, please contact us immediately,
               and we will take steps to delete such information.
             </p>
           </div>
@@ -174,8 +174,8 @@ const PrivacyContent = () => {
               Third-Party Links and Services
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              Our platform may contain links to third-party websites or integrate with external services. We are not responsible 
-              for the privacy practices of these third parties. We encourage you to review their privacy policies before 
+              Our platform may contain links to third-party websites or integrate with external services. We are not responsible
+              for the privacy practices of these third parties. We encourage you to review their privacy policies before
               providing any personal information.
             </p>
           </div>
@@ -186,8 +186,8 @@ const PrivacyContent = () => {
               International Data Transfers
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              Your information may be transferred to and processed in countries other than your country of residence. 
-              These countries may have data protection laws different from those in your jurisdiction. By using our services, 
+              Your information may be transferred to and processed in countries other than your country of residence.
+              These countries may have data protection laws different from those in your jurisdiction. By using our services,
               you consent to such transfers.
             </p>
           </div>
@@ -198,8 +198,8 @@ const PrivacyContent = () => {
               Data Retention
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              We retain your personal information for as long as necessary to provide our services and comply with legal 
-              obligations. When you delete your account, we will remove your personal data within 30 days, except where 
+              We retain your personal information for as long as necessary to provide our services and comply with legal
+              obligations. When you delete your account, we will remove your personal data within 30 days, except where
               retention is required by law or for legitimate business purposes (e.g., fraud prevention, dispute resolution).
             </p>
           </div>
@@ -210,8 +210,8 @@ const PrivacyContent = () => {
               Changes to This Privacy Policy
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. 
-              We will notify you of significant changes by posting the updated policy on this page and updating the 
+              We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements.
+              We will notify you of significant changes by posting the updated policy on this page and updating the
               "Last Updated" date. Your continued use of Arthhwise after such changes constitutes acceptance of the updated policy.
             </p>
           </div>
@@ -222,7 +222,7 @@ const PrivacyContent = () => {
               Contact Us
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-4">
-              If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, 
+              If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices,
               please contact us:
             </p>
             <div className="bg-heroBg dark:bg-search p-6 rounded-lg">
@@ -252,7 +252,7 @@ const PrivacyContent = () => {
               Your Consent
             </p>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed">
-              By using Arthhwise's website and mobile application, you acknowledge that you have read, understood, 
+              By using Arthhwise's website and mobile application, you acknowledge that you have read, understood,
               and agree to be bound by this Privacy Policy.
             </p>
           </div>

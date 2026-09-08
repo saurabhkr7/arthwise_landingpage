@@ -46,18 +46,28 @@ const StockgroComparisonPage = () => {
               <p className="text-muted dark:text-white/80 mb-6 leading-relaxed">
                 Arthhwise offers a clean, **100% free**, professional simulated trading environment. No entry fees, no ads, and no artificial gamification tokens—just institutional-grade tools to practice equity, F&O options, and crypto trading.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 rounded-xl bg-midnight_text dark:bg-white text-white dark:text-midnight_text font-bold text-sm transition-all shadow-sm hover:opacity-90 flex items-center gap-2"
+                >
+                  <Icon icon="ri:apple-fill" width="18" height="18" />
+                  <span>App Store</span>
+                </Link>
                 <Link
                   href="https://play.google.com/store/apps/details?id=com.arthwise"
                   target="_blank"
-                  className="px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all shadow-lg shadow-primary/20 flex items-center gap-2"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all shadow-lg shadow-primary/20 flex items-center gap-2"
                 >
                   <Icon icon="logos:google-play-icon" width="18" height="18" />
-                  <span>Download Arthhwise</span>
+                  <span>Google Play</span>
                 </Link>
                 <Link
                   href="/host-event"
-                  className="px-6 py-3 rounded-xl bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/20 border border-grey/20 dark:border-white/10 font-bold text-sm transition-all text-midnight_text dark:text-white flex items-center gap-1"
+                  className="px-5 py-3 rounded-xl bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/20 border border-grey/20 dark:border-white/10 font-bold text-sm transition-all text-midnight_text dark:text-white flex items-center gap-1"
                 >
                   <span>Host a College Event</span>
                 </Link>

@@ -53,19 +53,24 @@ const Mobile = () => {
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-6 mt-12">
+            <div className="flex flex-wrap items-center gap-4 mt-12">
+              <Link
+                href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lg:text-16 flex gap-2.5 items-center bg-midnight_text dark:bg-white text-white dark:text-midnight_text py-2 px-4 lg:py-3 lg:px-6 rounded-lg font-semibold hover:opacity-90 transition shadow-sm"
+              >
+                <Icon icon="ri:apple-fill" width="18" height="18" />
+                <span>App Store</span>
+              </Link>
               <Link
                 href="https://play.google.com/store/apps/details?id=com.arthwise"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lg:text-17 flex gap-4 items-center bg-primary text-white py-2 px-4 lg:py-3 lg:px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent"
+                className="lg:text-16 flex gap-2.5 items-center bg-primary text-white py-2 px-4 lg:py-3 lg:px-6 rounded-lg font-semibold border border-primary hover:text-primary hover:bg-transparent transition shadow-md shadow-primary/20"
               >
-                Download on Play Store
-                <Icon
-                  icon="solar:alt-arrow-right-linear"
-                  width="13"
-                  height="13"
-                />
+                <Icon icon="logos:google-play-icon" width="16" height="16" />
+                <span>Play Store</span>
               </Link>
               <div className="flex items-center gap-3 bg-white dark:bg-darkHeroBg p-2 rounded-xl border border-grey/10 shadow-sm">
                 <Image

@@ -63,7 +63,21 @@ export default function ShareBridgePage() {
 
         <div className="border-t border-gray-100 my-6 pt-6">
           <p className="text-sm text-gray-500 mb-4">Don't have the app yet?</p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-wrap justify-center items-center gap-4">
+            <a 
+              href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <Image 
+                src="/images/footer/store.png" 
+                alt="Download on the App Store" 
+                width={140} 
+                height={42} 
+                className="hover:opacity-80 transition h-10 w-auto"
+              />
+            </a>
             <a 
               href="https://play.google.com/store/apps/details?id=com.arthwise" 
               target="_blank" 
@@ -71,11 +85,11 @@ export default function ShareBridgePage() {
               className="inline-block"
             >
               <Image 
-                src="/images/google-play-badge.png" 
+                src="/images/footer/play.png" 
                 alt="Get it on Google Play" 
-                width={150} 
-                height={45} 
-                className="hover:opacity-80 transition"
+                width={140} 
+                height={42} 
+                className="hover:opacity-80 transition h-10 w-auto"
               />
             </a>
           </div>

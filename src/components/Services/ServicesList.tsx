@@ -159,18 +159,29 @@ const ServicesList: React.FC = () => {
           <div>
             <h3 className="text-2xl font-extrabold text-white mb-2">Ready to Start Your Trading Journey?</h3>
             <p className="text-sm text-white/80 max-w-xl">
-              Download the free Arthhwise app on Android and get ₹10,00,000 virtual capital instantly to practice paper trading, F&O options, and daily contests.
+              Download the free Arthhwise app on iOS and Android to get ₹10,00,000 virtual capital instantly to practice paper trading, F&amp;O options, and daily contests.
             </p>
           </div>
-          <a
-            href="https://play.google.com/store/apps/details?id=com.arthwise"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all shrink-0 shadow-lg shadow-primary/25 flex items-center gap-2"
-          >
-            <Icon icon="logos:google-play-icon" width="18" height="18" />
-            <span>Get App on Google Play</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <a
+              href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3.5 rounded-xl bg-white text-slate-900 hover:bg-white/90 font-bold text-sm transition-all flex items-center gap-2 shadow-lg"
+            >
+              <Icon icon="ri:apple-fill" width="18" height="18" />
+              <span>Download on App Store</span>
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.arthwise"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-primary/25"
+            >
+              <Icon icon="logos:google-play-icon" width="18" height="18" />
+              <span>Get on Google Play</span>
+            </a>
+          </div>
         </div>
 
       </div>

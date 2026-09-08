@@ -6,7 +6,7 @@
 export const APP_CONFIG = {
   PACKAGE_NAME: "com.arthwise",
   PLAY_STORE_URL: "https://play.google.com/store/apps/details?id=com.arthwise",
-  APP_STORE_URL: "https://apps.apple.com/app/arthwise/id6502371508",
+  APP_STORE_URL: "https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616",
   DEEP_LINK_SCHEME: "arthwise://",
   FALLBACK_TIMEOUT: 1500, // ms
 };

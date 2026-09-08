@@ -53,13 +53,13 @@ const Hero = () => {
               </div>
               <div>
                 <Link
-                  href="https://testflight.apple.com/join/5wJveEYm"
+                  href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-16 flex gap-2 items-center bg-white dark:bg-darkHeroBg text-midnight_text dark:text-white py-3 px-6 rounded-lg border border-grey/20 dark:border-white/10 hover:border-primary hover:text-primary font-bold shadow-sm transition-all"
                 >
                   <Icon icon="solar:apple-bold" width="20" height="20" />
-                  <span>iOS Beta (TestFlight)</span>
+                  <span>Download on App Store</span>
                 </Link>
               </div>
               <div>

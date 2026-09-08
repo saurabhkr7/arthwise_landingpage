@@ -190,7 +190,7 @@ const DeepLinkHandler: React.FC<DeepLinkHandlerProps> = ({
           </Link>
           <span className="text-slate-300">•</span>
           <Link
-            href="https://apps.apple.com/app/arthwise/id6502371508"
+            href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs text-primary hover:text-blue-700 transition"

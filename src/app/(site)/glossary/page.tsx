@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
+import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
 
 export const metadata: Metadata = {
@@ -117,13 +118,26 @@ export default function GlossaryIndexPage() {
                   <p className="text-sm text-muted dark:text-white/60 mb-5">
                     Don&apos;t just read definitions. Practice trading these concepts with ₹10,00,000 virtual capital in our live NSE trading simulator.
                   </p>
-                  <Link
-                    href="https://play.google.com/store/apps/details?id=com.arthwise"
-                    target="_blank"
-                    className="block w-full text-center bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition"
-                  >
-                    Download Arthhwise Free
-                  </Link>
+                  <div className="space-y-2.5">
+                    <Link
+                      href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-midnight_text dark:bg-white text-white dark:text-midnight_text py-3 rounded-xl font-bold hover:opacity-90 transition text-sm shadow-sm"
+                    >
+                      <Icon icon="ri:apple-fill" width="16" height="16" />
+                      <span>Download on App Store</span>
+                    </Link>
+                    <Link
+                      href="https://play.google.com/store/apps/details?id=com.arthwise"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition text-sm shadow-md shadow-primary/20"
+                    >
+                      <Icon icon="logos:google-play-icon" width="14" height="14" />
+                      <span>Get on Google Play</span>
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="bg-white dark:bg-darkmode rounded-2xl p-6 border border-grey/10 dark:border-white/5 shadow-sm">

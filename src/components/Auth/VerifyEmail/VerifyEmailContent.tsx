@@ -216,7 +216,7 @@ export default function VerifyEmailContent() {
                   />
                 </Link>
                 <Link
-                  href="https://apps.apple.com/app/arthwise/id6502371508"
+                  href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-transform hover:scale-105 duration-200"

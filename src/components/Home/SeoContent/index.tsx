@@ -77,15 +77,24 @@ const SeoContent = () => {
                                 ))}
                             </div>
                         </div>
-                        <div className="mt-8">
+                        <div className="mt-8 flex flex-wrap items-center gap-4">
+                            <Link
+                                href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex gap-2.5 items-center bg-midnight_text dark:bg-white text-white dark:text-midnight_text py-3 px-6 rounded-lg font-bold hover:opacity-90 transition text-16 shadow-sm"
+                            >
+                                <Icon icon="ri:apple-fill" width="18" height="18" />
+                                Download on App Store
+                            </Link>
                             <Link
                                 href="https://play.google.com/store/apps/details?id=com.arthwise"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent text-17"
+                                className="inline-flex gap-2.5 items-center bg-primary text-white py-3 px-6 rounded-lg border border-primary hover:text-primary hover:bg-transparent font-bold transition text-16 shadow-md shadow-primary/20"
                             >
-                                Start Paper Trading Free
-                                <Icon icon="solar:alt-arrow-right-linear" width="13" height="13" />
+                                <Icon icon="logos:google-play-icon" width="16" height="16" />
+                                Get on Google Play
                             </Link>
                         </div>
                     </article>
@@ -126,7 +135,7 @@ const SeoContent = () => {
                                 {
                                     icon: "solar:wallet-money-bold",
                                     title: "Completely Free",
-                                    desc: "Download and use Arthhwise for free on Android. No hidden charges, no catch — just an insanely good virtual trading app.",
+                                    desc: "Download and use Arthhwise for free on iOS and Android. No hidden charges, no catch — just an insanely good virtual trading app.",
                                 },
                                 {
                                     icon: "solar:graph-up-bold",
@@ -209,19 +218,28 @@ const SeoContent = () => {
                                 demystify the stock market and build real investing confidence.
                             </p>
                         </div>
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-wrap gap-4 items-center">
+                            <Link
+                                href="https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex gap-2.5 items-center bg-midnight_text dark:bg-white text-white dark:text-midnight_text py-3 px-6 rounded-lg font-bold hover:opacity-90 transition text-16 shadow-sm"
+                            >
+                                <Icon icon="ri:apple-fill" width="18" height="18" />
+                                Download on App Store
+                            </Link>
                             <Link
                                 href="https://play.google.com/store/apps/details?id=com.arthwise"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex gap-2 items-center bg-primary text-white py-3 px-8 rounded-lg border border-primary hover:text-primary hover:bg-transparent text-17"
+                                className="inline-flex gap-2.5 items-center bg-primary text-white py-3 px-6 rounded-lg border border-primary hover:text-primary hover:bg-transparent font-bold transition text-16 shadow-md shadow-primary/20"
                             >
-                                Play Now — It&apos;s Free
-                                <Icon icon="solar:alt-arrow-right-linear" width="13" height="13" />
+                                <Icon icon="logos:google-play-icon" width="16" height="16" />
+                                Play Store — Free
                             </Link>
                             <Link
                                 href="/blog"
-                                className="inline-flex gap-2 items-center text-primary hover:text-blue-700 py-3 px-8 text-17 font-medium"
+                                className="inline-flex gap-2 items-center text-primary hover:text-blue-700 py-3 px-6 text-16 font-semibold"
                             >
                                 Read Our Trading Blog
                                 <Icon icon="solar:alt-arrow-right-linear" width="13" height="13" />
