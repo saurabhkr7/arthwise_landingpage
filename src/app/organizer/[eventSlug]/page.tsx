@@ -1744,7 +1744,7 @@ export default function EventOrganizerControlPanel() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-muted dark:text-white/60">
-                      Approved Stock Universe ({infoModalScript.allowedSymbols.length} Stocks)
+                      Approved Universe ({infoModalScript.allowedSymbols.length} {infoModalScript.category === "FNO_WHITELIST" ? "F&O Indices" : "Stocks"})
                     </h4>
                     <p className="text-[11px] text-muted dark:text-white/50">
                       Participants trading any symbol outside this list will be flagged as violators.
@@ -1779,7 +1779,11 @@ export default function EventOrganizerControlPanel() {
                   <Icon icon="solar:magnifer-linear" width="16" height="16" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
                   <input
                     type="text"
-                    placeholder="Search approved stocks (e.g. Paytm, RVNL, TCS)..."
+                    placeholder={
+                      infoModalScript.category === "FNO_WHITELIST"
+                        ? "Search approved indices (e.g. NIFTY, BANKNIFTY)..."
+                        : "Search approved stocks (e.g. Paytm, RVNL, TCS)..."
+                    }
                     value={symbolSearchQuery}
                     onChange={(e) => setSymbolSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-4 py-2 rounded-xl text-xs bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 text-midnight_text dark:text-white focus:outline-none focus:border-primary"
@@ -1804,7 +1808,7 @@ export default function EventOrganizerControlPanel() {
                     if (filteredSymbols.length === 0) {
                       return (
                         <p className="text-xs text-muted dark:text-white/50 text-center py-4">
-                          No approved stocks match &quot;{symbolSearchQuery}&quot;
+                          No approved instruments match &quot;{symbolSearchQuery}&quot;
                         </p>
                       );
                     }
