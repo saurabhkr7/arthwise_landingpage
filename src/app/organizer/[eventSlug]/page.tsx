@@ -46,6 +46,37 @@ export default function EventOrganizerControlPanel() {
   const [groupAnalytics, setGroupAnalytics] = useState<any[]>([]);
   const [groupLoading, setGroupLoading] = useState(false);
 
+  // ── Compliance Filter Scripts State ──
+  const [complianceScripts, setComplianceScripts] = useState<any[]>([]);
+  const [selectedScriptId, setSelectedScriptId] = useState<string>("");
+  const [scriptScanData, setScriptScanData] = useState<any>(null);
+  const [scanning, setScanning] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const [filterTab, setFilterTab] = useState<"VIOLATING" | "COMPLIANT" | "ALL">("VIOLATING");
+  const [selectedViolatorIds, setSelectedViolatorIds] = useState<string[]>([]);
+  const [eliminationModalOpen, setEliminationModalOpen] = useState(false);
+  const [eliminationReason, setEliminationReason] = useState("");
+  const [eliminating, setEliminating] = useState(false);
+  const [complianceMessage, setComplianceMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
+  const [infoModalScript, setInfoModalScript] = useState<any | null>(null);
+  const [symbolSearchQuery, setSymbolSearchQuery] = useState("");
+  const [copiedSymbols, setCopiedSymbols] = useState(false);
+
+  // 10-Minute Cooldown live countdown ticker
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownRemaining((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
+
+  const formatCooldown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const ANNOUNCEMENT_TITLE_LIMIT = 80;
   const ANNOUNCEMENT_DESCRIPTION_LIMIT = 500;
 
@@ -99,6 +130,31 @@ export default function EventOrganizerControlPanel() {
     }
   }, [passcode]);
 
+  const fetchComplianceScripts = useCallback(async (eventId: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventId}/compliance/scripts`, {
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const scripts = json.scripts || [];
+        setComplianceScripts(scripts);
+        if (scripts.length > 0) {
+          setSelectedScriptId((prev) => {
+            const exists = scripts.some((s: any) => s.scriptId === prev);
+            return exists ? prev : scripts[0].scriptId;
+          });
+          const activeScript = scripts.find((s: any) => s.scriptId === (selectedScriptId || scripts[0].scriptId)) || scripts[0];
+          if (activeScript && activeScript.cooldownRemainingSeconds > 0) {
+            setCooldownRemaining(activeScript.cooldownRemainingSeconds);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching compliance scripts:", err);
+    }
+  }, [passcode, selectedScriptId]);
+
   // Fetch event details and real-time leaderboard rankings
   const fetchDashboardData = useCallback(async () => {
     if (!passcode) return;
@@ -131,6 +187,7 @@ export default function EventOrganizerControlPanel() {
 
         fetchFinalizationHealth(eventId);
         fetchCertificates(eventId);
+        fetchComplianceScripts(eventId);
         const announcementRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/announcements?limit=10`, {
           headers: { Authorization: `Bearer ${passcode}` },
         });
@@ -140,7 +197,7 @@ export default function EventOrganizerControlPanel() {
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, groupByField, fetchGroupAnalytics]);
+  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, groupByField, fetchGroupAnalytics, fetchComplianceScripts]);
 
   const removeParticipant = async (student: any) => {
     if (!eventData?.id || !student?.userId) return;
@@ -152,7 +209,90 @@ export default function EventOrganizerControlPanel() {
     });
     const json = await res.json();
     if (!res.ok || !json.success) alert(json.message || "Could not remove participant.");
-    else fetchDashboardData();
+    else {
+      fetchDashboardData();
+      if (selectedScriptId) fetchComplianceScripts(eventData.id);
+    }
+  };
+
+  // ── Compliance Script Handlers ──
+  const handleRunComplianceScan = async (scriptId: string, force = false) => {
+    if (!eventData?.id || !scriptId) return;
+    setScanning(true);
+    setComplianceMessage(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/compliance/scripts/${scriptId}/run${force ? "?force=true" : ""}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${passcode}` },
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setScriptScanData(json);
+        setCooldownRemaining(json.cooldownRemainingSeconds || 600);
+        setComplianceMessage({
+          type: "success",
+          text: `Scan complete: ${json.violatingCount} violator${json.violatingCount === 1 ? "" : "s"} flagged out of ${json.totalEvaluated} participants.`,
+        });
+        setSelectedViolatorIds([]);
+        fetchComplianceScripts(eventData.id);
+      } else if (res.status === 429) {
+        setCooldownRemaining(json.cooldownRemainingSeconds || 60);
+        setComplianceMessage({
+          type: "info",
+          text: `Cooldown active. Next scan available in ${formatCooldown(json.cooldownRemainingSeconds || 60)}.`,
+        });
+      } else {
+        setComplianceMessage({
+          type: "error",
+          text: json.message || "Failed to execute compliance scan.",
+        });
+      }
+    } catch (err) {
+      setComplianceMessage({
+        type: "error",
+        text: "Network error while running compliance scan.",
+      });
+    } finally {
+      setScanning(false);
+    }
+  };
+
+
+  const handleBulkEliminate = async () => {
+    if (!eventData?.id || selectedViolatorIds.length === 0) return;
+    setEliminating(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/compliance/bulk-remove`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${passcode}`,
+        },
+        body: JSON.stringify({
+          scriptId: selectedScriptId,
+          userIds: selectedViolatorIds,
+          reason: eliminationReason || "Violated NIFTY 50 trading rules.",
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setComplianceMessage({
+          type: "success",
+          text: `Successfully disqualified and removed ${json.removedCount} participant${json.removedCount === 1 ? "" : "s"}.`,
+        });
+        setEliminationModalOpen(false);
+        setSelectedViolatorIds([]);
+        setEliminationReason("");
+        await handleRunComplianceScan(selectedScriptId, true);
+        fetchDashboardData();
+      } else {
+        alert(json.message || "Could not eliminate selected participants.");
+      }
+    } catch (err) {
+      alert("Network error while eliminating participants.");
+    } finally {
+      setEliminating(false);
+    }
   };
 
   const handleGenerateCertificates = async () => {
@@ -718,6 +858,484 @@ export default function EventOrganizerControlPanel() {
           </div>
         )}
 
+        {/* Compliance Banner Message if active */}
+        {complianceMessage && (
+          <div
+            className={`mb-6 p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm font-semibold transition ${
+              complianceMessage.type === "success"
+                ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
+                : complianceMessage.type === "error"
+                ? "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
+                : "bg-primary/10 border-primary/30 text-primary"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Icon
+                icon={
+                  complianceMessage.type === "success"
+                    ? "solar:check-circle-bold"
+                    : complianceMessage.type === "error"
+                    ? "solar:danger-triangle-bold"
+                    : "solar:info-circle-bold"
+                }
+                width="20"
+                height="20"
+              />
+              <span>{complianceMessage.text}</span>
+            </div>
+            <button
+              onClick={() => setComplianceMessage(null)}
+              className="text-xs font-bold opacity-70 hover:opacity-100"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* ── Compliance & Trading Rule Audits Section ── */}
+        <section className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-3xl p-6 shadow-xl mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-grey/10 dark:border-white/10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1.5">
+                  <Icon icon="solar:shield-check-bold" width="14" height="14" />
+                  Compliance & Trading Rule Audits
+                </span>
+                {complianceScripts.length > 0 && (
+                  <span className="text-xs text-muted dark:text-white/60 font-semibold">
+                    • {complianceScripts.length} Active Filter{complianceScripts.length > 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+              <h2 className="text-xl font-extrabold text-midnight_text dark:text-white mt-2">
+                Real-Time Contest Rule Compliance
+              </h2>
+              <p className="text-xs text-muted dark:text-white/60 mt-0.5">
+                Automatically audit participants against competition restrictions and eliminate rule violators with one click.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-muted dark:text-white/50 bg-gray-100 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-grey/10 dark:border-white/10 flex items-center gap-1.5">
+                <Icon icon="solar:lock-bold" width="13" height="13" />
+                <span>Managed by Event Administrator</span>
+              </span>
+            </div>
+          </div>
+
+          {complianceScripts.length === 0 ? (
+            <div className="py-10 text-center bg-gray-50/50 dark:bg-white/[0.02] rounded-2xl border border-dashed border-grey/20 dark:border-white/10 my-4">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 text-muted dark:text-white/60 flex items-center justify-center mx-auto mb-3">
+                <Icon icon="solar:shield-check-bold" width="24" height="24" />
+              </div>
+              <h3 className="text-sm font-bold text-midnight_text dark:text-white">No Compliance Filters Attached</h3>
+              <p className="text-xs text-muted dark:text-white/60 max-w-md mx-auto mt-1">
+                No compliance or trading rule filter scripts are currently configured for this event by the administrator. Contact your competition administrator if rule auditing is required.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-5 space-y-5">
+              {/* Script Selector Tabs if multiple scripts */}
+              {complianceScripts.length > 1 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {complianceScripts.map((s) => {
+                    const isSelected = s.scriptId === selectedScriptId;
+                    return (
+                      <button
+                        key={s.scriptId}
+                        onClick={() => {
+                          setSelectedScriptId(s.scriptId);
+                          setScriptScanData(null);
+                          setSelectedViolatorIds([]);
+                          if (s.cooldownRemainingSeconds > 0) setCooldownRemaining(s.cooldownRemainingSeconds);
+                        }}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${
+                          isSelected
+                            ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
+                            : "bg-gray-100 dark:bg-white/5 text-midnight_text dark:text-white/70 border-grey/10 hover:bg-gray-200"
+                        }`}
+                      >
+                        <span>{s.title}</span>
+                        {s.lastResultSummary?.violatingCount > 0 && (
+                          <span
+                            className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                              isSelected ? "bg-white text-primary" : "bg-red-500 text-white"
+                            }`}
+                          >
+                            {s.lastResultSummary.violatingCount}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Active Script Details & Controls Card */}
+              {(() => {
+                const activeScript =
+                  complianceScripts.find((s) => s.scriptId === selectedScriptId) || complianceScripts[0];
+                if (!activeScript) return null;
+
+                const summary = scriptScanData || {
+                  totalEvaluated: activeScript.lastResultSummary?.totalEvaluated || participants.length,
+                  compliantCount: activeScript.lastResultSummary?.compliantCount || 0,
+                  violatingCount: activeScript.lastResultSummary?.violatingCount || 0,
+                  summary: activeScript.lastEvaluatedAt
+                    ? `${activeScript.lastResultSummary?.violatingCount || 0} violator(s) flagged at ${new Date(activeScript.lastEvaluatedAt).toLocaleTimeString()}`
+                    : "Not evaluated yet. Click 'Run Filter Scan' to audit participants.",
+                  evaluatedAt: activeScript.lastEvaluatedAt,
+                  violatingParticipants: [],
+                  compliantParticipants: [],
+                };
+
+                const violatingList = scriptScanData?.violatingParticipants || [];
+                const compliantList = scriptScanData?.compliantParticipants || [];
+                const allList = [...violatingList, ...compliantList];
+
+                const displayedParticipants =
+                  filterTab === "VIOLATING"
+                    ? violatingList
+                    : filterTab === "COMPLIANT"
+                    ? compliantList
+                    : allList;
+
+                const isAllSelected =
+                  violatingList.length > 0 &&
+                  violatingList.every((v: any) => selectedViolatorIds.includes(String(v.userId)));
+
+                return (
+                  <div>
+                    {/* Active Script Top Bar */}
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-grey/10 dark:border-white/10">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-extrabold text-midnight_text dark:text-white">
+                            {activeScript.title}
+                          </h3>
+                          <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                            {activeScript.scriptKey}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted dark:text-white/60 mt-1 max-w-2xl">
+                          {activeScript.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 self-start lg:self-center">
+                        {/* 10-Minute Cooldown Run Scan Button */}
+                        <button
+                          onClick={() => handleRunComplianceScan(activeScript.scriptId)}
+                          disabled={scanning || cooldownRemaining > 0}
+                          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center gap-2 shadow-md ${
+                            cooldownRemaining > 0
+                              ? "bg-gray-200 dark:bg-white/10 text-muted dark:text-white/40 cursor-not-allowed border border-grey/20 dark:border-white/10"
+                              : "bg-primary hover:bg-primary/90 text-white shadow-primary/25 active:scale-[0.98]"
+                          }`}
+                        >
+                          {scanning ? (
+                            <>
+                              <Icon icon="line-md:loading-twotone-loop" width="16" height="16" />
+                              <span>Scanning Orders...</span>
+                            </>
+                          ) : cooldownRemaining > 0 ? (
+                            <>
+                              <Icon icon="solar:clock-circle-bold" width="16" height="16" />
+                              <span>Next scan in {formatCooldown(cooldownRemaining)}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Icon icon="solar:play-bold" width="16" height="16" />
+                              <span>Run Filter Scan</span>
+                            </>
+                          )}
+                        </button>
+
+                        {/* Filter Scope & Timing Tooltip / Info Modal Trigger */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInfoModalScript(activeScript);
+                            setSymbolSearchQuery("");
+                            setCopiedSymbols(false);
+                          }}
+                          className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white transition border border-grey/10 dark:border-white/10 flex items-center justify-center shadow-xs"
+                          title="Filter Scope, Schedule & Approved Stocks"
+                        >
+                          <Icon icon="solar:info-circle-bold" width="18" height="18" className="text-primary" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Metric Cards Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                      <div className="bg-gray-50 dark:bg-slate-900/40 border border-grey/10 dark:border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <span className="text-[11px] font-bold text-muted dark:text-white/60 uppercase">Participants Scanned</span>
+                          <p className="text-xl font-black text-midnight_text dark:text-white mt-0.5">
+                            {summary.totalEvaluated}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-white/10 text-muted dark:text-white/80 flex items-center justify-center">
+                          <Icon icon="solar:users-group-two-rounded-bold" width="20" height="20" />
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-50 dark:bg-slate-900/40 border border-green-500/20 rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <span className="text-[11px] font-bold text-green-600 dark:text-green-400 uppercase">Compliant</span>
+                          <p className="text-xl font-black text-green-500 mt-0.5">
+                            {summary.compliantCount}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center">
+                          <Icon icon="solar:shield-check-bold" width="20" height="20" />
+                        </div>
+                      </div>
+
+                      <div className={`bg-gray-50 dark:bg-slate-900/40 border rounded-2xl p-4 flex items-center justify-between ${
+                        summary.violatingCount > 0 ? "border-red-500/30 bg-red-500/5" : "border-grey/10 dark:border-white/10"
+                      }`}>
+                        <div>
+                          <span className="text-[11px] font-bold text-red-600 dark:text-red-400 uppercase">Flagged Violations</span>
+                          <p className={`text-xl font-black mt-0.5 ${summary.violatingCount > 0 ? "text-red-500" : "text-muted"}`}>
+                            {summary.violatingCount}
+                          </p>
+                        </div>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          summary.violatingCount > 0 ? "bg-red-500/10 text-red-500 animate-pulse" : "bg-gray-200 dark:bg-white/10 text-muted"
+                        }`}>
+                          <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Scan Status line */}
+                    {activeScript.lastEvaluatedAt && (
+                      <p className="text-[11px] text-muted dark:text-white/50 mt-2 flex items-center gap-1.5">
+                        <Icon icon="solar:clock-circle-linear" width="13" height="13" />
+                        <span>Last evaluated: {new Date(activeScript.lastEvaluatedAt).toLocaleTimeString()} ({new Date(activeScript.lastEvaluatedAt).toLocaleDateString()})</span>
+                      </p>
+                    )}
+
+                    {/* Filter Tabs & Bulk Actions Bar */}
+                    {scriptScanData && (
+                      <div className="mt-5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-grey/10 dark:border-white/10">
+                          {/* Tabs */}
+                          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-900 p-1 rounded-xl w-fit">
+                            <button
+                              onClick={() => setFilterTab("VIOLATING")}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                filterTab === "VIOLATING"
+                                  ? "bg-red-500 text-white shadow"
+                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                              }`}
+                            >
+                              <span>🔴 Violations</span>
+                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
+                                {violatingList.length}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => setFilterTab("COMPLIANT")}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                filterTab === "COMPLIANT"
+                                  ? "bg-green-600 text-white shadow"
+                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                              }`}
+                            >
+                              <span>🟢 Compliant</span>
+                              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
+                                {compliantList.length}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => setFilterTab("ALL")}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                                filterTab === "ALL"
+                                  ? "bg-primary text-white shadow"
+                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                              }`}
+                            >
+                              <span>All ({allList.length})</span>
+                            </button>
+                          </div>
+
+                          {/* Bulk Actions Button when Violating tab active */}
+                          {filterTab === "VIOLATING" && violatingList.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              {selectedViolatorIds.length > 0 && (
+                                <button
+                                  onClick={() => {
+                                    setEliminationReason(`Violated ${activeScript.title} by trading unauthorized stocks.`);
+                                    setEliminationModalOpen(true);
+                                  }}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition shadow-md shadow-red-500/20 flex items-center gap-1.5 active:scale-[0.98]"
+                                >
+                                  <Icon icon="solar:user-block-bold" width="14" height="14" />
+                                  <span>Eliminate Selected ({selectedViolatorIds.length})</span>
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Interactive Table */}
+                        {displayedParticipants.length === 0 ? (
+                          <div className="py-8 text-center text-xs text-muted dark:text-white/60">
+                            {filterTab === "VIOLATING" ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-2xl mb-1">🎉</span>
+                                <span className="font-bold text-green-500">Zero Rule Violations Found!</span>
+                                <span>All evaluated participants are compliant with the trading rules.</span>
+                              </div>
+                            ) : (
+                              "No participants found in this filter."
+                            )}
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto mt-3 rounded-2xl border border-grey/10 dark:border-white/10">
+                            <table className="w-full text-left text-xs border-collapse">
+                              <thead className="bg-gray-50 dark:bg-slate-900/80 text-muted dark:text-white/70 uppercase font-extrabold border-b border-grey/10 dark:border-white/10">
+                                <tr>
+                                  {filterTab === "VIOLATING" && (
+                                    <th className="py-3 px-3 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={isAllSelected}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setSelectedViolatorIds(violatingList.map((v: any) => String(v.userId)));
+                                          } else {
+                                            setSelectedViolatorIds([]);
+                                          }
+                                        }}
+                                        className="w-4 h-4 accent-red-600 rounded cursor-pointer"
+                                        title="Select all violating"
+                                      />
+                                    </th>
+                                  )}
+                                  <th className="py-3 px-3">Rank</th>
+                                  <th className="py-3 px-3">Participant</th>
+                                  <th className="py-3 px-3 text-right">Valuation</th>
+                                  <th className="py-3 px-3 text-right">Return</th>
+                                  <th className="py-3 px-4">Compliance Status & Audit Reason</th>
+                                  <th className="py-3 px-3 text-right">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-grey/10 dark:divide-white/10">
+                                {displayedParticipants.map((student: any) => {
+                                  const isViolating = Boolean(student.disallowedSymbols);
+                                  const isSelected = selectedViolatorIds.includes(String(student.userId));
+                                  return (
+                                    <tr
+                                      key={student.userId}
+                                      className={`transition ${
+                                        isSelected
+                                          ? "bg-red-500/10 dark:bg-red-500/15"
+                                          : "hover:bg-gray-50 dark:hover:bg-white/5"
+                                      }`}
+                                    >
+                                      {filterTab === "VIOLATING" && (
+                                        <td className="py-3 px-3 text-center">
+                                          <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={(e) => {
+                                              if (e.target.checked) {
+                                                setSelectedViolatorIds((prev) => [...prev, String(student.userId)]);
+                                              } else {
+                                                setSelectedViolatorIds((prev) =>
+                                                  prev.filter((id) => id !== String(student.userId))
+                                                );
+                                              }
+                                            }}
+                                            className="w-4 h-4 accent-red-600 rounded cursor-pointer"
+                                          />
+                                        </td>
+                                      )}
+                                      <td className="py-3 px-3 font-bold">#{student.rank}</td>
+                                      <td className="py-3 px-3">
+                                        <div className="font-bold text-midnight_text dark:text-white">
+                                          {student.displayName}
+                                        </div>
+                                        {student.customFieldValues && Object.keys(student.customFieldValues).length > 0 && (
+                                          <div className="text-[10px] text-muted dark:text-white/60 truncate max-w-xs">
+                                            {Object.entries(student.customFieldValues)
+                                              .map(([k, v]) => `${k}: ${v}`)
+                                              .join(" • ")}
+                                          </div>
+                                        )}
+                                      </td>
+                                      <td className="py-3 px-3 text-right font-mono font-bold">
+                                        ₹{(student.eventValuation || 0).toLocaleString("en-IN")}
+                                      </td>
+                                      <td
+                                        className={`py-3 px-3 text-right font-mono font-bold ${
+                                          (student.returnPercent || 0) >= 0 ? "text-green-500" : "text-red-500"
+                                        }`}
+                                      >
+                                        {(student.returnPercent || 0) >= 0 ? "+" : ""}
+                                        {(student.returnPercent || 0).toFixed(2)}%
+                                      </td>
+                                      <td className="py-3 px-4">
+                                        {isViolating ? (
+                                          <div className="inline-flex flex-col gap-0.5">
+                                            <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                                              ⚠️ {student.violationReason}
+                                            </span>
+                                            {student.lastViolationAt && (
+                                              <span className="text-[10px] text-muted dark:text-white/50">
+                                                Last trade: {new Date(student.lastViolationAt).toLocaleTimeString()}
+                                              </span>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 inline-flex items-center gap-1">
+                                            <Icon icon="solar:check-circle-bold" width="12" height="12" />
+                                            Compliant
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td className="py-3 px-3 text-right space-x-2 whitespace-nowrap">
+                                        <button
+                                          onClick={() => openTradeAudit(student)}
+                                          className="text-primary hover:underline font-bold"
+                                        >
+                                          Audit
+                                        </button>
+                                        {isViolating && (
+                                          <button
+                                            onClick={() => {
+                                              setSelectedViolatorIds([String(student.userId)]);
+                                              setEliminationReason(student.violationReason || "Violated trading rules.");
+                                              setEliminationModalOpen(true);
+                                            }}
+                                            className="text-red-500 hover:underline font-bold ml-2"
+                                          >
+                                            Eliminate
+                                          </button>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </section>
+
         <div className="mb-4">
           <input
             type="text"
@@ -947,6 +1565,291 @@ export default function EventOrganizerControlPanel() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Participant Elimination Modal */}
+      {eliminationModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-darkHeroBg border border-red-500/30 rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 pb-4 border-b border-grey/10 dark:border-white/10 text-red-500">
+              <div className="w-10 h-10 rounded-2xl bg-red-500/10 flex items-center justify-center">
+                <Icon icon="solar:danger-triangle-bold" width="22" height="22" />
+              </div>
+              <div>
+                <h3 className="text-lg font-extrabold text-midnight_text dark:text-white">
+                  Disqualify & Eliminate Participants
+                </h3>
+                <p className="text-xs text-muted dark:text-white/60">
+                  {selectedViolatorIds.length} participant{selectedViolatorIds.length > 1 ? "s" : ""} selected for removal
+                </p>
+              </div>
+            </div>
+
+            <div className="my-4 space-y-3">
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300">
+                <p className="font-bold">⚠️ Action Summary:</p>
+                <ul className="list-disc list-inside mt-1 space-y-0.5 opacity-90">
+                  <li>Selected participants will be disqualified from the leaderboard.</li>
+                  <li>Any open event orders will be cancelled immediately.</li>
+                  <li>Open event positions will be safely liquidated.</li>
+                  <li>Personal portfolios remain 100% safe and unlocked.</li>
+                </ul>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase mb-1 text-midnight_text dark:text-white">
+                  Disqualification Reason (Audit Log)
+                </label>
+                <input
+                  type="text"
+                  value={eliminationReason}
+                  onChange={(e) => setEliminationReason(e.target.value)}
+                  placeholder="e.g. Traded unauthorized non-NIFTY 50 stocks"
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-red-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3 border-t border-grey/10 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setEliminationModalOpen(false)}
+                disabled={eliminating}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/10 hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkEliminate}
+                disabled={eliminating}
+                className="px-5 py-2 rounded-xl text-xs font-extrabold bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-red-500/25"
+              >
+                {eliminating ? (
+                  <>
+                    <Icon icon="line-md:loading-twotone-loop" width="16" height="16" />
+                    <span>Eliminating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="solar:trash-bin-trash-bold" width="16" height="16" />
+                    <span>Confirm Disqualification</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Scope & Schedule Tooltip Modal */}
+      {infoModalScript && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 my-8">
+            
+            {/* Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-grey/10 dark:border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+                  <Icon icon="solar:document-text-bold" width="24" height="24" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                      {infoModalScript.scriptKey}
+                    </span>
+                    <span className="text-[11px] font-bold text-muted dark:text-white/60">
+                      • Filter Rules & Auditing Scope
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-extrabold text-midnight_text dark:text-white mt-1">
+                    {infoModalScript.title}
+                  </h3>
+                  <p className="text-xs text-muted dark:text-white/60 mt-0.5">
+                    {infoModalScript.description}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setInfoModalScript(null)}
+                className="text-muted hover:text-midnight_text dark:hover:text-white transition p-1"
+              >
+                <Icon icon="solar:close-circle-bold" width="22" height="22" />
+              </button>
+            </div>
+
+            {/* Scan Timing & Cooldown Schedule Card */}
+            <div className="bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:clock-circle-bold" width="18" height="18" className="text-primary" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-midnight_text dark:text-white">
+                    Scan Timing & Evaluation Window
+                  </h4>
+                </div>
+                <span className="text-[11px] font-extrabold bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-full">
+                  {infoModalScript.cooldownMinutes || 10} min break interval
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="bg-white dark:bg-white/5 p-3 rounded-xl border border-grey/10 dark:border-white/5 space-y-1">
+                  <span className="text-[11px] font-semibold text-muted dark:text-white/50 block">Previous Audit Run</span>
+                  <span className="font-bold text-midnight_text dark:text-white text-sm">
+                    {infoModalScript.lastEvaluatedAt
+                      ? new Date(infoModalScript.lastEvaluatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                      : "Initial scan pending"}
+                  </span>
+                </div>
+
+                <div className="bg-white dark:bg-white/5 p-3 rounded-xl border border-grey/10 dark:border-white/5 space-y-1">
+                  <span className="text-[11px] font-semibold text-muted dark:text-white/50 block">Next Scan Availability</span>
+                  <span className={`font-bold text-sm ${cooldownRemaining > 0 ? "text-amber-500" : "text-green-500"}`}>
+                    {cooldownRemaining > 0
+                      ? `Unlocked in ${formatCooldown(cooldownRemaining)}`
+                      : "Ready to run on demand"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Incremental Scan Window Explanation */}
+              <div className="bg-primary/5 border border-primary/15 rounded-xl p-3.5 text-xs text-midnight_text dark:text-white/90 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-primary text-[11px] uppercase tracking-wider">
+                  <Icon icon="solar:calendar-date-bold" width="14" height="14" />
+                  <span>Orders Audited in Next Execution</span>
+                </div>
+                <p className="leading-relaxed">
+                  On the next execution, the engine will audit trade orders placed between{" "}
+                  <strong className="text-primary font-mono">
+                    {infoModalScript.lastEvaluatedAt
+                      ? new Date(infoModalScript.lastEvaluatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                      : (eventData?.startTime ? new Date(eventData.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "Event Start")}
+                  </strong>{" "}
+                  and the{" "}
+                  <strong className="text-primary">moment of scan execution</strong>, in addition to verifying all currently open holdings.
+                </p>
+                <p className="text-[11px] text-muted dark:text-white/60">
+                  • Trades placed prior to this start window were already validated in previous executions and will not be re-processed.
+                </p>
+              </div>
+            </div>
+
+            {/* Approved Stocks / Filter Symbols Section */}
+            {infoModalScript.allowedSymbols && infoModalScript.allowedSymbols.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted dark:text-white/60">
+                      Approved Stock Universe ({infoModalScript.allowedSymbols.length} Stocks)
+                    </h4>
+                    <p className="text-[11px] text-muted dark:text-white/50">
+                      Participants trading any symbol outside this list will be flagged as violators.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(infoModalScript.allowedSymbols.join(", "));
+                      setCopiedSymbols(true);
+                      setTimeout(() => setCopiedSymbols(false), 3000);
+                    }}
+                    className="self-start sm:self-auto bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-grey/10 dark:border-white/10 shadow-2xs"
+                  >
+                    {copiedSymbols ? (
+                      <>
+                        <Icon icon="solar:check-circle-bold" width="14" height="14" className="text-green-500" />
+                        <span className="text-green-600 dark:text-green-400">Copied to Clipboard!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Icon icon="solar:copy-bold" width="14" height="14" />
+                        <span>Copy All Symbols</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Symbol Search Bar */}
+                <div className="relative">
+                  <Icon icon="solar:magnifer-linear" width="16" height="16" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search approved stocks (e.g. Paytm, RVNL, TCS)..."
+                    value={symbolSearchQuery}
+                    onChange={(e) => setSymbolSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-xl text-xs bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 text-midnight_text dark:text-white focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                {/* Stock Symbols Grid */}
+                <div className="max-h-60 overflow-y-auto pr-1 space-y-1.5 divide-y divide-grey/5 dark:divide-white/5 bg-gray-50/50 dark:bg-slate-900/30 rounded-2xl p-3 border border-grey/10 dark:border-white/10">
+                  {(() => {
+                    const query = symbolSearchQuery.toLowerCase().trim();
+                    const detailsMap = new Map<string, string>();
+                    (infoModalScript.stockDetails || []).forEach((d: any) => {
+                      if (d && d.symbol) detailsMap.set(String(d.symbol), String(d.name || d.symbol));
+                    });
+                    const filteredSymbols: string[] = (infoModalScript.allowedSymbols || [])
+                      .map((s: any) => String(s))
+                      .filter((sym: string) => {
+                        const name = String(detailsMap.get(sym) || "").toLowerCase();
+                        return sym.toLowerCase().includes(query) || name.includes(query);
+                      });
+
+                    if (filteredSymbols.length === 0) {
+                      return (
+                        <p className="text-xs text-muted dark:text-white/50 text-center py-4">
+                          No approved stocks match &quot;{symbolSearchQuery}&quot;
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {filteredSymbols.map((sym: string) => {
+                          const companyName = String(detailsMap.get(sym) || "");
+                          return (
+                            <div
+                              key={sym}
+                              className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 text-xs shadow-2xs"
+                            >
+                              <div className="truncate mr-2">
+                                <span className="font-mono font-extrabold text-primary text-xs mr-1.5">
+                                  {sym}
+                                </span>
+                                {companyName && companyName !== sym && (
+                                  <span className="text-[11px] text-muted dark:text-white/60 truncate">
+                                    {companyName}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div className="flex justify-end pt-3 border-t border-grey/10 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setInfoModalScript(null)}
+                className="bg-primary hover:bg-primary/90 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-md shadow-primary/20"
+              >
+                Done
+              </button>
+            </div>
+
           </div>
         </div>
       )}

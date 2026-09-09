@@ -79,18 +79,33 @@ const TermsContent = () => {
             </ul>
           </div>
 
-          {/* 4. Simulated Trading & Contests */}
+          {/* 4. Simulated Trading, Contests & Championship Rules */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-midnight_text dark:text-white mb-4">
-              4. Paper Trading Simulation & Free Daily Contests
+              4. Paper Trading Simulation, Contests &amp; Championship Rules
             </h2>
             <p className="text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-4">
-              Arthwise is 100% free to access and use:
+              All paper trading features, market events, championships, and simulation tournaments on Arthwise are 100% free and governed by the following official rules:
             </p>
-            <ul className="list-disc list-inside text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-6 ml-4 space-y-2">
-              <li><strong>Virtual Simulation Only:</strong> The ₹10 Lakh virtual funds, derivative trades, and balances provided are purely fictional simulation tokens for practice and education. They have no real monetary value, cannot be deposited, converted, or withdrawn.</li>
-              <li><strong>Daily Contests (StockHub):</strong> Daily contests and simulation events are educational paper-trading challenges. Participation is free, and ranking is based purely on virtual portfolio performance. Contests are not real-money gambling, sports betting, lotteries, or wagering.</li>
-              <li><strong>No Financial Advice:</strong> Content, analysis, charts, and simulation metrics provided on Arthwise are solely for educational purposes and do not constitute registered financial, investment, or legal advice.</li>
+            <ul className="list-disc list-inside text-DeepOcean dark:text-white dark:text-opacity-70 leading-relaxed mb-6 ml-4 space-y-3">
+              <li>
+                <strong>Eligibility &amp; Free Entry:</strong> Contests are open to all registered Arthwise users. Private competitions hosted by partner universities or institutions may require an organizer-provided joining code or passcode. Participation is completely free with zero entry fees, deposits, or purchases required.
+              </li>
+              <li>
+                <strong>Virtual Simulation Only:</strong> The ₹10 Lakh virtual funds, derivative trades, margins, and portfolio balances provided are purely fictional simulation credits for practice and education. They have no real monetary value and cannot be deposited, converted, redeemed, or withdrawn as cash or monetary prizes.
+              </li>
+              <li>
+                <strong>No Real Money / No Gambling:</strong> Contests and trading tournaments are educational, skill-based simulations designed to teach market literacy. Contests do not constitute real-money gambling, betting, wagering, or lotteries under any jurisdiction.
+              </li>
+              <li>
+                <strong>Leaderboard &amp; Public Performance Consent:</strong> By registering for, entering, or participating in any market competition, you explicitly consent to displaying your public username, avatar, and simulated performance metrics (such as rank, return percentage, and virtual valuation) on the event and platform leaderboards.
+              </li>
+              <li>
+                <strong>Apple Inc. Disclaimer:</strong> Apple Inc. is not a sponsor, co-sponsor, or endorser, and is not involved in any manner with any contest, sweepstakes, tournament, or leaderboard hosted on Arthwise.
+              </li>
+              <li>
+                <strong>No Financial Advice:</strong> Content, research, charts, and simulation metrics provided on Arthwise are solely for educational purposes and do not constitute registered investment, financial, tax, or legal advice.
+              </li>
             </ul>
           </div>
 

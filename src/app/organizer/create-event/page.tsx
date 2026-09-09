@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
@@ -13,11 +13,24 @@ const PRESET_BANNERS = [
   { name: "Abstract Slate", url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000" },
 ];
 
-export default function CreateEventPage() {
+function toDatetimeLocal(isoString: string) {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function CreateOrEditEventForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams ? searchParams.get("edit") : null;
+  const isEditMode = Boolean(editId);
+
   const [token, setToken] = useState("");
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
   
-  // Create Event Form States
+  // Create / Edit Event Form States
   const [title, setTitle] = useState("");
   const [sponsorName, setSponsorName] = useState("");
   const [bannerImageUrl, setBannerImageUrl] = useState(PRESET_BANNERS[0].url);
@@ -31,6 +44,8 @@ export default function CreateEventPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO", "COMMODITY"]);
+  const [eventStatus, setEventStatus] = useState("UPCOMING");
+  const [participantCount, setParticipantCount] = useState(0);
   
   // Custom Verification Fields
   const [customFields, setCustomFields] = useState<any[]>([
@@ -48,8 +63,8 @@ export default function CreateEventPage() {
   ]);
   const [newRule, setNewRule] = useState("");
 
-  const [createLoading, setCreateLoading] = useState(false);
-  const [createError, setCreateError] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   // Authentication check
   useEffect(() => {
@@ -60,6 +75,60 @@ export default function CreateEventPage() {
     }
     setToken(storedToken);
   }, [router]);
+
+  // If in Edit Mode, fetch existing event details
+  useEffect(() => {
+    if (!token || !isEditMode || !editId) return;
+
+    const fetchExistingEvent = async () => {
+      setInitialLoading(true);
+      setFormError("");
+      try {
+        const res = await fetch(`${API_BASE_URL}/market-event/organizer/${editId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const json = await res.json();
+        if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again")))) {
+          sessionStorage.clear();
+          router.push("/organizer/login");
+          return;
+        }
+
+        if (!res.ok || !json.success || !json.event) {
+          throw new Error(json.message || "Failed to load event details for editing.");
+        }
+
+        const ev = json.event;
+        setTitle(ev.title || "");
+        setSponsorName(ev.sponsorName || "");
+        setBannerImageUrl(ev.bannerImageUrl || PRESET_BANNERS[0].url);
+        setBannerBgColor(ev.bannerBgColor || "#0F172A");
+        setBannerTextColor(ev.bannerTextColor || "#38BDF8");
+        setDescription(ev.description || "");
+        setJoinCode(ev.joinCode || "");
+        setPasscode(ev.passcode || "");
+        setInitialCapital(ev.initialCapital || 1000000);
+        setMaxParticipants(ev.maxParticipants || 150);
+        setStartTime(toDatetimeLocal(ev.startTime));
+        setEndTime(toDatetimeLocal(ev.endTime));
+        setAllowedAssetClasses(ev.allowedAssetClasses || ["EQUITY"]);
+        setCustomFields(ev.customVerificationFields || []);
+        setRules(ev.rules || []);
+        setEventStatus(ev.status || "UPCOMING");
+        setParticipantCount(ev.participantCount || 0);
+      } catch (err: any) {
+        console.error("❌ Error fetching event for edit:", err);
+        setFormError(err.message || "Could not retrieve event details.");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    fetchExistingEvent();
+  }, [token, isEditMode, editId, router]);
 
   // Add custom verification field
   const addCustomField = () => {
@@ -96,26 +165,31 @@ export default function CreateEventPage() {
     setRules(rules.filter((_, i) => i !== index));
   };
 
-  // Submit Event Creation Form
-  const handleCreateEventSubmit = async (e: React.FormEvent) => {
+  // Submit Event Form (Create or Update)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCreateError("");
+    setFormError("");
 
-    if (!title || !sponsorName || !joinCode || !passcode || !startTime || !endTime) {
-      setCreateError("Please fill out all required fields marked with *.");
+    if (!title.trim() || !sponsorName.trim() || !joinCode.trim() || !passcode.trim() || !startTime || !endTime) {
+      setFormError("Please fill out all required fields marked with *.");
       return;
     }
 
-    setCreateLoading(true);
+    if (new Date(startTime) >= new Date(endTime)) {
+      setFormError("Event Start Time must be before End Time.");
+      return;
+    }
+
+    setSubmitLoading(true);
 
     try {
-      const payload = {
-        title,
-        sponsorName,
+      const payload: any = {
+        title: title.trim(),
+        sponsorName: sponsorName.trim(),
         bannerImageUrl,
         bannerBgColor,
         bannerTextColor,
-        description,
+        description: description.trim(),
         joinCode: joinCode.trim().toUpperCase(),
         passcode: passcode.trim(),
         initialCapital: Number(initialCapital),
@@ -127,8 +201,13 @@ export default function CreateEventPage() {
         rules
       };
 
-      const res = await fetch(`${API_BASE_URL}/market-event/organizer/create`, {
-        method: "POST",
+      const url = isEditMode
+        ? `${API_BASE_URL}/market-event/organizer/${editId}`
+        : `${API_BASE_URL}/market-event/organizer/create`;
+      const method = isEditMode ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
@@ -143,17 +222,26 @@ export default function CreateEventPage() {
         return;
       }
       if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to create trading event.");
+        throw new Error(json.message || `Failed to ${isEditMode ? "update" : "create"} trading event.`);
       }
 
       router.push("/organizer/dashboard");
     } catch (err: any) {
       console.error(err);
-      setCreateError(err.message || "Failed to save event. Try again.");
+      setFormError(err.message || "Failed to save event configuration. Please check your inputs.");
     } finally {
-      setCreateLoading(false);
+      setSubmitLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white p-6 pt-28 flex flex-col items-center justify-center gap-4">
+        <Icon icon="line-md:loading-twotone-loop" width="48" height="48" className="text-primary" />
+        <p className="text-sm font-semibold text-muted dark:text-white/70">Loading event configuration for editing...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-heroBg dark:bg-darkmode text-midnight_text dark:text-white p-6 pt-28 font-sans transition-colors duration-300">
@@ -163,24 +251,51 @@ export default function CreateEventPage() {
         <div className="flex items-center justify-between pb-4 border-b border-grey/10 dark:border-white/10">
           <div>
             <button 
+              type="button"
               onClick={() => router.push("/organizer/dashboard")}
               className="text-xs font-bold text-primary hover:underline transition uppercase flex items-center gap-1"
             >
               <Icon icon="solar:alt-arrow-left-linear" width="14" height="14" />
               <span>Back to Dashboard</span>
             </button>
-            <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white mt-2">Create Paper Trading Event</h1>
+            <div className="flex items-center gap-3 mt-2">
+              <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white">
+                {isEditMode ? "Edit Paper Trading Event" : "Create Paper Trading Event"}
+              </h1>
+              {isEditMode && (
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${
+                  eventStatus === "LIVE"
+                    ? "bg-green-500/20 text-green-400 border-green-500/30"
+                    : eventStatus === "UPCOMING"
+                    ? "bg-sky-500/20 text-sky-400 border-sky-500/30"
+                    : "bg-slate-700 text-slate-300 border-slate-600"
+                }`}>
+                  {eventStatus}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {createError && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-500 font-medium text-sm flex items-center gap-2">
-            <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
-            <span>{createError}</span>
+        {/* Live Event Notice */}
+        {isEditMode && eventStatus === "LIVE" && (
+          <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-4 text-amber-600 dark:text-amber-400 font-medium text-xs flex items-start gap-3">
+            <Icon icon="solar:shield-warning-bold" width="22" height="22" className="flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold text-sm">Notice: This event is currently LIVE with {participantCount} enrolled participants.</p>
+              <p>You may adjust branding, guidelines, asset rules, passcode, and end times. Initial virtual capital is locked if trades have already executed to preserve leaderboard score integrity.</p>
+            </div>
           </div>
         )}
 
-        <form onSubmit={handleCreateEventSubmit} className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl relative overflow-hidden">
+        {formError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-500 font-medium text-sm flex items-center gap-2">
+            <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
+            <span>{formError}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl relative overflow-hidden">
           
           {/* Section 1: Identity */}
           <div>
@@ -291,6 +406,7 @@ export default function CreateEventPage() {
                   onChange={(e) => setInitialCapital(Number(e.target.value))}
                   className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
+                  min={1000}
                 />
               </div>
               <div>
@@ -301,6 +417,7 @@ export default function CreateEventPage() {
                   onChange={(e) => setMaxParticipants(Number(e.target.value))}
                   className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition"
                   required
+                  min={1}
                 />
               </div>
             </div>
@@ -476,15 +593,37 @@ export default function CreateEventPage() {
             </button>
             <button
               type="submit"
-              disabled={createLoading}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl text-sm font-extrabold transition shadow-lg shadow-primary/25 active:scale-[0.98] disabled:opacity-50"
+              disabled={submitLoading}
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl text-sm font-extrabold transition shadow-lg shadow-primary/25 active:scale-[0.98] disabled:opacity-50 flex items-center gap-2"
             >
-              {createLoading ? "Creating..." : "Save Event Configuration"}
+              {submitLoading ? (
+                <>
+                  <Icon icon="line-md:loading-twotone-loop" width="16" height="16" />
+                  <span>{isEditMode ? "Updating..." : "Creating..."}</span>
+                </>
+              ) : (
+                <span>{isEditMode ? "Update Event Configuration" : "Save Event Configuration"}</span>
+              )}
             </button>
           </div>
 
         </form>
       </div>
     </div>
+  );
+}
+
+export default function CreateEventPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-heroBg dark:bg-darkmode flex flex-col items-center justify-center gap-3">
+          <Icon icon="line-md:loading-twotone-loop" width="40" height="40" className="text-primary" />
+          <p className="text-xs text-muted dark:text-white/60 font-semibold">Loading Event Builder...</p>
+        </div>
+      }
+    >
+      <CreateOrEditEventForm />
+    </Suspense>
   );
 }
