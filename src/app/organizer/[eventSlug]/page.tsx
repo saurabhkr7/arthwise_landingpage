@@ -47,6 +47,10 @@ export default function EventOrganizerControlPanel() {
   const [groupAnalytics, setGroupAnalytics] = useState<any[]>([]);
   const [groupLoading, setGroupLoading] = useState(false);
 
+  // ── Leaderboard Table Pagination State ──
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
   // ── Compliance Filter Scripts State ──
   const [complianceScripts, setComplianceScripts] = useState<any[]>([]);
   const [selectedScriptId, setSelectedScriptId] = useState<string>("");
@@ -612,6 +616,12 @@ export default function EventOrganizerControlPanel() {
     const customValues = Object.values(p.customFieldValues || {}).join(" ").toLowerCase();
     return name.includes(q) || customValues.includes(q);
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredParticipants.length / rowsPerPage));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, filteredParticipants.length);
+  const paginatedParticipants = filteredParticipants.slice(startIndex, endIndex);
 
   const visibleCustomFields = (eventData?.customVerificationFields || []).filter((field: any) =>
     participants.some((participant: any) => String(participant.customFieldValues?.[field.fieldKey] || '').trim())
@@ -1481,7 +1491,10 @@ export default function EventOrganizerControlPanel() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="🔍 Search student by name, enrollment number, or division..."
             className="w-full bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl px-4 py-3 text.midnight_text dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary transition text-sm shadow-md"
           />
@@ -1507,72 +1520,171 @@ export default function EventOrganizerControlPanel() {
 
         {/* Leaderboard Data Table */}
         <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+          {/* Top Bar: Title & Rows Per Page Selector */}
+          <div className="p-4 sm:p-5 border-b border-grey/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 dark:bg-slate-900/50">
+            <div className="flex items-center gap-2.5">
+              <span className="font-extrabold text-sm text-midnight_text dark:text-white">
+                Leaderboard Rankings
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                {filteredParticipants.length} {filteredParticipants.length === 1 ? "student" : "students"}
+              </span>
+            </div>
+
+            {/* Rows Per Page selector (10, 25, 50) */}
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted dark:text-white/60 font-semibold">Rows per page:</span>
+              <div className="inline-flex rounded-xl bg-gray-200/70 dark:bg-slate-800 p-0.5 border border-grey/10 dark:border-white/10">
+                {[10, 25, 50].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setRowsPerPage(option);
+                      setCurrentPage(1);
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-extrabold transition ${
+                      rowsPerPage === option
+                        ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
+                        : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {loading && !participants.length ? (
             <div className="p-12 text-center text-muted dark:text-white/60">Loading student rankings...</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-slate-900/80 text-muted dark:text-white/70 text-xs uppercase font-extrabold border-b border-grey/10 dark:border-white/10">
-                    <th className="py-4 px-4">Rank</th>
-                    {visibleCustomFields.map((field: any) => (
-                      <th key={field.fieldKey} className="py-4 px-4">{field.fieldLabel || field.fieldKey}</th>
-                    ))}
-                    <th className="py-4 px-4">Student Name</th>
-                    <th className="py-4 px-4 text-right">Open Holdings</th>
-                    <th className="py-4 px-4 text-right">Portfolio Value</th>
-                    <th className="py-4 px-4 text-right">Return (%)</th>
-                    <th className="py-4 px-4 text-right">Win Rate</th>
-                    <th className="py-4 px-4 text-right">Trades</th>
-                    <th className="py-4 px-4 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-grey/10 dark:divide-white/10 text-sm">
-                  {filteredParticipants.map((student) => {
-                    const isGain = (student.returnPercent || 0) >= 0;
-                    return (
-                      <tr key={student.userId || student.rank} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
-                        <td className="py-3.5 px-4 font-black text-midnight_text dark:text-white">
-                          {student.rank === 1 ? "🥇 1" : student.rank === 2 ? "🥈 2" : student.rank === 3 ? "🥉 3" : `#${student.rank}`}
-                        </td>
-                        {visibleCustomFields.map((field: any) => (
-                          <td key={field.fieldKey} className="py-3.5 px-4 text-muted dark:text-white/70">
-                            {student.customFieldValues?.[field.fieldKey] || ""}
-                          </td>
-                        ))}
-                        <td className="py-3.5 px-4 font-bold text-midnight_text dark:text-white">{student.displayName}</td>
-                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">{student.openHoldingsCount || 0}</td>
-                        <td className="py-3.5 px-4 text-right font-mono font-bold text-midnight_text dark:text-white">
-                          ₹{(student.eventValuation || 1000000).toLocaleString("en-IN")}
-                        </td>
-                        <td className={`py-3.5 px-4 text-right font-mono font-extrabold ${isGain ? "text-green-500" : "text-red-500"}`}>
-                          {isGain ? "+" : ""}
-                          {student.returnPercent ? student.returnPercent.toFixed(2) : "0.00"}%
-                        </td>
-                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">
-                          {student.winRate ? student.winRate.toFixed(0) : 0}%
-                        </td>
-                        <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/70">{student.totalTrades || 0}</td>
-                        <td className="py-3.5 px-4 text-center">
-                          <button
-                            onClick={() => openTradeAudit(student)}
-                            className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-xl text-xs font-bold transition border border-primary/20"
-                          >
-                            Inspect Audit
-                          </button>
-                          <button
-                            onClick={() => removeParticipant(student)}
-                            className="ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 rounded-xl text-xs font-bold transition border border-red-500/20"
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          ) : filteredParticipants.length === 0 ? (
+            <div className="p-12 text-center text-muted dark:text-white/60">
+              <span className="text-2xl block mb-2">🔍</span>
+              No students found matching your search.
             </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-slate-900/80 text-muted dark:text-white/70 text-xs uppercase font-extrabold border-b border-grey/10 dark:border-white/10">
+                      <th className="py-4 px-4">Rank</th>
+                      {visibleCustomFields.map((field: any) => (
+                        <th key={field.fieldKey} className="py-4 px-4">{field.fieldLabel || field.fieldKey}</th>
+                      ))}
+                      <th className="py-4 px-4">Student Name</th>
+                      <th className="py-4 px-4 text-right">Open Holdings</th>
+                      <th className="py-4 px-4 text-right">Portfolio Value</th>
+                      <th className="py-4 px-4 text-right">Return (%)</th>
+                      <th className="py-4 px-4 text-right">Win Rate</th>
+                      <th className="py-4 px-4 text-right">Trades</th>
+                      <th className="py-4 px-4 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-grey/10 dark:divide-white/10 text-sm">
+                    {paginatedParticipants.map((student) => {
+                      const isGain = (student.returnPercent || 0) >= 0;
+                      return (
+                        <tr key={student.userId || student.rank} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                          <td className="py-3.5 px-4 font-black text-midnight_text dark:text-white">
+                            {student.rank === 1 ? "🥇 1" : student.rank === 2 ? "🥈 2" : student.rank === 3 ? "🥉 3" : `#${student.rank}`}
+                          </td>
+                          {visibleCustomFields.map((field: any) => (
+                            <td key={field.fieldKey} className="py-3.5 px-4 text-muted dark:text-white/70">
+                              {student.customFieldValues?.[field.fieldKey] || ""}
+                            </td>
+                          ))}
+                          <td className="py-3.5 px-4 font-bold text-midnight_text dark:text-white">{student.displayName}</td>
+                          <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">{student.openHoldingsCount || 0}</td>
+                          <td className="py-3.5 px-4 text-right font-mono font-bold text-midnight_text dark:text-white">
+                            ₹{(student.eventValuation || 1000000).toLocaleString("en-IN")}
+                          </td>
+                          <td className={`py-3.5 px-4 text-right font-mono font-extrabold ${isGain ? "text-green-500" : "text-red-500"}`}>
+                            {isGain ? "+" : ""}
+                            {student.returnPercent ? student.returnPercent.toFixed(2) : "0.00"}%
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/80">
+                            {student.winRate ? student.winRate.toFixed(0) : 0}%
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-mono text-muted dark:text-white/70">{student.totalTrades || 0}</td>
+                          <td className="py-3.5 px-4 text-center">
+                            <button
+                              onClick={() => openTradeAudit(student)}
+                              className="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-xl text-xs font-bold transition border border-primary/20"
+                            >
+                              Inspect Audit
+                            </button>
+                            <button
+                              onClick={() => removeParticipant(student)}
+                              className="ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 py-1.5 rounded-xl text-xs font-bold transition border border-red-500/20"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Bar: Showing range & Page Navigation */}
+              <div className="p-4 sm:p-5 border-t border-grey/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 dark:bg-slate-900/50 text-xs">
+                <div className="text-muted dark:text-white/60">
+                  Showing <span className="font-bold text-midnight_text dark:text-white">{startIndex + 1}</span> to{" "}
+                  <span className="font-bold text-midnight_text dark:text-white">{endIndex}</span> of{" "}
+                  <span className="font-bold text-midnight_text dark:text-white">{filteredParticipants.length}</span> students
+                </div>
+
+                <div className="flex items-center gap-1.5 self-end sm:self-center">
+                  {/* First Page */}
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={safeCurrentPage <= 1}
+                    className="px-2.5 py-1.5 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                    title="First Page"
+                  >
+                    «
+                  </button>
+
+                  {/* Previous Page */}
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={safeCurrentPage <= 1}
+                    className="px-3 py-1.5 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition flex items-center gap-1"
+                  >
+                    <Icon icon="solar:alt-arrow-left-linear" width="14" height="14" />
+                    <span>Prev</span>
+                  </button>
+
+                  {/* Page indicator */}
+                  <span className="px-3 py-1.5 text-muted dark:text-white/70 font-semibold">
+                    Page <span className="font-bold text-midnight_text dark:text-white">{safeCurrentPage}</span> of{" "}
+                    <span className="font-bold text-midnight_text dark:text-white">{totalPages}</span>
+                  </span>
+
+                  {/* Next Page */}
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={safeCurrentPage >= totalPages}
+                    className="px-3 py-1.5 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition flex items-center gap-1"
+                  >
+                    <span>Next</span>
+                    <Icon icon="solar:alt-arrow-right-linear" width="14" height="14" />
+                  </button>
+
+                  {/* Last Page */}
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={safeCurrentPage >= totalPages}
+                    className="px-2.5 py-1.5 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                    title="Last Page"
+                  >
+                    »
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </main>
