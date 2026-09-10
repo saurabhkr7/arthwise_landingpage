@@ -739,6 +739,72 @@ export default function EventOrganizerControlPanel() {
           </div>
         </div>
 
+        {/* Event Finalization & Automated Settlement Control */}
+        <section className="bg-white dark:bg-darkHeroBg border border-emerald-500/20 rounded-2xl p-5 shadow-xl mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">⚙️ Competition Settlement & Status</span>
+                <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${
+                  eventData?.status === "COMPLETED"
+                    ? "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-400"
+                    : eventData?.status === "FINALIZATION_BLOCKED" || finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
+                    ? "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 animate-pulse"
+                    : eventData?.status === "FINALIZATION_RETRYING"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
+                    : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
+                }`}>
+                  {eventData?.status === "COMPLETED"
+                    ? "✅ Event Completed"
+                    : eventData?.status === "FINALIZATION_BLOCKED"
+                    ? "⚠️ Finalization Blocked"
+                    : eventData?.status === "FINALIZATION_RETRYING"
+                    ? "🔄 Finalization Retrying"
+                    : eventData?.status === "LIVE"
+                    ? "🟢 Live Session Active"
+                    : eventData?.status || "Upcoming"}
+                </span>
+              </div>
+              <p className="text-xs text-muted dark:text-white/60 mt-1">
+                {eventData?.status === "COMPLETED"
+                  ? "All portfolio positions are liquidated, final rankings are locked, and certificates are generated."
+                  : finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
+                  ? "The scheduled event time has passed, but finalization was halted. Click 'Force Reconcile & Finalize' to automatically resolve pending reservations, liquidate positions, and unlock participant portfolios."
+                  : "Automatic settlement will execute at event closing time. All active stock positions will be settled at closing prices."}
+              </p>
+              {finalizationHealth && (
+                <div className="flex flex-wrap gap-4 mt-3 text-[11px] font-semibold text-muted dark:text-white/70">
+                  <span>Accounts Settled: <strong className="text-midnight_text dark:text-white">{finalizationHealth.completedAccounts || 0} / {finalizationHealth.accounts || 0}</strong></span>
+                  <span>Pending Orders: <strong className="text-midnight_text dark:text-white">{finalizationHealth.openOrders || 0}</strong></span>
+                  {finalizationHealth.failedNotifications > 0 && (
+                    <span className="text-red-500">Failed Notifications: <strong>{finalizationHealth.failedNotifications}</strong></span>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {eventData?.status !== "COMPLETED" && (
+                <button
+                  onClick={handleRetryFinalization}
+                  disabled={retryLoading}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-extrabold transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-lg shadow-emerald-600/20"
+                >
+                  {retryLoading ? "Reconciling..." : "⚡ Force Reconcile & Finalize"}
+                </button>
+              )}
+              {finalizationHealth?.failedNotifications > 0 && (
+                <button
+                  onClick={handleRetryNotifications}
+                  disabled={notifRetryLoading}
+                  className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition disabled:opacity-50"
+                >
+                  {notifRetryLoading ? "Sending..." : "🔔 Retry Notifications"}
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* Certificate generation and downloads */}
         <section className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
