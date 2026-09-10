@@ -14,6 +14,7 @@ export default function OrganizerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionSuccessMsg, setActionSuccessMsg] = useState("");
+  const [retryingEventId, setRetryingEventId] = useState<string | null>(null);
 
   // Deletion modal state
   const [eventToDelete, setEventToDelete] = useState<any | null>(null);
@@ -88,6 +89,32 @@ export default function OrganizerDashboard() {
   const handleManageEvent = (event: any) => {
     sessionStorage.setItem(`organizer_passcode_${event.slug}`, event.passcode);
     router.push(`/organizer/${event.slug}`);
+  };
+
+  const handleRetryFinalization = async (event: any) => {
+    if (!event?._id || !token) return;
+    if (!window.confirm(`Retry finalization for "${event.title}"?`)) return;
+
+    setRetryingEventId(event._id);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${event._id}/finalization/retry`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Could not retry event finalization.");
+      }
+      setEvents((previous) => previous.map((item) => (
+        item._id === event._id ? { ...item, status: "FINALIZATION_RETRYING" } : item
+      )));
+      setActionSuccessMsg(`Finalization retry started for "${event.title}".`);
+      setTimeout(() => setActionSuccessMsg(""), 6000);
+    } catch (err: any) {
+      setError(err.message || "Could not retry event finalization.");
+    } finally {
+      setRetryingEventId(null);
+    }
   };
 
   // Delete event handler
@@ -378,6 +405,16 @@ export default function OrganizerDashboard() {
                     <Icon icon="solar:settings-minimalistic-bold" width="16" height="16" />
                     <span>Open Live Event Monitor</span>
                   </button>
+                  {event.status === "FINALIZATION_BLOCKED" && (
+                    <button
+                      onClick={() => handleRetryFinalization(event)}
+                      disabled={retryingEventId === event._id}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Icon icon="solar:restart-bold" width="16" height="16" />
+                      <span>{retryingEventId === event._id ? "Reconciling..." : "Force Reconcile & Finalize"}</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => handleOpenComplianceModal(event)}
                     className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"

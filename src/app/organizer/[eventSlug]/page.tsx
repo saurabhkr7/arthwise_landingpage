@@ -17,7 +17,6 @@ export default function EventOrganizerControlPanel() {
   const [participants, setParticipants] = useState<any[]>([]);
   const [finalizationHealth, setFinalizationHealth] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [retryLoading, setRetryLoading] = useState(false);
   const [notifRetryLoading, setNotifRetryLoading] = useState(false);
   const [passcodeError, setPasscodeError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +37,8 @@ export default function EventOrganizerControlPanel() {
   const [announcementSending, setAnnouncementSending] = useState(false);
   const [announcementMessage, setAnnouncementMessage] = useState("");
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [announcementTargetUserIds, setAnnouncementTargetUserIds] = useState<string[] | null>(null);
+  const [announcementTargetLabel, setAnnouncementTargetLabel] = useState<string>("");
   const [announcementRetryId, setAnnouncementRetryId] = useState<string | null>(null);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [certificateLoading, setCertificateLoading] = useState(false);
@@ -318,6 +319,36 @@ export default function EventOrganizerControlPanel() {
     }
   };
 
+  const openWarningModalForViolators = (
+    userIds: string[],
+    targetLabel: string,
+    script?: any
+  ) => {
+    if (!userIds || userIds.length === 0) return;
+    setAnnouncementTargetUserIds(userIds);
+    setAnnouncementTargetLabel(targetLabel);
+
+    const scriptKey = script?.scriptKey || script?.key;
+    if (scriptKey === "MAX_25_PERCENT_SINGLE_STOCK") {
+      setAnnouncementTitle("Portfolio Limit Warning: Max 25% Single Stock");
+      setAnnouncementDescription(
+        "Notice: You have exceeded the 25% single-stock allocation limit (₹2,50,000 max per stock). Please reduce your holding to within the permitted limit before 10:00 AM on the next trading day to avoid disqualification."
+      );
+    } else if (scriptKey === "MAX_20_TRADES_PER_DAY") {
+      setAnnouncementTitle("Trading Limit Warning: Max 20 Trades/Day");
+      setAnnouncementDescription(
+        "Notice: You have exceeded the daily ceiling of 20 trades for today. Further trades today may lead to immediate disqualification. Please manage your positions accordingly."
+      );
+    } else {
+      setAnnouncementTitle(`Rule Violation Notice: ${script?.title || "Trading Rules"}`);
+      setAnnouncementDescription(
+        `Notice: An audit flagged non-compliance with the competition rules (${script?.title || "Trading Policy"}). Please align your trades and open positions immediately to avoid disqualification.`
+      );
+    }
+    setAnnouncementMessage("");
+    setAnnouncementModalOpen(true);
+  };
+
   const handleSendAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventData?.id) return;
@@ -329,22 +360,36 @@ export default function EventOrganizerControlPanel() {
     setAnnouncementSending(true);
     setAnnouncementMessage("");
     try {
+      const payload: any = {
+        title: announcementTitle.trim(),
+        description: announcementDescription.trim(),
+      };
+      if (announcementTargetUserIds && announcementTargetUserIds.length > 0) {
+        payload.targetUserIds = announcementTargetUserIds;
+      }
+
       const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/announcements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${passcode}`,
         },
-        body: JSON.stringify({ title: announcementTitle.trim(), description: announcementDescription.trim() }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
         setAnnouncementMessage(json.message || "Could not queue the announcement.");
         return;
       }
-      setAnnouncementMessage(`Queued for ${json.data?.queuedCount || 0} participants. ${json.data?.skippedCount || 0} have no push token.`);
+      setAnnouncementMessage(
+        announcementTargetUserIds && announcementTargetUserIds.length > 0
+          ? `Warning queued for ${json.data?.queuedCount || 0} targeted violator(s). ${json.data?.skippedCount || 0} have no push token.`
+          : `Queued for ${json.data?.queuedCount || 0} participants. ${json.data?.skippedCount || 0} have no push token.`
+      );
       setAnnouncementTitle("");
       setAnnouncementDescription("");
+      setAnnouncementTargetUserIds(null);
+      setAnnouncementTargetLabel("");
       setAnnouncementModalOpen(false);
       fetchDashboardData();
     } catch (err) {
@@ -369,28 +414,6 @@ export default function EventOrganizerControlPanel() {
       alert("Network error while retrying the announcement.");
     } finally {
       setAnnouncementRetryId(null);
-    }
-  };
-
-  // Retry V2 Finalization Execution
-  const handleRetryFinalization = async () => {
-    if (!eventData?.id) return;
-    const ok = confirm("Are you sure you want to retry finalization for this event?");
-    if (!ok) return;
-
-    setRetryLoading(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/finalization/retry`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${passcode}` },
-      });
-      const json = await res.json();
-      alert(json.message || (json.success ? "Finalization triggered successfully." : "Failed to retry finalization."));
-      fetchFinalizationHealth(eventData.id);
-    } catch (err: any) {
-      alert("Error triggering finalization retry.");
-    } finally {
-      setRetryLoading(false);
     }
   };
 
@@ -696,7 +719,14 @@ export default function EventOrganizerControlPanel() {
           </button>
 
           <button
-            onClick={() => { setAnnouncementMessage(""); setAnnouncementModalOpen(true); }}
+            onClick={() => {
+              setAnnouncementTargetUserIds(null);
+              setAnnouncementTargetLabel("");
+              setAnnouncementTitle("");
+              setAnnouncementDescription("");
+              setAnnouncementMessage("");
+              setAnnouncementModalOpen(true);
+            }}
             disabled={!['UPCOMING', 'LIVE'].includes(eventData?.status)}
             className="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-amber-500/20 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -745,32 +775,31 @@ export default function EventOrganizerControlPanel() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">⚙️ Competition Settlement & Status</span>
-                <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${
-                  eventData?.status === "COMPLETED"
+                <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${eventData?.status === "COMPLETED"
                     ? "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-400"
                     : eventData?.status === "FINALIZATION_BLOCKED" || finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
-                    ? "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 animate-pulse"
-                    : eventData?.status === "FINALIZATION_RETRYING"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
-                }`}>
+                      ? "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 animate-pulse"
+                      : eventData?.status === "FINALIZATION_RETRYING"
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
+                        : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
+                  }`}>
                   {eventData?.status === "COMPLETED"
                     ? "✅ Event Completed"
                     : eventData?.status === "FINALIZATION_BLOCKED"
-                    ? "⚠️ Finalization Blocked"
-                    : eventData?.status === "FINALIZATION_RETRYING"
-                    ? "🔄 Finalization Retrying"
-                    : eventData?.status === "LIVE"
-                    ? "🟢 Live Session Active"
-                    : eventData?.status || "Upcoming"}
+                      ? "⚠️ Finalization Blocked"
+                      : eventData?.status === "FINALIZATION_RETRYING"
+                        ? "🔄 Finalization Retrying"
+                        : eventData?.status === "LIVE"
+                          ? "🟢 Live Session Active"
+                          : eventData?.status || "Upcoming"}
                 </span>
               </div>
               <p className="text-xs text-muted dark:text-white/60 mt-1">
                 {eventData?.status === "COMPLETED"
                   ? "All portfolio positions are liquidated, final rankings are locked, and certificates are generated."
                   : finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
-                  ? "The scheduled event time has passed, but finalization was halted. Click 'Force Reconcile & Finalize' to automatically resolve pending reservations, liquidate positions, and unlock participant portfolios."
-                  : "Automatic settlement will execute at event closing time. All active stock positions will be settled at closing prices."}
+                  ? "The scheduled event time has passed, but finalization was halted. Use the reconciliation action on the organizer dashboard event card to retry settlement."
+                    : "Automatic settlement will execute at event closing time. All active stock positions will be settled at closing prices."}
               </p>
               {finalizationHealth && (
                 <div className="flex flex-wrap gap-4 mt-3 text-[11px] font-semibold text-muted dark:text-white/70">
@@ -783,15 +812,6 @@ export default function EventOrganizerControlPanel() {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              {eventData?.status !== "COMPLETED" && (
-                <button
-                  onClick={handleRetryFinalization}
-                  disabled={retryLoading}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-extrabold transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-lg shadow-emerald-600/20"
-                >
-                  {retryLoading ? "Reconciling..." : "⚡ Force Reconcile & Finalize"}
-                </button>
-              )}
               {finalizationHealth?.failedNotifications > 0 && (
                 <button
                   onClick={handleRetryNotifications}
@@ -896,13 +916,32 @@ export default function EventOrganizerControlPanel() {
                 <span className="text-xs font-bold text-primary uppercase tracking-widest">📣 Participant Announcements</span>
                 <p className="text-xs text-muted dark:text-white/60 mt-0.5">Delivery status for messages sent to this event only.</p>
               </div>
-              <button onClick={() => setAnnouncementModalOpen(true)} className="text-xs font-bold text-primary hover:underline">Send another</button>
+              <button
+                onClick={() => {
+                  setAnnouncementTargetUserIds(null);
+                  setAnnouncementTargetLabel("");
+                  setAnnouncementTitle("");
+                  setAnnouncementDescription("");
+                  setAnnouncementMessage("");
+                  setAnnouncementModalOpen(true);
+                }}
+                className="text-xs font-bold text-primary hover:underline"
+              >
+                Send another
+              </button>
             </div>
             <div className="space-y-2">
               {announcements.map((announcement) => (
                 <div key={announcement._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl bg-gray-50 dark:bg-white/5 px-3 py-2.5">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold truncate">{announcement.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold truncate">{announcement.title}</p>
+                      {announcement.targetUserIds && announcement.targetUserIds.length > 0 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
+                          ⚠️ Targeted ({announcement.targetUserIds.length})
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted dark:text-white/60 truncate">{announcement.description}</p>
                   </div>
                   <div className="flex items-center gap-3 text-[11px] whitespace-nowrap">
@@ -927,13 +966,12 @@ export default function EventOrganizerControlPanel() {
         {/* Compliance Banner Message if active */}
         {complianceMessage && (
           <div
-            className={`mb-6 p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm font-semibold transition ${
-              complianceMessage.type === "success"
+            className={`mb-6 p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm font-semibold transition ${complianceMessage.type === "success"
                 ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
                 : complianceMessage.type === "error"
-                ? "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
-                : "bg-primary/10 border-primary/30 text-primary"
-            }`}
+                  ? "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
+                  : "bg-primary/10 border-primary/30 text-primary"
+              }`}
           >
             <div className="flex items-center gap-2">
               <Icon
@@ -941,8 +979,8 @@ export default function EventOrganizerControlPanel() {
                   complianceMessage.type === "success"
                     ? "solar:check-circle-bold"
                     : complianceMessage.type === "error"
-                    ? "solar:danger-triangle-bold"
-                    : "solar:info-circle-bold"
+                      ? "solar:danger-triangle-bold"
+                      : "solar:info-circle-bold"
                 }
                 width="20"
                 height="20"
@@ -1015,18 +1053,16 @@ export default function EventOrganizerControlPanel() {
                           setSelectedViolatorIds([]);
                           if (s.cooldownRemainingSeconds > 0) setCooldownRemaining(s.cooldownRemainingSeconds);
                         }}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${
-                          isSelected
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${isSelected
                             ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
                             : "bg-gray-100 dark:bg-white/5 text-midnight_text dark:text-white/70 border-grey/10 hover:bg-gray-200"
-                        }`}
+                          }`}
                       >
                         <span>{s.title}</span>
                         {s.lastResultSummary?.violatingCount > 0 && (
                           <span
-                            className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                              isSelected ? "bg-white text-primary" : "bg-red-500 text-white"
-                            }`}
+                            className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${isSelected ? "bg-white text-primary" : "bg-red-500 text-white"
+                              }`}
                           >
                             {s.lastResultSummary.violatingCount}
                           </span>
@@ -1063,8 +1099,8 @@ export default function EventOrganizerControlPanel() {
                   filterTab === "VIOLATING"
                     ? violatingList
                     : filterTab === "COMPLIANT"
-                    ? compliantList
-                    : allList;
+                      ? compliantList
+                      : allList;
 
                 const isAllSelected =
                   violatingList.length > 0 &&
@@ -1093,11 +1129,10 @@ export default function EventOrganizerControlPanel() {
                         <button
                           onClick={() => handleRunComplianceScan(activeScript.scriptId)}
                           disabled={scanning || cooldownRemaining > 0}
-                          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center gap-2 shadow-md ${
-                            cooldownRemaining > 0
+                          className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center gap-2 shadow-md ${cooldownRemaining > 0
                               ? "bg-gray-200 dark:bg-white/10 text-muted dark:text-white/40 cursor-not-allowed border border-grey/20 dark:border-white/10"
                               : "bg-primary hover:bg-primary/90 text-white shadow-primary/25 active:scale-[0.98]"
-                          }`}
+                            }`}
                         >
                           {scanning ? (
                             <>
@@ -1159,18 +1194,16 @@ export default function EventOrganizerControlPanel() {
                         </div>
                       </div>
 
-                      <div className={`bg-gray-50 dark:bg-slate-900/40 border rounded-2xl p-4 flex items-center justify-between ${
-                        summary.violatingCount > 0 ? "border-red-500/30 bg-red-500/5" : "border-grey/10 dark:border-white/10"
-                      }`}>
+                      <div className={`bg-gray-50 dark:bg-slate-900/40 border rounded-2xl p-4 flex items-center justify-between ${summary.violatingCount > 0 ? "border-red-500/30 bg-red-500/5" : "border-grey/10 dark:border-white/10"
+                        }`}>
                         <div>
                           <span className="text-[11px] font-bold text-red-600 dark:text-red-400 uppercase">Flagged Violations</span>
                           <p className={`text-xl font-black mt-0.5 ${summary.violatingCount > 0 ? "text-red-500" : "text-muted"}`}>
                             {summary.violatingCount}
                           </p>
                         </div>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          summary.violatingCount > 0 ? "bg-red-500/10 text-red-500 animate-pulse" : "bg-gray-200 dark:bg-white/10 text-muted"
-                        }`}>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${summary.violatingCount > 0 ? "bg-red-500/10 text-red-500 animate-pulse" : "bg-gray-200 dark:bg-white/10 text-muted"
+                          }`}>
                           <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
                         </div>
                       </div>
@@ -1192,11 +1225,10 @@ export default function EventOrganizerControlPanel() {
                           <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-900 p-1 rounded-xl w-fit">
                             <button
                               onClick={() => setFilterTab("VIOLATING")}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                filterTab === "VIOLATING"
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "VIOLATING"
                                   ? "bg-red-500 text-white shadow"
                                   : "text-muted dark:text-white/60 hover:text-midnight_text"
-                              }`}
+                                }`}
                             >
                               <span>🔴 Violations</span>
                               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
@@ -1206,11 +1238,10 @@ export default function EventOrganizerControlPanel() {
 
                             <button
                               onClick={() => setFilterTab("COMPLIANT")}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                filterTab === "COMPLIANT"
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "COMPLIANT"
                                   ? "bg-green-600 text-white shadow"
                                   : "text-muted dark:text-white/60 hover:text-midnight_text"
-                              }`}
+                                }`}
                             >
                               <span>🟢 Compliant</span>
                               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
@@ -1220,11 +1251,10 @@ export default function EventOrganizerControlPanel() {
 
                             <button
                               onClick={() => setFilterTab("ALL")}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                                filterTab === "ALL"
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "ALL"
                                   ? "bg-primary text-white shadow"
                                   : "text-muted dark:text-white/60 hover:text-midnight_text"
-                              }`}
+                                }`}
                             >
                               <span>All ({allList.length})</span>
                             </button>
@@ -1232,11 +1262,43 @@ export default function EventOrganizerControlPanel() {
 
                           {/* Bulk Actions Button when Violating tab active */}
                           {filterTab === "VIOLATING" && violatingList.length > 0 && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {/* Notify All Violators button */}
+                              <button
+                                onClick={() =>
+                                  openWarningModalForViolators(
+                                    violatingList.map((p: any) => String(p.userId)),
+                                    `All ${violatingList.length} Violator${violatingList.length > 1 ? "s" : ""}`,
+                                    activeScript
+                                  )
+                                }
+                                className="bg-amber-500 hover:bg-amber-400 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition shadow-md shadow-amber-500/20 flex items-center gap-1.5 active:scale-[0.98]"
+                              >
+                                <Icon icon="solar:bell-bing-bold" width="14" height="14" />
+                                <span>Notify All Violators ({violatingList.length})</span>
+                              </button>
+
+                              {/* Notify Selected Violators button */}
+                              {selectedViolatorIds.length > 0 && (
+                                <button
+                                  onClick={() =>
+                                    openWarningModalForViolators(
+                                      selectedViolatorIds,
+                                      `${selectedViolatorIds.length} Selected Violator${selectedViolatorIds.length > 1 ? "s" : ""}`,
+                                      activeScript
+                                    )
+                                  }
+                                  className="bg-amber-600 hover:bg-amber-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition shadow-md shadow-amber-600/20 flex items-center gap-1.5 active:scale-[0.98]"
+                                >
+                                  <Icon icon="solar:bell-bold" width="14" height="14" />
+                                  <span>Notify Selected ({selectedViolatorIds.length})</span>
+                                </button>
+                              )}
+
                               {selectedViolatorIds.length > 0 && (
                                 <button
                                   onClick={() => {
-                                    setEliminationReason(`Violated ${activeScript.title} by trading unauthorized stocks.`);
+                                    setEliminationReason(`Violated ${activeScript.title}.`);
                                     setEliminationModalOpen(true);
                                   }}
                                   className="bg-red-600 hover:bg-red-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition shadow-md shadow-red-500/20 flex items-center gap-1.5 active:scale-[0.98]"
@@ -1299,11 +1361,10 @@ export default function EventOrganizerControlPanel() {
                                   return (
                                     <tr
                                       key={student.userId}
-                                      className={`transition ${
-                                        isSelected
+                                      className={`transition ${isSelected
                                           ? "bg-red-500/10 dark:bg-red-500/15"
                                           : "hover:bg-gray-50 dark:hover:bg-white/5"
-                                      }`}
+                                        }`}
                                     >
                                       {filterTab === "VIOLATING" && (
                                         <td className="py-3 px-3 text-center">
@@ -1340,9 +1401,8 @@ export default function EventOrganizerControlPanel() {
                                         ₹{(student.eventValuation || 0).toLocaleString("en-IN")}
                                       </td>
                                       <td
-                                        className={`py-3 px-3 text-right font-mono font-bold ${
-                                          (student.returnPercent || 0) >= 0 ? "text-green-500" : "text-red-500"
-                                        }`}
+                                        className={`py-3 px-3 text-right font-mono font-bold ${(student.returnPercent || 0) >= 0 ? "text-green-500" : "text-red-500"
+                                          }`}
                                       >
                                         {(student.returnPercent || 0) >= 0 ? "+" : ""}
                                         {(student.returnPercent || 0).toFixed(2)}%
@@ -1374,16 +1434,31 @@ export default function EventOrganizerControlPanel() {
                                           Audit
                                         </button>
                                         {isViolating && (
-                                          <button
-                                            onClick={() => {
-                                              setSelectedViolatorIds([String(student.userId)]);
-                                              setEliminationReason(student.violationReason || "Violated trading rules.");
-                                              setEliminationModalOpen(true);
-                                            }}
-                                            className="text-red-500 hover:underline font-bold ml-2"
-                                          >
-                                            Eliminate
-                                          </button>
+                                          <>
+                                            <button
+                                              onClick={() =>
+                                                openWarningModalForViolators(
+                                                  [String(student.userId)],
+                                                  student.name || student.enrollmentNumber || "Participant",
+                                                  activeScript
+                                                )
+                                              }
+                                              className="text-amber-500 hover:underline font-bold ml-2 inline-flex items-center gap-1"
+                                            >
+                                              <Icon icon="solar:bell-bold" width="12" height="12" />
+                                              Notify
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                setSelectedViolatorIds([String(student.userId)]);
+                                                setEliminationReason(student.violationReason || "Violated trading rules.");
+                                                setEliminationModalOpen(true);
+                                              }}
+                                              className="text-red-500 hover:underline font-bold ml-2"
+                                            >
+                                              Eliminate
+                                            </button>
+                                          </>
                                         )}
                                       </td>
                                     </tr>
@@ -1588,11 +1663,40 @@ export default function EventOrganizerControlPanel() {
           <div className="bg-white dark:bg-darkHeroBg border border-amber-500/20 rounded-3xl p-6 max-w-xl w-full shadow-2xl">
             <div className="flex justify-between items-start pb-4 border-b border-grey/10 dark:border-white/10">
               <div>
-                <span className="text-[10px] font-extrabold text-amber-500 uppercase tracking-wider bg-amber-500/10 px-2.5 py-0.5 rounded-md">PARTICIPANT ANNOUNCEMENT</span>
-                <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-2">Notify event participants</h3>
-                <p className="text-xs text-muted dark:text-white/60 mt-1">Only registered participants of this event will receive this message.</p>
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
+                  announcementTargetUserIds && announcementTargetUserIds.length > 0
+                    ? "text-amber-600 bg-amber-500/15 border border-amber-500/30"
+                    : "text-amber-500 bg-amber-500/10"
+                }`}>
+                  {announcementTargetUserIds && announcementTargetUserIds.length > 0
+                    ? "⚠️ TARGETED COMPLIANCE WARNING"
+                    : "PARTICIPANT ANNOUNCEMENT"}
+                </span>
+                <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-2">
+                  {announcementTargetUserIds && announcementTargetUserIds.length > 0
+                    ? `Warn Violating Participants (${announcementTargetUserIds.length})`
+                    : "Notify event participants"}
+                </h3>
+                <p className="text-xs text-muted dark:text-white/60 mt-1">
+                  {announcementTargetUserIds && announcementTargetUserIds.length > 0 ? (
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">
+                      ⚠️ Sending notice exclusively to {announcementTargetLabel || `${announcementTargetUserIds.length} violators`}. Compliant participants will NOT be messaged.
+                    </span>
+                  ) : (
+                    "Only registered participants of this event will receive this message."
+                  )}
+                </p>
               </div>
-              <button onClick={() => setAnnouncementModalOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center font-bold">✕</button>
+              <button
+                onClick={() => {
+                  setAnnouncementModalOpen(false);
+                  setAnnouncementTargetUserIds(null);
+                  setAnnouncementTargetLabel("");
+                }}
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 flex items-center justify-center font-bold"
+              >
+                ✕
+              </button>
             </div>
 
             <form onSubmit={handleSendAnnouncement} className="space-y-4 mt-5">
@@ -1625,9 +1729,31 @@ export default function EventOrganizerControlPanel() {
               </div>
               {announcementMessage && <p className="text-xs font-semibold text-amber-500">{announcementMessage}</p>}
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setAnnouncementModalOpen(false)} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/10">Cancel</button>
-                <button type="submit" disabled={announcementSending || !announcementTitle.trim() || !announcementDescription.trim()} className="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-white disabled:opacity-50">
-                  {announcementSending ? "Queuing..." : "Send to participants"}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAnnouncementModalOpen(false);
+                    setAnnouncementTargetUserIds(null);
+                    setAnnouncementTargetLabel("");
+                  }}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={announcementSending || !announcementTitle.trim() || !announcementDescription.trim()}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition shadow-md ${
+                    announcementTargetUserIds && announcementTargetUserIds.length > 0
+                      ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
+                      : "bg-amber-500 hover:bg-amber-400 shadow-amber-500/20"
+                  }`}
+                >
+                  {announcementSending
+                    ? "Queuing..."
+                    : announcementTargetUserIds && announcementTargetUserIds.length > 0
+                    ? `Send Warning Notice (${announcementTargetUserIds.length})`
+                    : "Send to participants"}
                 </button>
               </div>
             </form>
@@ -1714,7 +1840,7 @@ export default function EventOrganizerControlPanel() {
       {infoModalScript && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200 my-8">
-            
+
             {/* Header */}
             <div className="flex items-start justify-between pb-4 border-b border-grey/10 dark:border-white/10">
               <div className="flex items-center gap-3">
