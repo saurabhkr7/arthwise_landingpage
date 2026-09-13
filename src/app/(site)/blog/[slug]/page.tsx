@@ -120,6 +120,7 @@ export default async function Post({ params }: Props) {
         "keywords",
         "author",
         "date",
+        "readTime",
       ]);
 
       post = {
@@ -134,8 +135,7 @@ export default async function Post({ params }: Props) {
         publishedAt: local.date,
         createdAt: local.date,
         updatedAt: local.date,
-        views: 0,
-        likes: 0,
+        readTime: local.readTime,
         _source: "markdown" as const,
       };
     } catch {
@@ -145,6 +145,9 @@ export default async function Post({ params }: Props) {
 
   const getImageUrl = () => {
     const rawUrl = post.image || post.coverImage || "";
+    if (rawUrl && rawUrl.startsWith("/images/")) {
+      return rawUrl;
+    }
     const match = rawUrl.match(/blog_(\d+)\.png/);
     if (match) {
       return `/images/blogs/blog_${match[1]}.png`;
@@ -246,13 +249,15 @@ export default async function Post({ params }: Props) {
         <div className="container lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) mx-auto px-4">
           <div className="grid md:grid-cols-12 grid-cols-1 items-center">
             <div className="col-span-8">
-              <div className="flex flex-col sm:flex-row">
-                <span className="text-base text-midnight_text font-medium dark:text-white pr-7 border-r border-solid border-grey dark:border-white w-fit">
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <span className={`text-base text-midnight_text font-medium dark:text-white w-fit ${post.readTime ? "sm:pr-7 sm:border-r border-solid border-grey/30 dark:border-white/20" : ""}`}>
                   {format(new Date(dateStr), "dd MMM yyyy")}
                 </span>
-                <span className="text-base text-midnight_text font-medium dark:text-white sm:pl-7 pl-0 w-fit">
-                  {post.views || 0} Views
-                </span>
+                {post.readTime && (
+                  <span className="text-base text-midnight_text font-medium dark:text-white sm:pl-7 pl-0 w-fit">
+                    {post.readTime}
+                  </span>
+                )}
               </div>
               <h2 className="text-midnight_text dark:text-white text-[40px] leading-tight font-bold pt-7">
                 {post.title}
@@ -282,14 +287,14 @@ export default async function Post({ params }: Props) {
         <div className="container lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) mx-auto px-4">
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="w-full px-4">
-              <div className="z-20 mb-16 h-150 overflow-hidden rounded-sm md:h-45">
+              <div className="z-20 mb-12 w-full overflow-hidden rounded-2xl md:rounded-3xl border border-grey/10 dark:border-white/5 bg-gray-50/40 dark:bg-dark flex items-center justify-center p-2 sm:p-4">
                 <Image
                   src={imageUrl}
                   alt={post.title}
-                  width={1170}
-                  height={766}
+                  width={1200}
+                  height={750}
                   quality={100}
-                  className="h-full w-full object-cover object-center rounded-3xl"
+                  className="w-full h-auto max-h-[680px] object-contain rounded-xl md:rounded-2xl"
                   priority
                 />
               </div>
@@ -322,28 +327,34 @@ export default async function Post({ params }: Props) {
                   <div className="blog-details markdown xl:pr-10 prose dark:prose-invert max-w-none">
                     <ReactMarkdown
                       components={{
-                        h1: ({ ...props }) => <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />,
+                        h1: ({ ...props }) => <h1 className="text-3xl font-bold mt-6 mb-4 text-midnight_text dark:text-white" {...props} />,
                         h2: ({ ...props }) => {
                           const text = typeof props.children === 'string' ? props.children : '';
                           const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-                          return <h2 id={id} className="text-2xl font-bold mt-5 mb-3 scroll-mt-24" {...props} />;
+                          return <h2 id={id} className="text-2xl font-bold mt-6 mb-3 scroll-mt-24 text-midnight_text dark:text-white" {...props} />;
                         },
                         h3: ({ ...props }) => {
                           const text = typeof props.children === 'string' ? props.children : '';
                           const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-                          return <h3 id={id} className="text-xl font-bold mt-4 mb-2 scroll-mt-24" {...props} />;
+                          return <h3 id={id} className="text-xl font-bold mt-5 mb-2 scroll-mt-24 text-midnight_text dark:text-white" {...props} />;
                         },
-                        p: ({ ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-                        ul: ({ ...props }) => <ul className="list-disc list-inside mb-4 space-y-2" {...props} />,
-                        ol: ({ ...props }) => <ol className="list-decimal list-inside mb-4 space-y-2" {...props} />,
-                        blockquote: ({ ...props }) => <blockquote className="border-l-4 border-primary pl-4 italic my-4" {...props} />,
+                        h4: ({ ...props }) => {
+                          const text = typeof props.children === 'string' ? props.children : '';
+                          const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+                          return <h4 id={id} className="text-lg font-bold mt-4 mb-2 scroll-mt-24 text-midnight_text dark:text-white" {...props} />;
+                        },
+                        p: ({ ...props }) => <p className="mb-4 leading-relaxed text-midnight_text dark:text-white/85" {...props} />,
+                        strong: ({ ...props }) => <strong className="font-bold text-midnight_text dark:text-white" {...props} />,
+                        ul: ({ ...props }) => <ul className="list-disc list-inside mb-4 space-y-2 text-midnight_text dark:text-white/85" {...props} />,
+                        ol: ({ ...props }) => <ol className="list-decimal list-inside mb-4 space-y-2 text-midnight_text dark:text-white/85" {...props} />,
+                        blockquote: ({ ...props }) => <blockquote className="border-l-4 border-primary pl-4 py-1 italic my-4 text-midnight_text dark:text-white bg-primary/5 dark:bg-primary/10 rounded-r-lg" {...props} />,
                         code: ({ inline, ...props }: any) => 
                           inline ? (
-                            <code className="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded text-sm" {...props} />
+                            <code className="bg-gray-100 dark:bg-gray-800 text-primary dark:text-primary px-2 py-0.5 rounded text-sm font-semibold" {...props} />
                           ) : (
-                            <code className="bg-gray-200 dark:bg-gray-800 p-4 rounded block my-4 overflow-auto" {...props} />
+                            <code className="bg-gray-100 dark:bg-gray-800 text-midnight_text dark:text-white p-4 rounded-xl block my-4 overflow-auto border border-grey/10 dark:border-white/10 text-sm" {...props} />
                           ),
-                        a: ({ ...props }) => <a className="text-primary hover:underline" {...props} />,
+                        a: ({ ...props }) => <a className="text-primary hover:underline font-medium" {...props} />,
                       }}
                     >
                       {post.content}
@@ -357,7 +368,7 @@ export default async function Post({ params }: Props) {
                         {post.tags.map((tag: string) => (
                           <span
                             key={tag}
-                            className="px-3 py-1 bg-primary bg-opacity-10 text-primary rounded-full text-sm"
+                            className="px-3.5 py-1.5 bg-primary text-white font-medium rounded-full text-sm shadow-xs"
                           >
                             #{tag}
                           </span>

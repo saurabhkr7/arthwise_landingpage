@@ -116,44 +116,44 @@
     }
 
     h3 {
-        @apply md:text-28 text-18 font-bold text-white dark:text-primary;
+        @apply md:text-28 text-18 font-bold text-midnight_text dark:text-white;
     }
 
     h4 {
-        @apply text-24 font-bold text-midnight_text dark:text-primary;
+        @apply text-24 font-bold text-midnight_text dark:text-white;
     }
 
     h5 {
-        @apply text-22 font-medium text-midnight_text dark:text-primary;
+        @apply text-22 font-medium text-midnight_text dark:text-white;
     }
 }
 
 .blog-details p, .blog-details hr {
-    @apply mb-8;
+    @apply mb-8 text-midnight_text dark:text-white/85;
 }
 
 .blog-details strong {
-    @apply font-bold dark:text-white;
+    @apply font-bold text-midnight_text dark:text-white;
 }
 
 .blog-details ul {
-    @apply mb-8 list-inside list-disc space-y-3;
+    @apply mb-8 list-inside list-disc space-y-3 text-midnight_text dark:text-white/85;
 }
 
 .blog-details ol {
-    @apply mb-8 list-inside list-decimal space-y-3;
+    @apply mb-8 list-inside list-decimal space-y-3 text-midnight_text dark:text-white/85;
 }
 
 .blog-details h1 {
-    @apply mb-8 text-3xl font-bold dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.28];
+    @apply mb-8 text-3xl font-bold text-midnight_text dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.28];
 }
 
 .blog-details h2 {
-    @apply mb-8 text-2xl font-bold dark:text-white sm:text-3xl md:text-[35px] md:leading-[1.28];
+    @apply mb-8 text-2xl font-bold text-midnight_text dark:text-white sm:text-3xl md:text-[35px] md:leading-[1.28];
 }
 
 .blog-details h3 {
-    @apply mb-6 text-2xl font-bold dark:text-white sm:text-[28px] sm:leading-[40px];
+    @apply mb-6 text-2xl font-bold text-midnight_text dark:text-white sm:text-[28px] sm:leading-[40px];
 }
 
 .blog-details hr {

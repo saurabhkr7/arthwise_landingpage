@@ -15,6 +15,7 @@ export type Blog = {
   tags?: string[];
   views?: number;
   likes?: number;
+  readTime?: string;
   isPublished?: boolean;
   createdAt?: string;
   updatedAt?: string;

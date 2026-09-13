@@ -11,6 +11,9 @@ const BlogCard: FC<{ blog: Blog, index?: number }> = ({ blog, index }) => {
   // Consistent image logic
   const getImageUrl = () => {
     const rawUrl = coverImage || image || "";
+    if (rawUrl && rawUrl.startsWith("/images/")) {
+      return rawUrl;
+    }
     const match = rawUrl.match(/blog_(\d+)\.png/);
     if (match) {
       return `/images/blogs/blog_${match[1]}.png`;

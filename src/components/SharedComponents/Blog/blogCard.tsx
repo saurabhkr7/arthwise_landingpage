@@ -13,6 +13,11 @@ const BlogCard = ({ blog, index }: { blog: Blog; index?: number }) => {
   const getImageUrl = () => {
     const rawUrl = coverImage || image || "";
     
+    // Support explicit local image paths
+    if (rawUrl && rawUrl.startsWith("/images/")) {
+      return rawUrl;
+    }
+
     // Check if the backend string already contains our local pattern
     const match = rawUrl.match(/blog_(\d+)\.png/);
     if (match) {
