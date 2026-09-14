@@ -54,10 +54,11 @@ export default function EventOrganizerControlPanel() {
   // ── Compliance Filter Scripts State ──
   const [complianceScripts, setComplianceScripts] = useState<any[]>([]);
   const [selectedScriptId, setSelectedScriptId] = useState<string>("");
+  const [selectedScanId, setSelectedScanId] = useState<string>("latest");
   const [scriptScanData, setScriptScanData] = useState<any>(null);
   const [scanning, setScanning] = useState(false);
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
-  const [filterTab, setFilterTab] = useState<"VIOLATING" | "COMPLIANT" | "ALL">("VIOLATING");
+  const [filterTab, setFilterTab] = useState<"VIOLATING" | "RESOLVED" | "COMPLIANT" | "ALL">("VIOLATING");
   const [selectedViolatorIds, setSelectedViolatorIds] = useState<string[]>([]);
   const [eliminationModalOpen, setEliminationModalOpen] = useState(false);
   const [eliminationReason, setEliminationReason] = useState("");
@@ -233,6 +234,7 @@ export default function EventOrganizerControlPanel() {
       const json = await res.json();
       if (res.ok && json.success) {
         setScriptScanData(json);
+        setSelectedScanId("latest");
         setCooldownRemaining(json.cooldownRemainingSeconds || 600);
         setComplianceMessage({
           type: "success",
@@ -1059,8 +1061,10 @@ export default function EventOrganizerControlPanel() {
                         key={s.scriptId}
                         onClick={() => {
                           setSelectedScriptId(s.scriptId);
+                          setSelectedScanId("latest");
                           setScriptScanData(null);
                           setSelectedViolatorIds([]);
+                          setFilterTab("VIOLATING");
                           if (s.cooldownRemainingSeconds > 0) setCooldownRemaining(s.cooldownRemainingSeconds);
                         }}
                         className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${isSelected
@@ -1089,28 +1093,56 @@ export default function EventOrganizerControlPanel() {
                   complianceScripts.find((s) => s.scriptId === selectedScriptId) || complianceScripts[0];
                 if (!activeScript) return null;
 
-                const summary = scriptScanData || {
-                  totalEvaluated: activeScript.lastResultSummary?.totalEvaluated || participants.length,
-                  compliantCount: activeScript.lastResultSummary?.compliantCount || 0,
-                  violatingCount: activeScript.lastResultSummary?.violatingCount || 0,
-                  summary: activeScript.lastEvaluatedAt
-                    ? `${activeScript.lastResultSummary?.violatingCount || 0} violator(s) flagged at ${new Date(activeScript.lastEvaluatedAt).toLocaleTimeString()}`
-                    : "Not evaluated yet. Click 'Run Filter Scan' to audit participants.",
-                  evaluatedAt: activeScript.lastEvaluatedAt,
-                  violatingParticipants: [],
-                  compliantParticipants: [],
+                const history: any[] = (scriptScanData?.scanHistory && scriptScanData.scanHistory.length > 0)
+                  ? scriptScanData.scanHistory
+                  : (activeScript.scanHistory || []);
+
+                // Determine active run being inspected
+                const isViewingLatest = selectedScanId === "latest" || (history.length > 0 && selectedScanId === history[0].scanId);
+                const currentRun = isViewingLatest
+                  ? (scriptScanData || history[0] || null)
+                  : (history.find((h: any) => h.scanId === selectedScanId) || history[0] || scriptScanData || null);
+
+                // Determine run immediately preceding currentRun for comparative diffing
+                const currentRunIndex = currentRun?.scanId
+                  ? history.findIndex((h: any) => h.scanId === currentRun.scanId)
+                  : (isViewingLatest ? 0 : -1);
+                const priorRun = (currentRunIndex >= 0 && currentRunIndex < history.length - 1)
+                  ? history[currentRunIndex + 1]
+                  : null;
+
+                const summary = {
+                  totalEvaluated: currentRun?.totalEvaluated ?? (activeScript.lastResultSummary?.totalEvaluated || participants.length),
+                  compliantCount: currentRun?.compliantCount ?? (activeScript.lastResultSummary?.compliantCount || 0),
+                  violatingCount: currentRun?.violatingCount ?? (activeScript.lastResultSummary?.violatingCount || 0),
+                  evaluatedAt: currentRun?.evaluatedAt || activeScript.lastEvaluatedAt,
                 };
 
-                const violatingList = scriptScanData?.violatingParticipants || [];
-                const compliantList = scriptScanData?.compliantParticipants || [];
-                const allList = [...violatingList, ...compliantList];
+                const violatingList: any[] =
+                  (currentRun?.violatingParticipants && currentRun.violatingParticipants.length > 0)
+                    ? currentRun.violatingParticipants
+                    : (activeScript.violatingParticipants || []);
+                const compliantList: any[] = currentRun?.compliantParticipants || [];
+                const allList: any[] = [...violatingList, ...compliantList];
+
+                // Calculate diff vs priorRun
+                const currentViolatorIds = new Set(violatingList.map((v: any) => String(v.userId)));
+                const priorViolatorList: any[] = priorRun?.violatingParticipants || [];
+                const priorViolatorIds = new Set(priorViolatorList.map((v: any) => String(v.userId)));
+
+                // Participants who were violating in priorRun but are NOT in currentViolatorIds (resolved)
+                const resolvedParticipants: any[] = priorViolatorList.filter(
+                  (p: any) => !currentViolatorIds.has(String(p.userId))
+                );
 
                 const displayedParticipants =
                   filterTab === "VIOLATING"
                     ? violatingList
-                    : filterTab === "COMPLIANT"
-                      ? compliantList
-                      : allList;
+                    : filterTab === "RESOLVED"
+                      ? resolvedParticipants
+                      : filterTab === "COMPLIANT"
+                        ? compliantList
+                        : allList;
 
                 const isAllSelected =
                   violatingList.length > 0 &&
@@ -1147,7 +1179,7 @@ export default function EventOrganizerControlPanel() {
                           {scanning ? (
                             <>
                               <Icon icon="line-md:loading-twotone-loop" width="16" height="16" />
-                              <span>Scanning Orders...</span>
+                              <span>Scanning All Trades...</span>
                             </>
                           ) : cooldownRemaining > 0 ? (
                             <>
@@ -1177,6 +1209,98 @@ export default function EventOrganizerControlPanel() {
                         </button>
                       </div>
                     </div>
+
+                    {/* Scan Run History & Consecutive Comparison Bar */}
+                    {history.length > 0 && (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-gray-50 dark:bg-slate-900/50 border border-grey/10 dark:border-white/10 rounded-2xl mt-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted dark:text-white/60 flex items-center gap-1.5">
+                            <Icon icon="solar:history-bold" width="15" height="15" className="text-primary" />
+                            <span>Scan History:</span>
+                          </span>
+                          <div className="relative">
+                            <select
+                              value={selectedScanId}
+                              onChange={(e) => {
+                                setSelectedScanId(e.target.value);
+                                setSelectedViolatorIds([]);
+                                if (filterTab === "RESOLVED") {
+                                  setFilterTab("VIOLATING");
+                                }
+                              }}
+                              aria-label="Select compliance scan run"
+                              className="bg-white dark:bg-slate-800 border border-grey/20 dark:border-white/15 text-midnight_text dark:text-white text-xs font-bold rounded-xl px-3 py-1.5 pr-8 focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer shadow-xs"
+                            >
+                              <option value="latest">
+                                ⚡ Latest Run {history[0] ? `(${new Date(history[0].evaluatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}) — ${history[0].violatingCount} violator${history[0].violatingCount === 1 ? "" : "s"}` : ""}
+                              </option>
+                              {history.map((run: any, idx: number) => {
+                                const runNumber = history.length - idx;
+                                const timeStr = new Date(run.evaluatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+                                const dateStr = new Date(run.evaluatedAt).toLocaleDateString([], { month: "short", day: "numeric" });
+                                return (
+                                  <option key={run.scanId || idx} value={run.scanId}>
+                                    Run #{runNumber} • {dateStr} {timeStr} — {run.violatingCount} violator{run.violatingCount === 1 ? "" : "s"} ({run.compliantCount} compliant)
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <Icon
+                              icon="solar:alt-arrow-down-linear"
+                              width="14"
+                              height="14"
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+                            />
+                          </div>
+                          <span className="text-[10px] font-semibold text-muted dark:text-white/50">
+                            ({history.length} run{history.length === 1 ? "" : "s"} logged)
+                          </span>
+                        </div>
+
+                        {/* Comparative Insight Pills */}
+                        {priorRun && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {resolvedParticipants.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setFilterTab("RESOLVED")}
+                                className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/25 flex items-center gap-1 transition"
+                              >
+                                <Icon icon="solar:check-circle-bold" width="13" height="13" />
+                                <span>{resolvedParticipants.length} resolved since prior scan</span>
+                              </button>
+                            )}
+                            {currentRun?.violatingCount === 0 ? (
+                              <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 flex items-center gap-1">
+                                <Icon icon="solar:check-circle-bold" width="13" height="13" />
+                                100% compliant in this scan
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                                <Icon icon="solar:info-circle-bold" width="13" height="13" />
+                                <span>{violatingList.filter((v: any) => priorViolatorIds.has(String(v.userId))).length} still active from prior scan</span>
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {!isViewingLatest && currentRun && (
+                      <div className="mt-2 px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 font-semibold">
+                          <Icon icon="solar:history-bold" width="14" height="14" />
+                          Viewing snapshot from {new Date(currentRun.evaluatedAt).toLocaleString()}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedScanId("latest")}
+                          className="font-extrabold text-[11px] text-primary hover:underline ml-2"
+                        >
+                          Switch to Latest Run
+                        </button>
+                      </div>
+                    )}
 
                     {/* Metric Cards Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
@@ -1211,6 +1335,11 @@ export default function EventOrganizerControlPanel() {
                           <p className={`text-xl font-black mt-0.5 ${summary.violatingCount > 0 ? "text-red-500" : "text-muted"}`}>
                             {summary.violatingCount}
                           </p>
+                          {summary.violatingCount > 0 && activeScript.scriptKey === 'MAX_25_PERCENT_SINGLE_STOCK' && (
+                            <p className="text-[10px] text-muted dark:text-white/60 font-medium mt-0.5">
+                              {violatingList.filter((v: any) => v.hasOpenPosition).length} Active • {violatingList.filter((v: any) => !v.hasOpenPosition).length} Squared Off
+                            </p>
+                          )}
                         </div>
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${summary.violatingCount > 0 ? "bg-red-500/10 text-red-500 animate-pulse" : "bg-gray-200 dark:bg-white/10 text-muted"
                           }`}>
@@ -1220,19 +1349,48 @@ export default function EventOrganizerControlPanel() {
                     </div>
 
                     {/* Scan Status line */}
-                    {activeScript.lastEvaluatedAt && (
+                    {summary.evaluatedAt && (
                       <p className="text-[11px] text-muted dark:text-white/50 mt-2 flex items-center gap-1.5">
                         <Icon icon="solar:clock-circle-linear" width="13" height="13" />
-                        <span>Last evaluated: {new Date(activeScript.lastEvaluatedAt).toLocaleTimeString()} ({new Date(activeScript.lastEvaluatedAt).toLocaleDateString()})</span>
+                        <span>Last evaluated: {new Date(summary.evaluatedAt).toLocaleTimeString()} ({new Date(summary.evaluatedAt).toLocaleDateString()})</span>
                       </p>
                     )}
 
+                    {/* Resolution Banner */}
+                    {resolvedParticipants.length > 0 && (
+                      <div className="mt-3 p-3.5 rounded-2xl bg-green-50 dark:bg-green-950/25 border border-green-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0">
+                            <Icon icon="solar:check-circle-bold" width="18" height="18" />
+                          </div>
+                          <div>
+                            <span className="font-extrabold text-green-700 dark:text-green-300">
+                              🎉 {resolvedParticipants.length} Participant{resolvedParticipants.length === 1 ? "" : "s"} Corrected Violations!
+                            </span>
+                            <p className="text-green-600 dark:text-green-400/90 text-[11px] mt-0.5">
+                              {resolvedParticipants.map((p: any) => p.displayName || p.name).join(", ")} {resolvedParticipants.length === 1 ? "is" : "are"} now compliant after adjusting positions or trades.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFilterTab("RESOLVED")}
+                          className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition border whitespace-nowrap self-start sm:self-center ${filterTab === "RESOLVED"
+                              ? "bg-green-600 text-white border-green-600 shadow-sm"
+                              : "bg-white dark:bg-white/10 text-green-700 dark:text-green-300 border-green-500/30 hover:bg-green-100 dark:hover:bg-white/15"
+                            }`}
+                        >
+                          View Resolved ({resolvedParticipants.length})
+                        </button>
+                      </div>
+                    )}
+
                     {/* Filter Tabs & Bulk Actions Bar */}
-                    {scriptScanData && (
+                    {(scriptScanData || history.length > 0 || violatingList.length > 0 || activeScript.lastEvaluatedAt) && (
                       <div className="mt-5">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-grey/10 dark:border-white/10">
                           {/* Tabs */}
-                          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-900 p-1 rounded-xl w-fit">
+                          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-slate-900 p-1 rounded-xl w-fit flex-wrap">
                             <button
                               onClick={() => setFilterTab("VIOLATING")}
                               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "VIOLATING"
@@ -1246,6 +1404,21 @@ export default function EventOrganizerControlPanel() {
                               </span>
                             </button>
 
+                            {resolvedParticipants.length > 0 && (
+                              <button
+                                onClick={() => setFilterTab("RESOLVED")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "RESOLVED"
+                                    ? "bg-green-600 text-white shadow"
+                                    : "text-muted dark:text-white/60 hover:text-midnight_text"
+                                  }`}
+                              >
+                                <span>✅ Resolved</span>
+                                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
+                                  {resolvedParticipants.length}
+                                </span>
+                              </button>
+                            )}
+
                             <button
                               onClick={() => setFilterTab("COMPLIANT")}
                               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "COMPLIANT"
@@ -1255,7 +1428,7 @@ export default function EventOrganizerControlPanel() {
                             >
                               <span>🟢 Compliant</span>
                               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">
-                                {compliantList.length}
+                                {compliantList.length || summary.compliantCount}
                               </span>
                             </button>
 
@@ -1266,7 +1439,7 @@ export default function EventOrganizerControlPanel() {
                                   : "text-muted dark:text-white/60 hover:text-midnight_text"
                                 }`}
                             >
-                              <span>All ({allList.length})</span>
+                              <span>All ({allList.length || summary.totalEvaluated})</span>
                             </button>
                           </div>
 
@@ -1330,6 +1503,12 @@ export default function EventOrganizerControlPanel() {
                                 <span className="font-bold text-green-500">Zero Rule Violations Found!</span>
                                 <span>All evaluated participants are compliant with the trading rules.</span>
                               </div>
+                            ) : filterTab === "RESOLVED" ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-2xl mb-1">ℹ️</span>
+                                <span className="font-bold text-muted dark:text-white/70">No Resolved Participants</span>
+                                <span>No participants resolved violations between these consecutive scan runs.</span>
+                              </div>
                             ) : (
                               "No participants found in this filter."
                             )}
@@ -1366,8 +1545,12 @@ export default function EventOrganizerControlPanel() {
                               </thead>
                               <tbody className="divide-y divide-grey/10 dark:divide-white/10">
                                 {displayedParticipants.map((student: any) => {
-                                  const isViolating = Boolean(student.disallowedSymbols);
+                                  const isViolatingRow = filterTab === "VIOLATING" || Boolean(student.violationReason || student.disallowedSymbols);
+                                  const isResolvedRow = filterTab === "RESOLVED";
                                   const isSelected = selectedViolatorIds.includes(String(student.userId));
+                                  const isStillActive = priorViolatorList.length > 0 && priorViolatorIds.has(String(student.userId));
+                                  const isNewViolation = priorViolatorList.length > 0 && !priorViolatorIds.has(String(student.userId));
+
                                   return (
                                     <tr
                                       key={student.userId}
@@ -1418,16 +1601,53 @@ export default function EventOrganizerControlPanel() {
                                         {(student.returnPercent || 0).toFixed(2)}%
                                       </td>
                                       <td className="py-3 px-4">
-                                        {isViolating ? (
+                                        {isResolvedRow ? (
                                           <div className="inline-flex flex-col gap-0.5">
-                                            <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
-                                              ⚠️ {student.violationReason}
+                                            <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 inline-flex items-center gap-1">
+                                              <Icon icon="solar:check-circle-bold" width="13" height="13" />
+                                              <span>Trade Corrected (Compliant)</span>
                                             </span>
-                                            {student.lastViolationAt && (
+                                            {student.violationReason && (
                                               <span className="text-[10px] text-muted dark:text-white/50">
-                                                Last trade: {new Date(student.lastViolationAt).toLocaleTimeString()}
+                                                Previous: {student.violationReason}
                                               </span>
                                             )}
+                                          </div>
+                                        ) : isViolatingRow ? (
+                                          <div className="inline-flex flex-col gap-1">
+                                            <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
+                                              ⚠️ {student.violationReason || "Flagged for rule violation"}
+                                            </span>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                              {activeScript.scriptKey === "MAX_25_PERCENT_SINGLE_STOCK" && (
+                                                student.hasOpenPosition === false || student.violationReason?.includes("Squared off") ? (
+                                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-500/30 inline-flex items-center gap-1">
+                                                    <Icon icon="solar:clock-circle-bold" width="11" height="11" />
+                                                    <span>Intraday Breach (Squared Off)</span>
+                                                  </span>
+                                                ) : (
+                                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500/30 inline-flex items-center gap-1">
+                                                    <Icon icon="solar:danger-bold" width="11" height="11" />
+                                                    <span>Active Holding Exceeds Cap</span>
+                                                  </span>
+                                                )
+                                              )}
+                                              {isStillActive && (
+                                                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                                                  ⚠️ Still Active (Consecutive Scan)
+                                                </span>
+                                              )}
+                                              {isNewViolation && (
+                                                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                                                  🆕 New Violation
+                                                </span>
+                                              )}
+                                              {student.lastViolationAt && (
+                                                <span className="text-[10px] text-muted dark:text-white/50">
+                                                  Last trade: {new Date(student.lastViolationAt).toLocaleTimeString()}
+                                                </span>
+                                              )}
+                                            </div>
                                           </div>
                                         ) : (
                                           <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 inline-flex items-center gap-1">
@@ -1443,13 +1663,13 @@ export default function EventOrganizerControlPanel() {
                                         >
                                           Audit
                                         </button>
-                                        {isViolating && (
+                                        {isViolatingRow && (
                                           <>
                                             <button
                                               onClick={() =>
                                                 openWarningModalForViolators(
                                                   [String(student.userId)],
-                                                  student.name || student.enrollmentNumber || "Participant",
+                                                  student.displayName || student.name || student.enrollmentNumber || "Participant",
                                                   activeScript
                                                 )
                                               }
