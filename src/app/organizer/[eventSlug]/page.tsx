@@ -26,6 +26,8 @@ export default function EventOrganizerControlPanel() {
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [tradeLogs, setTradeLogs] = useState<any[]>([]);
   const [loadingTrades, setLoadingTrades] = useState(false);
+  const [tradeAuditPage, setTradeAuditPage] = useState<number>(1);
+  const [tradeAuditRowsPerPage, setTradeAuditRowsPerPage] = useState<number>(10);
 
   // Allowed asset classes quick-edit state
   const [allowedEdit, setAllowedEdit] = useState<string[]>([]);
@@ -509,6 +511,7 @@ export default function EventOrganizerControlPanel() {
   // Fetch Trade Audit Log for a student
   const openTradeAudit = async (student: any) => {
     setSelectedStudent(student);
+    setTradeAuditPage(1);
     setLoadingTrades(true);
     try {
       const eventId = eventData?.id;
@@ -587,7 +590,7 @@ export default function EventOrganizerControlPanel() {
     setAssetSaving(true);
     setAssetSaveMsg("");
     try {
-      const orgToken = sessionStorage.getItem("organizer_token");
+      const orgToken = sessionStorage.getItem("organizer_token") || passcode;
       const res = await fetch(`${API_BASE_URL}/market-event/organizer/${eventData.id}`, {
         method: "PATCH",
         headers: {
@@ -893,8 +896,8 @@ export default function EventOrganizerControlPanel() {
               <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">⚡ Allowed Trading Instruments</span>
               <p className="text-xs text-muted dark:text-white/60 mt-0.5">Enable or disable asset classes for students in this live event.</p>
             </div>
-            <div className="flex items-center gap-4">
-              {["EQUITY", "FNO", "CRYPTO"].map((asset) => (
+            <div className="flex flex-wrap items-center gap-4">
+              {["EQUITY", "FNO", "CRYPTO", "COMMODITY"].map((asset) => (
                 <label key={asset} className="flex items-center gap-2 text-xs font-bold text-midnight_text dark:text-white cursor-pointer">
                   <input
                     type="checkbox"
@@ -905,7 +908,7 @@ export default function EventOrganizerControlPanel() {
                     }}
                     className="w-4 h-4 accent-primary rounded cursor-pointer"
                   />
-                  {asset}
+                  {asset === "COMMODITY" ? "COMMODITY (Gold/Silver)" : asset}
                 </label>
               ))}
               <button
@@ -1910,84 +1913,223 @@ export default function EventOrganizerControlPanel() {
       </main>
 
       {/* Trade Audit Modal */}
-      {selectedStudent && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-6 max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="flex justify-between items-center pb-4 border-b border-grey/10 dark:border-white/10">
-              <div>
-                <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-md">
-                  STUDENT TRADE AUDIT
-                </span>
-                <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-1">
-                  {selectedStudent.displayName} ({selectedStudent.customFieldValues?.enrollmentNo || "N/A"})
-                </h3>
+      {selectedStudent && (() => {
+        const totalTradePages = Math.max(1, Math.ceil(tradeLogs.length / tradeAuditRowsPerPage));
+        const safeTradePage = Math.min(tradeAuditPage, totalTradePages);
+        const tradeStartIndex = (safeTradePage - 1) * tradeAuditRowsPerPage;
+        const paginatedTrades = tradeLogs.slice(tradeStartIndex, tradeStartIndex + tradeAuditRowsPerPage);
+
+        return (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-6 max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl">
+              {/* Modal Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-grey/10 dark:border-white/10">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-md">
+                      STUDENT TRADE AUDIT
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 dark:bg-slate-800 text-muted dark:text-white/70 border border-grey/10 dark:border-white/10">
+                      {tradeLogs.length} {tradeLogs.length === 1 ? "trade" : "trades"} executed
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-midnight_text dark:text-white mt-1">
+                    {selectedStudent.displayName} ({selectedStudent.customFieldValues?.enrollmentNo || "N/A"})
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-3 self-end sm:self-center">
+                  {/* Rows per page selector */}
+                  {tradeLogs.length > 0 && (
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <span className="text-muted dark:text-white/60 font-semibold">Rows:</span>
+                      <div className="inline-flex rounded-xl bg-gray-200/70 dark:bg-slate-800 p-0.5 border border-grey/10 dark:border-white/10">
+                        {[10, 25, 50].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => {
+                              setTradeAuditRowsPerPage(option);
+                              setTradeAuditPage(1);
+                            }}
+                            className={`px-2.5 py-0.5 rounded-lg text-xs font-extrabold transition ${
+                              tradeAuditRowsPerPage === option
+                                ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
+                                : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setSelectedStudent(null)}
+                    className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white flex items-center justify-center font-bold transition"
+                    title="Close"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => setSelectedStudent(null)}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white flex items-center justify-center font-bold"
-              >
-                ✕
-              </button>
-            </div>
 
-            <div className="overflow-y-auto flex-grow my-4">
-              {loadingTrades ? (
-                <div className="p-8 text-center text-muted dark:text-white/60">Loading student trade history...</div>
-              ) : !tradeLogs.length ? (
-                <div className="p-8 text-center text-muted dark:text-white/50">No trades executed by this student yet.</div>
-              ) : (
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-gray-50 dark:bg-slate-900 text-muted dark:text-white/70 uppercase font-bold border-b border-grey/10 dark:border-white/10">
-                      <th className="py-2.5 px-3">Symbol</th>
-                      <th className="py-2.5 px-3">Type</th>
-                      <th className="py-2.5 px-3 text-right">Qty</th>
-                      <th className="py-2.5 px-3 text-right">Price</th>
-                      <th className="py-2.5 px-3 text-right">Total Value</th>
-                      <th className="py-2.5 px-3 text-right">P&L</th>
-                      <th className="py-2.5 px-3 text-right">Executed At</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-grey/10 dark:divide-white/10 font-mono">
-                    {tradeLogs.map((trade) => {
-                      const isBuy = trade.side === "BUY";
-                      const isProfit = (trade.pnl || 0) >= 0;
-                      return (
-                        <tr key={trade._id} className="hover:bg-gray-50 dark:hover:bg-white/5">
-                          <td className="py-2.5 px-3 font-bold text-midnight_text dark:text-white">{trade.symbol}</td>
-                          <td className="py-2.5 px-3">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${isBuy ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                              {trade.side}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">{trade.quantity}</td>
-                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.price}</td>
-                          <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.totalValue?.toLocaleString("en-IN")}</td>
-                          <td className={`py-2.5 px-3 text-right font-bold ${isProfit ? "text-green-500" : "text-red-500"}`}>
-                            {trade.side === "SELL" ? `₹${trade.pnl?.toFixed(2)}` : "---"}
-                          </td>
-                          <td className="py-2.5 px-3 text-right text-muted dark:text-white/60">
-                            {trade.executedAt ? new Date(trade.executedAt).toLocaleTimeString() : "---"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
+              {/* Modal Body / Table */}
+              <div className="overflow-y-auto flex-grow my-4 rounded-xl border border-grey/10 dark:border-white/10">
+                {loadingTrades ? (
+                  <div className="p-8 text-center text-muted dark:text-white/60">Loading student trade history...</div>
+                ) : !tradeLogs.length ? (
+                  <div className="p-8 text-center text-muted dark:text-white/50">No trades executed by this student yet.</div>
+                ) : (
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-gray-50 dark:bg-slate-900 text-muted dark:text-white/70 uppercase font-bold border-b border-grey/10 dark:border-white/10 sticky top-0 z-10">
+                        <th className="py-2.5 px-3">Symbol</th>
+                        <th className="py-2.5 px-3">Type</th>
+                        <th className="py-2.5 px-3 text-right">Qty</th>
+                        <th className="py-2.5 px-3 text-right">Price</th>
+                        <th className="py-2.5 px-3 text-right">Total Value</th>
+                        <th className="py-2.5 px-3 text-right">P&L</th>
+                        <th className="py-2.5 px-3 text-right">Date & Time (IST)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-grey/10 dark:divide-white/10 font-mono">
+                      {paginatedTrades.map((trade) => {
+                        const isBuy = trade.side === "BUY";
+                        const isProfit = (trade.pnl || 0) >= 0;
+                        return (
+                          <tr key={trade._id} className="hover:bg-gray-50 dark:hover:bg-white/5">
+                            <td className="py-2.5 px-3 font-bold text-midnight_text dark:text-white">
+                              <div className="flex items-center gap-1.5">
+                                <span>{trade.symbol}</span>
+                                {trade.assetClass && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-gray-100 dark:bg-slate-800 text-muted dark:text-white/60 border border-grey/10 dark:border-white/10">
+                                    {trade.assetClass}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-2.5 px-3">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${isBuy ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
+                                {trade.side}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">{trade.quantity}</td>
+                            <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.price?.toLocaleString("en-IN")}</td>
+                            <td className="py-2.5 px-3 text-right text-midnight_text dark:text-white">₹{trade.totalValue?.toLocaleString("en-IN")}</td>
+                            <td className={`py-2.5 px-3 text-right font-bold ${isProfit ? "text-green-500" : "text-red-500"}`}>
+                              {trade.side === "SELL" ? `₹${trade.pnl?.toFixed(2)}` : "---"}
+                            </td>
+                            <td className="py-2.5 px-3 text-right">
+                              {trade.executedAt ? (
+                                <div className="flex flex-col items-end whitespace-nowrap">
+                                  <span className="font-bold text-midnight_text dark:text-white text-[11px]">
+                                    {new Date(trade.executedAt).toLocaleDateString("en-IN", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })}
+                                  </span>
+                                  <span className="text-[10px] text-muted dark:text-white/60 font-sans">
+                                    {new Date(trade.executedAt).toLocaleTimeString("en-IN", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      second: "2-digit",
+                                      hour12: true,
+                                    })}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted dark:text-white/40">---</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
 
-            <div className="pt-3 border-t border-grey/10 dark:border-white/10 text-right">
-              <button
-                onClick={() => setSelectedStudent(null)}
-                className="bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-5 py-2 rounded-xl text-xs font-bold transition"
-              >
-                Close Audit
-              </button>
+              {/* Modal Footer with Pagination Controls */}
+              <div className="pt-3 border-t border-grey/10 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="text-muted dark:text-white/60">
+                  {tradeLogs.length > 0 ? (
+                    <>
+                      Showing <span className="font-bold text-midnight_text dark:text-white">{tradeStartIndex + 1}</span> to{" "}
+                      <span className="font-bold text-midnight_text dark:text-white">
+                        {Math.min(tradeStartIndex + tradeAuditRowsPerPage, tradeLogs.length)}
+                      </span>{" "}
+                      of <span className="font-bold text-midnight_text dark:text-white">{tradeLogs.length}</span> trades
+                    </>
+                  ) : (
+                    "0 trades"
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-center">
+                  {totalTradePages > 1 && (
+                    <div className="flex items-center gap-1">
+                      {/* First Page */}
+                      <button
+                        onClick={() => setTradeAuditPage(1)}
+                        disabled={safeTradePage <= 1}
+                        className="px-2 py-1 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                        title="First Page"
+                      >
+                        «
+                      </button>
+
+                      {/* Prev Page */}
+                      <button
+                        onClick={() => setTradeAuditPage((prev) => Math.max(1, prev - 1))}
+                        disabled={safeTradePage <= 1}
+                        className="px-2.5 py-1 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition flex items-center gap-1"
+                      >
+                        <Icon icon="solar:alt-arrow-left-linear" width="12" height="12" />
+                        <span>Prev</span>
+                      </button>
+
+                      {/* Page Info */}
+                      <span className="px-2.5 py-1 text-muted dark:text-white/70 font-semibold">
+                        Page <span className="font-bold text-midnight_text dark:text-white">{safeTradePage}</span> of{" "}
+                        <span className="font-bold text-midnight_text dark:text-white">{totalTradePages}</span>
+                      </span>
+
+                      {/* Next Page */}
+                      <button
+                        onClick={() => setTradeAuditPage((prev) => Math.min(totalTradePages, prev + 1))}
+                        disabled={safeTradePage >= totalTradePages}
+                        className="px-2.5 py-1 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition flex items-center gap-1"
+                      >
+                        <span>Next</span>
+                        <Icon icon="solar:alt-arrow-right-linear" width="12" height="12" />
+                      </button>
+
+                      {/* Last Page */}
+                      <button
+                        onClick={() => setTradeAuditPage(totalTradePages)}
+                        disabled={safeTradePage >= totalTradePages}
+                        className="px-2 py-1 rounded-lg border border-grey/20 dark:border-white/10 bg-white dark:bg-slate-800 font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+                        title="Last Page"
+                      >
+                        »
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setSelectedStudent(null)}
+                    className="bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-4 py-1.5 rounded-xl text-xs font-bold transition ml-2"
+                  >
+                    Close Audit
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Organizer announcement composer */}
       {announcementModalOpen && (
