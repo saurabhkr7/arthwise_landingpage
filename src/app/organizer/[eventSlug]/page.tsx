@@ -338,14 +338,18 @@ export default function EventOrganizerControlPanel() {
 
     const scriptKey = script?.scriptKey || script?.key;
     if (scriptKey === "MAX_25_PERCENT_SINGLE_STOCK") {
-      setAnnouncementTitle("Portfolio Limit Warning: Max 25% Single Stock");
+      const capPct = script?.config?.maxAllocationPercent || 25;
+      const initialCap = Number(eventData?.initialCapital) || 1000000;
+      const maxCap = Math.round((initialCap * capPct) / 100);
+      setAnnouncementTitle(`Portfolio Limit Warning: Max ${capPct}% of Total Initial Amount`);
       setAnnouncementDescription(
-        "Notice: You have exceeded the 25% single-stock allocation limit (₹2,50,000 max per stock). Please reduce your holding to within the permitted limit before 10:00 AM on the next trading day to avoid disqualification."
+        `Notice: You have exceeded the ${capPct}% single-stock allocation limit (₹${maxCap.toLocaleString("en-IN")} max per stock / ${capPct}% of total initial amount). Please reduce your holding to within the permitted limit before the next trading session to avoid disqualification.`
       );
-    } else if (scriptKey === "MAX_20_TRADES_PER_DAY") {
-      setAnnouncementTitle("Trading Limit Warning: Max 20 Trades/Day");
+    } else if (scriptKey === "MAX_20_TRADES_PER_DAY" || scriptKey === "MAX_30_TRADES_PER_DAY") {
+      const maxTrades = script?.config?.maxDailyTrades || (scriptKey === "MAX_30_TRADES_PER_DAY" ? 30 : 20);
+      setAnnouncementTitle(`Trading Limit Warning: Max ${maxTrades} Trades/Day`);
       setAnnouncementDescription(
-        "Notice: You have exceeded the daily ceiling of 20 trades for today. Further trades today may lead to immediate disqualification. Please manage your positions accordingly."
+        `Notice: You have exceeded the daily ceiling of ${maxTrades} trades for today. Further trades today may lead to immediate disqualification. Please manage your positions accordingly.`
       );
     } else {
       setAnnouncementTitle(`Rule Violation Notice: ${script?.title || "Trading Rules"}`);
@@ -791,12 +795,12 @@ export default function EventOrganizerControlPanel() {
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">⚙️ Competition Settlement & Status</span>
                 <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase ${eventData?.status === "COMPLETED"
-                    ? "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-400"
-                    : eventData?.status === "FINALIZATION_BLOCKED" || finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
-                      ? "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 animate-pulse"
-                      : eventData?.status === "FINALIZATION_RETRYING"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
-                        : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
+                  ? "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-400"
+                  : eventData?.status === "FINALIZATION_BLOCKED" || finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
+                    ? "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 animate-pulse"
+                    : eventData?.status === "FINALIZATION_RETRYING"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400"
                   }`}>
                   {eventData?.status === "COMPLETED"
                     ? "✅ Event Completed"
@@ -813,7 +817,7 @@ export default function EventOrganizerControlPanel() {
                 {eventData?.status === "COMPLETED"
                   ? "All portfolio positions are liquidated, final rankings are locked, and certificates are generated."
                   : finalizationHealth?.systemStatus === "NEEDS_ATTENTION"
-                  ? "The scheduled event time has passed, but finalization was halted. Use the reconciliation action on the organizer dashboard event card to retry settlement."
+                    ? "The scheduled event time has passed, but finalization was halted. Use the reconciliation action on the organizer dashboard event card to retry settlement."
                     : "Automatic settlement will execute at event closing time. All active stock positions will be settled at closing prices."}
               </p>
               {finalizationHealth && (
@@ -908,7 +912,7 @@ export default function EventOrganizerControlPanel() {
                     }}
                     className="w-4 h-4 accent-primary rounded cursor-pointer"
                   />
-                  {asset === "COMMODITY" ? "COMMODITY (Gold/Silver)" : asset}
+                  {asset === "COMMODITY" ? "COMMODITY" : asset}
                 </label>
               ))}
               <button
@@ -982,10 +986,10 @@ export default function EventOrganizerControlPanel() {
         {complianceMessage && (
           <div
             className={`mb-6 p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm font-semibold transition ${complianceMessage.type === "success"
-                ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
-                : complianceMessage.type === "error"
-                  ? "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
-                  : "bg-primary/10 border-primary/30 text-primary"
+              ? "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
+              : complianceMessage.type === "error"
+                ? "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
+                : "bg-primary/10 border-primary/30 text-primary"
               }`}
           >
             <div className="flex items-center gap-2">
@@ -1071,8 +1075,8 @@ export default function EventOrganizerControlPanel() {
                           if (s.cooldownRemainingSeconds > 0) setCooldownRemaining(s.cooldownRemainingSeconds);
                         }}
                         className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${isSelected
-                            ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
-                            : "bg-gray-100 dark:bg-white/5 text-midnight_text dark:text-white/70 border-grey/10 hover:bg-gray-200"
+                          ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
+                          : "bg-gray-100 dark:bg-white/5 text-midnight_text dark:text-white/70 border-grey/10 hover:bg-gray-200"
                           }`}
                       >
                         <span>{s.title}</span>
@@ -1175,8 +1179,8 @@ export default function EventOrganizerControlPanel() {
                           onClick={() => handleRunComplianceScan(activeScript.scriptId)}
                           disabled={scanning || cooldownRemaining > 0}
                           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center gap-2 shadow-md ${cooldownRemaining > 0
-                              ? "bg-gray-200 dark:bg-white/10 text-muted dark:text-white/40 cursor-not-allowed border border-grey/20 dark:border-white/10"
-                              : "bg-primary hover:bg-primary/90 text-white shadow-primary/25 active:scale-[0.98]"
+                            ? "bg-gray-200 dark:bg-white/10 text-muted dark:text-white/40 cursor-not-allowed border border-grey/20 dark:border-white/10"
+                            : "bg-primary hover:bg-primary/90 text-white shadow-primary/25 active:scale-[0.98]"
                             }`}
                         >
                           {scanning ? (
@@ -1379,8 +1383,8 @@ export default function EventOrganizerControlPanel() {
                           type="button"
                           onClick={() => setFilterTab("RESOLVED")}
                           className={`px-3 py-1.5 rounded-xl font-extrabold text-xs transition border whitespace-nowrap self-start sm:self-center ${filterTab === "RESOLVED"
-                              ? "bg-green-600 text-white border-green-600 shadow-sm"
-                              : "bg-white dark:bg-white/10 text-green-700 dark:text-green-300 border-green-500/30 hover:bg-green-100 dark:hover:bg-white/15"
+                            ? "bg-green-600 text-white border-green-600 shadow-sm"
+                            : "bg-white dark:bg-white/10 text-green-700 dark:text-green-300 border-green-500/30 hover:bg-green-100 dark:hover:bg-white/15"
                             }`}
                         >
                           View Resolved ({resolvedParticipants.length})
@@ -1397,8 +1401,8 @@ export default function EventOrganizerControlPanel() {
                             <button
                               onClick={() => setFilterTab("VIOLATING")}
                               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "VIOLATING"
-                                  ? "bg-red-500 text-white shadow"
-                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                                ? "bg-red-500 text-white shadow"
+                                : "text-muted dark:text-white/60 hover:text-midnight_text"
                                 }`}
                             >
                               <span>🔴 Violations</span>
@@ -1411,8 +1415,8 @@ export default function EventOrganizerControlPanel() {
                               <button
                                 onClick={() => setFilterTab("RESOLVED")}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "RESOLVED"
-                                    ? "bg-green-600 text-white shadow"
-                                    : "text-muted dark:text-white/60 hover:text-midnight_text"
+                                  ? "bg-green-600 text-white shadow"
+                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
                                   }`}
                               >
                                 <span>✅ Resolved</span>
@@ -1425,8 +1429,8 @@ export default function EventOrganizerControlPanel() {
                             <button
                               onClick={() => setFilterTab("COMPLIANT")}
                               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "COMPLIANT"
-                                  ? "bg-green-600 text-white shadow"
-                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                                ? "bg-green-600 text-white shadow"
+                                : "text-muted dark:text-white/60 hover:text-midnight_text"
                                 }`}
                             >
                               <span>🟢 Compliant</span>
@@ -1438,8 +1442,8 @@ export default function EventOrganizerControlPanel() {
                             <button
                               onClick={() => setFilterTab("ALL")}
                               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${filterTab === "ALL"
-                                  ? "bg-primary text-white shadow"
-                                  : "text-muted dark:text-white/60 hover:text-midnight_text"
+                                ? "bg-primary text-white shadow"
+                                : "text-muted dark:text-white/60 hover:text-midnight_text"
                                 }`}
                             >
                               <span>All ({allList.length || summary.totalEvaluated})</span>
@@ -1558,8 +1562,8 @@ export default function EventOrganizerControlPanel() {
                                     <tr
                                       key={student.userId}
                                       className={`transition ${isSelected
-                                          ? "bg-red-500/10 dark:bg-red-500/15"
-                                          : "hover:bg-gray-50 dark:hover:bg-white/5"
+                                        ? "bg-red-500/10 dark:bg-red-500/15"
+                                        : "hover:bg-gray-50 dark:hover:bg-white/5"
                                         }`}
                                     >
                                       {filterTab === "VIOLATING" && (
@@ -1765,11 +1769,10 @@ export default function EventOrganizerControlPanel() {
                       setRowsPerPage(option);
                       setCurrentPage(1);
                     }}
-                    className={`px-3 py-1 rounded-lg text-xs font-extrabold transition ${
-                      rowsPerPage === option
+                    className={`px-3 py-1 rounded-lg text-xs font-extrabold transition ${rowsPerPage === option
                         ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
                         : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
@@ -1951,11 +1954,10 @@ export default function EventOrganizerControlPanel() {
                               setTradeAuditRowsPerPage(option);
                               setTradeAuditPage(1);
                             }}
-                            className={`px-2.5 py-0.5 rounded-lg text-xs font-extrabold transition ${
-                              tradeAuditRowsPerPage === option
+                            className={`px-2.5 py-0.5 rounded-lg text-xs font-extrabold transition ${tradeAuditRowsPerPage === option
                                 ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
                                 : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
-                            }`}
+                              }`}
                           >
                             {option}
                           </button>
@@ -2137,11 +2139,10 @@ export default function EventOrganizerControlPanel() {
           <div className="bg-white dark:bg-darkHeroBg border border-amber-500/20 rounded-3xl p-6 max-w-xl w-full shadow-2xl">
             <div className="flex justify-between items-start pb-4 border-b border-grey/10 dark:border-white/10">
               <div>
-                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
-                  announcementTargetUserIds && announcementTargetUserIds.length > 0
+                <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${announcementTargetUserIds && announcementTargetUserIds.length > 0
                     ? "text-amber-600 bg-amber-500/15 border border-amber-500/30"
                     : "text-amber-500 bg-amber-500/10"
-                }`}>
+                  }`}>
                   {announcementTargetUserIds && announcementTargetUserIds.length > 0
                     ? "⚠️ TARGETED COMPLIANCE WARNING"
                     : "PARTICIPANT ANNOUNCEMENT"}
@@ -2217,17 +2218,16 @@ export default function EventOrganizerControlPanel() {
                 <button
                   type="submit"
                   disabled={announcementSending || !announcementTitle.trim() || !announcementDescription.trim()}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition shadow-md ${
-                    announcementTargetUserIds && announcementTargetUserIds.length > 0
+                  className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition shadow-md ${announcementTargetUserIds && announcementTargetUserIds.length > 0
                       ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
                       : "bg-amber-500 hover:bg-amber-400 shadow-amber-500/20"
-                  }`}
+                    }`}
                 >
                   {announcementSending
                     ? "Queuing..."
                     : announcementTargetUserIds && announcementTargetUserIds.length > 0
-                    ? `Send Warning Notice (${announcementTargetUserIds.length})`
-                    : "Send to participants"}
+                      ? `Send Warning Notice (${announcementTargetUserIds.length})`
+                      : "Send to participants"}
                 </button>
               </div>
             </form>
