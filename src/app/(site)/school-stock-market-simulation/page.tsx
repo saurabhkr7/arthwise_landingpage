@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "School Stock Market Simulation & Financial Literacy Game | Arthhwise",
@@ -37,6 +38,12 @@ const SchoolSimulationPage: React.FC = () => {
           { name: "Host Event", href: "/host-event" },
           { name: "School Stock Market Simulation", href: "/school-stock-market-simulation" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Young Investors — School Stock Market Simulation & Financial Literacy Game"
+        description="Engaging, risk-free stock market simulation software for high schools (Grades 9-12). Teach practical budgeting, investing fundamentals, and NSE trading in a safe virtual classroom environment."
+        urlPath="/school-stock-market-simulation"
+        audienceType="High school students, economics teachers, school commerce departments, young investors"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />

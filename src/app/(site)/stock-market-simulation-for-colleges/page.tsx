@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Stock Market Simulation for Colleges & Universities | Finance Lab Platform | Arthhwise",
@@ -38,6 +39,12 @@ const CollegeSimulationPage: React.FC = () => {
           { name: "Host Event", href: "/host-event" },
           { name: "Stock Market Simulation for Colleges", href: "/stock-market-simulation-for-colleges" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — Stock Market Simulation Software for Colleges & Universities"
+        description="Institutional stock market simulation software for colleges and business schools with live NSE ticks, Sharpe ratio scoring, and student performance analytics."
+        urlPath="/stock-market-simulation-for-colleges"
+        audienceType="College professors, finance departments, business school deans, student finance labs"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />

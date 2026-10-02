@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import Breadcrumb from "@/components/Breadcrumb";
 import InquiryForm from "@/components/HostEvent/InquiryForm";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Host College Paper Trading Competition | Arthhwise Campus",
@@ -40,6 +41,12 @@ const HostEventPage: React.FC = () => {
           { name: "Home", href: "/" },
           { name: "Host Event", href: "/host-event" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — College Paper Trading Competition Hosting Platform"
+        description="Organize stock market championships and paper trading competitions for your college fest, E-Summit, or Finance Club. Turn-key platform with private join codes, real-time leaderboards, and Excel exports."
+        urlPath="/host-event"
+        audienceType="College fest organizers, student clubs, E-Cells, corporate event teams"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode">

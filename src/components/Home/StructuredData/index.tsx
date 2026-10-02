@@ -6,23 +6,25 @@ const structuredData = {
     name: "Arthhwise",
     alternateName: ["Arthwise", "Arthhwise App"],
     applicationCategory: "FinanceApplication",
-    applicationSubCategory: "Trading Simulator",
-    operatingSystem: "Android, iOS",
+    applicationSubCategory: "Stock Market Simulator & Tournament Platform",
+    operatingSystem: "Web, Android, iOS",
     url: "https://arthhwise.com",
     downloadUrl: [
         "https://apps.apple.com/in/app/arthhwise-paper-trading-f-o/id6803604616",
         "https://play.google.com/store/apps/details?id=com.arthwise",
     ],
     description:
-        "Arthhwise is India's leading paper trading app and stock market learning platform. Practice virtual trading with real NSE data, compete in trading game contests, join a trading community, and master the stock market — risk-free.",
+        "An advanced Indian stock market simulator and virtual paper trading platform. Enables colleges, corporates, and communities to host custom mock trading contests with live NSE, BSE, and F&O option chain data.",
     featureList: [
         "Paper Trading with ₹10,00,000 virtual capital",
-        "Real-time NSE & BSE market data",
-        "Trading game with competitive leaderboard",
-        "Social trading community",
-        "Stock market learning courses",
-        "Trading simulator with advanced charting",
-        "P&L analytics and portfolio tracking",
+        "Virtual trading contests for colleges, corporates, and finance fests",
+        "Real-time NSE and BSE stock market simulation",
+        "Live Futures and Options (F&O) paper trading with options Greeks and IV",
+        "Automated live leaderboards and trade audit logs",
+        "7 distinct contest scoring formats with private join codes",
+        "Automated PDF merit certificates and Excel master exports",
+        "Stock market learning courses and structured glossary",
+        "Trading simulator with advanced charting and P&L analytics",
     ],
     screenshot: "https://arthhwise.com/images/hero/hero-image.png",
     offers: {
@@ -30,11 +32,12 @@ const structuredData = {
         price: "0",
         priceCurrency: "INR",
         availability: "https://schema.org/InStock",
-        description: "Free to download and use",
+        description: "Free to download and use for students and organizers",
     },
-    // NOTE: aggregateRating removed — only add when you have real,
-    // verifiable ratings from Google Play Store / App Store.
-    // Using fake numbers can trigger a Google manual action penalty.
+    targetAudience: {
+        "@type": "Audience",
+        audienceType: "College students, finance cells, corporate teams, stock traders, E-Summit organizers",
+    },
     author: {
         "@type": "Organization",
         name: "Arthhwise",

@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
+import FAQSchema from "@/components/Schema/FAQSchema";
 
 export const metadata: Metadata = {
   title: "Organize a College Stock Market Competition | Arthhwise Campus",
@@ -128,6 +130,18 @@ const OrganizeCollegeContestPage: React.FC = () => {
           { name: "Organize College Trading Contest", href: "/organize-college-trading-contest" },
         ]}
       />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — College Stock Market Competition Platform"
+        description="The turn-key platform to organize a college stock market competition, paper trading fest, or E-Summit finance event with private join codes, real-time leaderboards, and automated certificates."
+        urlPath="/organize-college-trading-contest"
+        audienceType="College students, finance clubs, E-Summit organizers, university placement cells"
+      />
+      <FAQSchema
+        faqs={faqs.map((f) => ({
+          question: f.q,
+          answer: f.a,
+        }))}
+      />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />
 
@@ -170,8 +184,8 @@ const OrganizeCollegeContestPage: React.FC = () => {
               in Under 24 Hours
             </h1>
             <p className="text-base md:text-lg text-muted dark:text-white/80 leading-relaxed mb-8">
-              Purpose-built for Finance Clubs, E-Summits, Investment Cells, and Management Fests across India.
-              Give your students a live paper trading arena with real NSE/BSE data, private join codes,
+              The complete <strong>virtual trading tournament organizer</strong> and <strong>paper trading contest creator</strong> built for Finance Clubs, E-Summits, Investment Cells, and Management Fests across India.
+              Give your students a live mock stock arena with real NSE/BSE data, private join codes,
               a real-time leaderboard, and co-branded winner certificates — completely free.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
@@ -224,8 +238,7 @@ const OrganizeCollegeContestPage: React.FC = () => {
           {/* Feature Grid */}
           <div className="mb-20">
             <h2 className="text-2xl md:text-3xl font-extrabold text-midnight_text dark:text-white text-center mb-12">
-              Everything an Organizer Needs —{" "}
-              <span className="text-primary">Built In</span>
+              Turn-Key <span className="text-primary">Mock Stock Market Competition Software</span> for Organizers
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {features.map((f) => (

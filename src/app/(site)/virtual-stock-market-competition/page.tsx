@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Virtual Stock Market Competition Platform | Paper Trading Software | Arthhwise",
@@ -39,6 +40,12 @@ const VirtualCompetitionPage: React.FC = () => {
           { name: "Virtual Stock Market Competition", href: "/virtual-stock-market-competition" },
         ]}
       />
+      <CampusSoftwareSchema
+        name="Arthhwise — Virtual Stock Market Competition & Tournament Platform"
+        description="Launch custom virtual stock market competitions for your college, community, or company. Isolated contest wallets, real NSE options & equities, automated rankings, and verifiable certificates."
+        urlPath="/virtual-stock-market-competition"
+        audienceType="College finance clubs, trading communities, fintech organizers, corporate teams"
+      />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />
 
@@ -49,11 +56,14 @@ const VirtualCompetitionPage: React.FC = () => {
               <Icon icon="solar:global-bold" width="16" height="16" />
               Turnkey Virtual Trading Infrastructure
             </span>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-6">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-4">
               Launch a Branded <span className="text-primary">Virtual Stock Market Competition</span>
             </h1>
+            <p className="text-sm md:text-base font-bold text-primary mb-6">
+              India&apos;s Investopedia Stock Simulator Alternative — Virtual Trading Tournament Organizer &amp; Contest Creator
+            </p>
             <p className="text-base md:text-xl text-muted dark:text-white/80 leading-relaxed max-w-3xl mx-auto mb-8">
-              Everything you need to run an authentic, risk-free stock market tournament. Zero infrastructure hassle: we provide private entry codes, live NSE order simulation, Sharpe ratio rankings, and branded achievement certificates.
+              Everything you need to run an authentic, risk-free stock market tournament with live NSE &amp; BSE ticks. Zero infrastructure hassle: we provide private entry codes, live NSE order simulation, Sharpe ratio rankings, and branded achievement certificates.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link

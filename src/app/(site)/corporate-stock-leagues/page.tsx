@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Corporate Stock Market League & Paper Trading Software India | Arthhwise",
@@ -81,6 +82,12 @@ const CorporateStockLeaguesPage: React.FC = () => {
           { name: "Host Event", href: "/host-event" },
           { name: "Corporate Stock Leagues", href: "/corporate-stock-leagues" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Enterprise — Corporate Stock Market League & Paper Trading Software"
+        description="Run employee engagement stock market leagues, corporate paper trading competitions, and finance training simulations for your team using Arthhwise. Fully virtual, real NSE/BSE data."
+        urlPath="/corporate-stock-leagues"
+        audienceType="Corporate HR leaders, corporate training managers, employee wellness committees, enterprise finance teams"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />

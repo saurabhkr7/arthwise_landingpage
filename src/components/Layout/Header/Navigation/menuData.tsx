@@ -16,6 +16,7 @@ export const headerData: HeaderItem[] = [
       { label: "Finance Fest Mock Stocks", href: "/finance-fest-stock-market-game" },
       { label: "Hiring Assessment Platform", href: "/trading-assessment-platform" },
       { label: "Live Lobbies & Hall of Fame", href: "/championships" },
+      { label: "vs Investopedia Simulator", href: "/vs/investopedia-simulator" },
     ],
   },
   {
@@ -27,6 +28,15 @@ export const headerData: HeaderItem[] = [
       { label: "Corporate Stock Leagues", href: "/corporate-stock-leagues" },
       { label: "School Simulations", href: "/school-stock-market-simulation" },
       { label: "Free Organizer Toolkit", href: "/organizer-toolkit" },
+      { label: "Organizer & API Docs", href: "/documentation" },
+    ],
+  },
+  {
+    label: "Docs",
+    href: "/documentation",
+    submenu: [
+      { label: "Documentation Hub", href: "/documentation" },
+      { label: "Organizer API & Webhooks", href: "/organizer-api" },
     ],
   },
   {

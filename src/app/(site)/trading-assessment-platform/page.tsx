@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Trading Assessment Platform for Banks & Investment Firms | Arthhwise",
@@ -37,6 +38,19 @@ const AssessmentPlatformPage: React.FC = () => {
           { name: "Home", href: "/" },
           { name: "Services", href: "/services" },
           { name: "Trading Assessment Platform", href: "/trading-assessment-platform" },
+        ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Talent — Trading Assessment Platform for Banks & Investment Firms"
+        description="Evaluate candidate trading aptitude, risk management discipline, and market psychology. The 1-to-2 hour simulation platform for investment banks, proprietary trading desks, and recruiters."
+        urlPath="/trading-assessment-platform"
+        audienceType="Investment banks, prop trading desks, hedge funds, fintech recruiters, financial hiring managers"
+        featureList={[
+          "Live simulated NSE/BSE market conditions",
+          "Real-time candidate risk discipline score",
+          "Drawdown tolerance and position sizing audit logs",
+          "Comprehensive aptitude analytics and ranking report",
+          "Automated PDF candidate assessment reports",
         ]}
       />
 

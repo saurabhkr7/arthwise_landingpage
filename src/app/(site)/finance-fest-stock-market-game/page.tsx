@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Finance Fest Stock Market Game & Mock Stock Software | Arthhwise",
@@ -39,6 +40,12 @@ const FinanceFestGamePage: React.FC = () => {
           { name: "Finance Fest Stock Market Game", href: "/finance-fest-stock-market-game" },
         ]}
       />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — Mock Stock Competition Software for Finance Fests"
+        description="The ultimate Mock Stock competition software for college finance fests and E-Summits with live NSE prices, live leaderboard projection screen, and instant team join codes."
+        urlPath="/finance-fest-stock-market-game"
+        audienceType="College fest organizers, E-Summit committees, finance societies, student participants"
+      />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />
 
@@ -49,9 +56,12 @@ const FinanceFestGamePage: React.FC = () => {
               <Icon icon="solar:fire-bold" width="16" height="16" />
               Mock Stock &amp; E-Summit Platform
             </span>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-6">
-              The #1 Software for <span className="text-primary">Finance Fest Mock Stock</span> Games
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-4">
+              The #1 <span className="text-primary">Mock Stock Market Competition Software</span> for Finance Fests
             </h1>
+            <p className="text-sm md:text-base font-bold text-primary mb-6">
+              Turn-Key Paper Trading Contest Creator &amp; Live Leaderboard Platform for Indian Colleges &amp; E-Summits
+            </p>
             <p className="text-base md:text-xl text-muted dark:text-white/80 leading-relaxed max-w-3xl mx-auto mb-8">
               Ditch fragile Excel spreadsheets and delayed manual calculations. Power your college fest&apos;s Mock Stock with live NSE tick feeds, dynamic trading leaderboards for auditorium projectors, and automated certificates.
             </p>

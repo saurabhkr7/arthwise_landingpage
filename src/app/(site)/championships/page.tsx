@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import HeroSub from "@/components/SharedComponents/HeroSub";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -88,6 +89,12 @@ export default function ChampionshipsListingPage() {
 
   return (
     <>
+      <CampusSoftwareSchema
+        name="Arthhwise Championships — Live Paper Trading Lobbies & Tournaments"
+        description="Browse live stock league lobbies, register for upcoming college contests, or check the results of finalized paper trading championships across India."
+        urlPath="/championships"
+        audienceType="College traders, campus finance fests, retail options traders, tournament participants"
+      />
       <HeroSub
         title="Trading Lobbies & Championships"
         description="Browse live stock league lobbies, register for upcoming college contests, or check the results of finalized championships."

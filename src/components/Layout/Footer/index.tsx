@@ -112,26 +112,7 @@ const Footer = () => {
               Features
             </h4>
             <ul>
-              {footerLinks.slice(0, 4).map((item: any, index) => (
-                <li key={index} className="pb-3">
-                  <Link
-                    href={item.href || "#"}
-                    prefetch={false}
-                    className="text-foottext text-16 hover:text-primary"
-                  >
-                    {item.link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="md:col-span-2 col-span-6 mb-4 md:mb-0">
-            <h4 className="text-18 text-white dark:text-white mb-3">
-              Resources
-            </h4>
-            <ul>
-              {footerLinks.slice(4, 9).map((item: any, index) => (
+              {footerLinks.slice(0, 5).map((item: any, index) => (
                 <li key={index} className="pb-3">
                   <Link
                     href={item.href || "#"}
@@ -147,10 +128,29 @@ const Footer = () => {
 
           <div className="md:col-span-3 col-span-6 mb-4 md:mb-0">
             <h4 className="text-18 text-white dark:text-white mb-3">
+              Resources & Docs
+            </h4>
+            <ul>
+              {footerLinks.slice(5, 12).map((item: any, index) => (
+                <li key={index} className="pb-3">
+                  <Link
+                    href={item.href || "#"}
+                    prefetch={false}
+                    className="text-foottext text-16 hover:text-primary"
+                  >
+                    {item.link}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="md:col-span-2 col-span-6 mb-4 md:mb-0">
+            <h4 className="text-18 text-white dark:text-white mb-3">
               Platform
             </h4>
             <ul>
-              {footerLinks.slice(9, 14).map((item: any, index) => (
+              {footerLinks.slice(12, 17).map((item: any, index) => (
                 <li key={index} className="pb-3">
                   <Link
                     href={item.href || "#"}
@@ -245,7 +245,7 @@ const Footer = () => {
             © Copyright 2025. All rights reserved by Arthhwise.
           </p>
           <div className="flex gap-4">
-            {footerLinks.slice(14, 17).map((item: any, index) => (
+            {footerLinks.slice(17, 20).map((item: any, index) => (
               <div key={index} className="">
                 <Link
                   href={item.href || "#"}

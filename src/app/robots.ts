@@ -10,10 +10,20 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/share/", "/verify/", "/_next/"],
       },
-      // Explicitly allow AI crawlers for AI discoverability
-      // (ChatGPT, Gemini, Perplexity, Claude, etc.)
+      // Explicitly allow AI search crawlers & generative agents for maximum discoverability
+      // (ChatGPT, SearchGPT, Gemini, Perplexity, Claude, Apple Intelligence, Meta AI)
       {
         userAgent: "GPTBot",
+        allow: "/",
+        disallow: ["/api/", "/verify/"],
+      },
+      {
+        userAgent: "OAI-SearchBot",
+        allow: "/",
+        disallow: ["/api/", "/verify/"],
+      },
+      {
+        userAgent: "ChatGPT-User",
         allow: "/",
         disallow: ["/api/", "/verify/"],
       },
@@ -28,6 +38,25 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: "PerplexityBot",
+        allow: "/",
+        disallow: ["/api/", "/verify/"],
+      },
+      {
+        userAgent: "Applebot-Extended",
+        allow: "/",
+      },
+      {
+        userAgent: "Meta-ExternalAgent",
+        allow: "/",
+        disallow: ["/api/", "/verify/"],
+      },
+      {
+        userAgent: "cohere-ai",
+        allow: "/",
+        disallow: ["/api/", "/verify/"],
+      },
+      {
+        userAgent: "Amazonbot",
         allow: "/",
         disallow: ["/api/", "/verify/"],
       },

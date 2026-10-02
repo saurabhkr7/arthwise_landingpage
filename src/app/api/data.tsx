@@ -75,53 +75,64 @@ export const BeneifitImage = [
 
 // Footer Links
 export const footerLinks: { link: string, href?: string }[] = [
+  // Features (indices 0 - 4)
   {
     link: "Paper Trading",
     href: "/learn",
   },
   {
-    link: "Championships",
-    href: "/trading-events",
+    link: "National Championships",
+    href: "/stock-market-championship",
   },
   {
     link: "Learning Center",
     href: "/learn",
   },
   {
-    link: "Market Analysis",
+    link: "Market Analysis & Blog",
     href: "/blog",
+  },
+  {
+    link: "vs Investopedia Simulator",
+    href: "/vs/investopedia-simulator",
+  },
+  // Resources & Documentation (indices 5 - 11)
+  {
+    link: "Documentation Hub",
+    href: "/documentation",
+  },
+  {
+    link: "Organizer API & Webhooks",
+    href: "/organizer-api",
   },
   {
     link: "College Contests",
     href: "/organize-college-trading-contest",
   },
   {
-    link: "Corporate Leagues",
+    link: "Corporate Stock Leagues",
     href: "/corporate-stock-leagues",
   },
   {
-    link: "Organizer Toolkit",
+    link: "Free Organizer Toolkit",
     href: "/organizer-toolkit",
   },
   {
-    link: "Leaderboard",
-    href: "/leaderboard",
+    link: "Trading Glossary",
+    href: "/glossary",
   },
+  {
+    link: "Live Lobbies & Leaderboard",
+    href: "/championships",
+  },
+  // Platform (indices 12 - 16)
   {
     link: "Host Event",
     href: "/host-event",
   },
   {
-    link: "Support",
-    href: "/support",
-  },
-  {
-    link: "Help",
-    href: "/help",
-  },
-  {
-    link: "Feedback",
-    href: "/feedback",
+    link: "Support & Help",
+    href: "/contact",
   },
   {
     link: "About Us",
@@ -132,19 +143,16 @@ export const footerLinks: { link: string, href?: string }[] = [
     href: "/careers",
   },
   {
+    link: "Contact Us",
+    href: "/contact",
+  },
+  // Legal (indices 17 - 19)
+  {
     link: "Terms and conditions",
     href: "/terms",
   },
   {
-    link: "Legal",
-    href: "/terms",
-  },
-  {
-    link: "Privacy",
-    href: "/privacy",
-  },
-  {
-    link: "Cookies",
+    link: "Privacy Policy",
     href: "/privacy",
   },
   {

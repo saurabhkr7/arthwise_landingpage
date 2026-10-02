@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "MBA Stock Market Competition & B-School Trading Challenge | Arthhwise",
@@ -38,6 +39,12 @@ const MbaCompetitionPage: React.FC = () => {
           { name: "Host Event", href: "/host-event" },
           { name: "MBA Stock Market Competition", href: "/mba-stock-market-competition" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — MBA Stock Market Competition & B-School Challenge"
+        description="Institutional trading simulation software for MBA finance fests, IIMs, and premier B-Schools. Real F&O option chains, portfolio risk modeling, Sharpe ratio analytics, and instant certification."
+        urlPath="/mba-stock-market-competition"
+        audienceType="MBA students, B-School finance committees, professors of finance, investment research clubs"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />

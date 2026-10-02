@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
+import FAQSchema from "@/components/Schema/FAQSchema";
 
 export const metadata: Metadata = {
   title: "College Stock Market Competition Platform India | Host Paper Trading Fest | Arthhwise",
@@ -111,6 +113,18 @@ const CollegeStockMarketCompetitionPage: React.FC = () => {
           { name: "College Stock Market Competition", href: "/college-stock-market-competition" },
         ]}
       />
+      <CampusSoftwareSchema
+        name="Arthhwise Campus — College Stock Market Competition Platform"
+        description="Organize a professional college stock market competition in minutes with 7 scoring modes, live NSE tick feeds, private lobbies, and automated certificates."
+        urlPath="/college-stock-market-competition"
+        audienceType="College students, finance clubs, E-Summit organizers, inter-college competition participants"
+      />
+      <FAQSchema
+        faqs={faqs.map((f) => ({
+          question: f.q,
+          answer: f.a,
+        }))}
+      />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />
 
@@ -122,9 +136,12 @@ const CollegeStockMarketCompetitionPage: React.FC = () => {
               <Icon icon="solar:diploma-bold" width="16" height="16" />
               The Eventbrite of College Stock Market Fests
             </span>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-6">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-midnight_text dark:text-white leading-tight mb-4">
               Host India&apos;s Best <span className="text-primary">College Stock Market Competition</span>
             </h1>
+            <p className="text-sm md:text-base font-bold text-primary mb-6">
+              The Turn-Key Virtual Trading Tournament Organizer &amp; Paper Trading Contest Creator for Indian Universities
+            </p>
             <p className="text-base md:text-xl text-muted dark:text-white/80 leading-relaxed max-w-3xl mx-auto mb-8">
               Turn your college finance fest, E-Summit, or student club event into a high-stakes trading battle. Real-time NSE data, 7 customizable scoring formats, live leaderboards, and auto-generated co-branded certificates.
             </p>
@@ -191,7 +208,7 @@ const CollegeStockMarketCompetitionPage: React.FC = () => {
               Beyond Simple P&amp;L
             </span>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-              7 Intelligent Competition Mechanics
+              7 Intelligent Scoring Formats for Mock Stock Market Competition Software
             </h2>
             <p className="text-sm md:text-base text-muted dark:text-white/70">
               Don&apos;t settle for boring &quot;highest return wins&quot; contests that encourage reckless penny-stock gambling. Choose the scoring algorithm that fits your curriculum.

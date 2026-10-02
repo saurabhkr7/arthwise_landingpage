@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "Corporate Stock Market Game | Employee Engagement & HR Team Building | Arthhwise",
@@ -38,6 +39,19 @@ const CorporateStockMarketGamePage: React.FC = () => {
           { name: "Home", href: "/" },
           { name: "Host Event", href: "/host-event" },
           { name: "Corporate Stock Market Game", href: "/corporate-stock-market-game" },
+        ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise Enterprise — Corporate Stock Market Game & Team Building Platform"
+        description="Engage employees with a high-energy corporate stock market game. 1-to-2 hour fast news simulation mode, financial wellness workshops, and inter-department leagues."
+        urlPath="/corporate-stock-market-game"
+        audienceType="Corporate HR leaders, employee engagement teams, finance company outings, team building organizers"
+        featureList={[
+          "Inter-department trading leagues with private join PINs",
+          "1-hour fast news simulation mode with breaking market headlines",
+          "Real-time team leaderboard on conference room display",
+          "Zero real financial risk with simulated ₹10L company wallets",
+          "Custom co-branded corporate winner certificates and prize audits",
         ]}
       />
 

@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import BreadcrumbSchema from "@/components/Schema/BreadcrumbSchema";
+import CampusSoftwareSchema from "@/components/Schema/CampusSoftwareSchema";
 
 export const metadata: Metadata = {
   title: "National Stock Market Championship Platform India | Arthhwise",
@@ -39,6 +40,12 @@ const ChampionshipPage: React.FC = () => {
           { name: "Championships", href: "/championships" },
           { name: "National Stock Market Championship", href: "/stock-market-championship" },
         ]}
+      />
+      <CampusSoftwareSchema
+        name="Arthhwise National Stock Market Championship Platform"
+        description="Participate in or host India's largest National Stock Market Championship. Live NSE/BSE tick simulation, ₹10 Lakh virtual portfolio, options trading, and verifiable digital certificates."
+        urlPath="/stock-market-championship"
+        audienceType="College students, national traders, finance clubs, championship contenders"
       />
 
       <div className="pt-24 bg-heroBg dark:bg-darkmode" />

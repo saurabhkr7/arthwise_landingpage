@@ -103,6 +103,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { path: "/trading-assessment-platform", changeFrequency: "weekly", priority: 0.9 },
       { path: "/vs/frontpage", changeFrequency: "weekly", priority: 0.8 },
       { path: "/vs/stockgro", changeFrequency: "weekly", priority: 0.8 },
+      { path: "/vs/investopedia-simulator", changeFrequency: "weekly", priority: 0.85 },
+      { path: "/services", changeFrequency: "monthly", priority: 0.8 },
+      { path: "/pricing", changeFrequency: "monthly", priority: 0.7 },
+      { path: "/documentation", changeFrequency: "monthly", priority: 0.8 },
+      { path: "/organizer-api", changeFrequency: "monthly", priority: 0.85 },
       { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
       { path: "/terms", changeFrequency: "yearly", priority: 0.2 },
     ];
