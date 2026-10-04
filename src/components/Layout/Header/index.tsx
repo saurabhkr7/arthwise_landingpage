@@ -16,6 +16,7 @@ const Header: React.FC = () => {
   const { data: session } = useSession();
   const pathUrl = usePathname();
   const { theme, setTheme } = useTheme();
+  const organizerLanding = pathUrl === "/host-event";
 
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [sticky, setSticky] = useState(false);
@@ -75,8 +76,12 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed h-24 top-0 py-1 z-50 w-full bg-transparent transition-all ${
-        sticky ? "shadow-lg bg-white dark:bg-darkheader" : "shadow-none"
+      className={`fixed h-24 top-0 py-1 z-50 w-full transition-all ${
+        sticky
+          ? "shadow-lg bg-white dark:bg-darkheader"
+          : organizerLanding
+            ? "bg-white/85 backdrop-blur-md dark:bg-[#08111f]/85"
+            : "bg-transparent shadow-none"
       }`}
     >
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) flex justify-between lg:items-center xl:gap-8 lg:gap-4 px-4 py-6">

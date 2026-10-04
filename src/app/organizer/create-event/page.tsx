@@ -44,6 +44,9 @@ function CreateOrEditEventForm() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO", "COMMODITY"]);
+  const [eventMode, setEventMode] = useState<"LIVE_MARKET" | "SCENARIO_SIMULATION">("LIVE_MARKET");
+  const [simulationProfile, setSimulationProfile] = useState<any | null>(null);
+  const [simulationProfileName, setSimulationProfileName] = useState("");
   const [eventStatus, setEventStatus] = useState("UPCOMING");
   const [participantCount, setParticipantCount] = useState(0);
   
@@ -115,6 +118,7 @@ function CreateOrEditEventForm() {
         setStartTime(toDatetimeLocal(ev.startTime));
         setEndTime(toDatetimeLocal(ev.endTime));
         setAllowedAssetClasses(ev.allowedAssetClasses || ["EQUITY"]);
+        setEventMode(ev.eventMode === "SCENARIO_SIMULATION" ? "SCENARIO_SIMULATION" : "LIVE_MARKET");
         setCustomFields(ev.customVerificationFields || []);
         setRules(ev.rules || []);
         setEventStatus(ev.status || "UPCOMING");
@@ -165,6 +169,26 @@ function CreateOrEditEventForm() {
     setRules(rules.filter((_, i) => i !== index));
   };
 
+  const handleSimulationProfileFile = async (file?: File) => {
+    if (!file) return;
+    setFormError("");
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (!parsed || !Array.isArray(parsed.instruments) || parsed.instruments.length === 0) {
+        throw new Error("The simulation profile must contain at least one instrument.");
+      }
+      if (!Number.isFinite(Number(parsed.durationSeconds)) || Number(parsed.durationSeconds) <= 0) {
+        throw new Error("The simulation profile must contain a positive durationSeconds value.");
+      }
+      setSimulationProfile(parsed);
+      setSimulationProfileName(file.name);
+    } catch (err: any) {
+      setSimulationProfile(null);
+      setSimulationProfileName("");
+      setFormError(err.message || "Could not read the simulation profile JSON file.");
+    }
+  };
+
   // Submit Event Form (Create or Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,6 +201,11 @@ function CreateOrEditEventForm() {
 
     if (new Date(startTime) >= new Date(endTime)) {
       setFormError("Event Start Time must be before End Time.");
+      return;
+    }
+
+    if (!isEditMode && eventMode === "SCENARIO_SIMULATION" && !simulationProfile) {
+      setFormError("Select the generated simulation profile JSON before creating a scenario event.");
       return;
     }
 
@@ -196,7 +225,9 @@ function CreateOrEditEventForm() {
         maxParticipants: Number(maxParticipants),
         startTime: new Date(startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
-        allowedAssetClasses,
+        // Scenario events currently use the same V2 equity engine, but never
+        // expose live F&O/crypto/commodity flows to participants.
+        allowedAssetClasses: eventMode === "SCENARIO_SIMULATION" ? ["EQUITY"] : allowedAssetClasses,
         customVerificationFields: customFields,
         rules
       };
@@ -223,6 +254,26 @@ function CreateOrEditEventForm() {
       }
       if (!res.ok || !json.success) {
         throw new Error(json.message || `Failed to ${isEditMode ? "update" : "create"} trading event.`);
+      }
+
+      if (!isEditMode && eventMode === "SCENARIO_SIMULATION") {
+        const createdEventId = json.event?._id || json.event?.id;
+        if (!createdEventId) {
+          throw new Error("The event was created, but the API did not return its id for profile attachment.");
+        }
+
+        const profileRes = await fetch(`${API_BASE_URL}/market-event/${createdEventId}/simulation/profile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(simulationProfile)
+        });
+        const profileJson = await profileRes.json();
+        if (!profileRes.ok || !profileJson.success) {
+          throw new Error(profileJson.message || "Event was created, but the simulation profile could not be attached.");
+        }
       }
 
       router.push("/organizer/dashboard");
@@ -275,6 +326,7 @@ function CreateOrEditEventForm() {
               )}
             </div>
           </div>
+
         </div>
 
         {/* Live Event Notice */}
@@ -296,6 +348,35 @@ function CreateOrEditEventForm() {
         )}
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl relative overflow-hidden">
+
+          {/* Event mode */}
+          <div className="border-b border-grey/10 dark:border-white/10 pb-6">
+            <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <Icon icon="solar:alt-arrow-up-down-bold" width="16" height="16" />
+              <span>Event Market Mode</span>
+            </h3>
+            <p className="text-muted dark:text-white/70 text-xs mb-4">
+              Live Market uses current market quotes. Scenario Simulation replays an organizer-authored equity market profile and does not call NSE during the event.
+            </p>
+            <select
+              value={eventMode}
+              onChange={(e) => {
+                const nextMode = e.target.value as "LIVE_MARKET" | "SCENARIO_SIMULATION";
+                setEventMode(nextMode);
+                if (nextMode === "SCENARIO_SIMULATION") setAllowedAssetClasses(["EQUITY"]);
+              }}
+              disabled={isEditMode}
+              className="w-full md:w-1/2 bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition disabled:opacity-60"
+            >
+              <option value="LIVE_MARKET">Live Market Event</option>
+              <option value="SCENARIO_SIMULATION">Scenario Simulation Event</option>
+            </select>
+            {isEditMode && eventMode === "SCENARIO_SIMULATION" && (
+              <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">
+                Event mode and its profile are locked after creation. Edit branding, timings, and other permitted event settings only.
+              </p>
+            )}
+          </div>
           
           {/* Section 1: Identity */}
           <div>
@@ -452,7 +533,11 @@ function CreateOrEditEventForm() {
           {/* Allowed asset classes */}
           <div>
             <label className="block text-xs font-bold text-midnight_text dark:text-white mb-3">Allowed Asset Classes</label>
-            <div className="flex gap-6">
+            {eventMode === "SCENARIO_SIMULATION" ? (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs font-bold text-primary">
+                EQUITY only — F&O, crypto, and commodity tabs are disabled for scenario events.
+              </div>
+            ) : <div className="flex gap-6">
               {["EQUITY", "FNO", "CRYPTO", "COMMODITY"].map((asset) => (
                 <label key={asset} className="flex items-center gap-2 text-xs font-bold text-midnight_text dark:text-white cursor-pointer">
                   <input
@@ -470,8 +555,34 @@ function CreateOrEditEventForm() {
                   {asset}
                 </label>
               ))}
-            </div>
+            </div>}
           </div>
+
+          {eventMode === "SCENARIO_SIMULATION" && !isEditMode && (
+            <div className="border-t border-grey/10 dark:border-white/10 pt-6">
+              <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <Icon icon="solar:database-bold" width="16" height="16" />
+                <span>Scenario Market Profile *</span>
+              </h3>
+              <p className="text-muted dark:text-white/70 text-xs mb-4">
+                Upload the generated profile JSON. It should contain the curated instruments, historical timeline candles, duration, and scenario announcements. The server validates and stores it before the event can run.
+              </p>
+              <input
+                type="file"
+                accept="application/json,.json"
+                onChange={(e) => handleSimulationProfileFile(e.target.files?.[0])}
+                className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-xs text-midnight_text dark:text-white file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-bold file:text-white"
+              />
+              {simulationProfileName && (
+                <div className="mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-600 dark:text-emerald-400">
+                  Loaded <strong>{simulationProfileName}</strong> — {simulationProfile.instruments.length} instruments, {simulationProfile.scenarios?.length || 0} scenarios, {simulationProfile.durationSeconds}s duration.
+                </div>
+              )}
+              <p className="mt-3 text-[11px] text-muted dark:text-white/50">
+                Build it with the backend script: <code>buildScenarioPilotProfile.js</code>. Do not upload the raw candle or blueprint files directly.
+              </p>
+            </div>
+          )}
 
           {/* Section 3: Custom fields */}
           <div className="border-t border-grey/10 dark:border-white/10 pt-6">

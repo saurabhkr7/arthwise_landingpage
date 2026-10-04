@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const Logo: React.FC = () => {
+const Logo: React.FC<{ light?: boolean }> = ({ light = false }) => {
   return (
     <Link href="/">
       <Image
@@ -10,7 +10,7 @@ const Logo: React.FC = () => {
         width={160}
         height={50}
         quality={100}
-        className="dark:hidden"
+        className={light ? "hidden" : "dark:hidden"}
       />
 
       <Image
@@ -19,7 +19,7 @@ const Logo: React.FC = () => {
         width={140}
         height={30}
         quality={100}
-        className="hidden dark:block"
+        className={light ? "block" : "hidden dark:block"}
       />
     </Link>
   );

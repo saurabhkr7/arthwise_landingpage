@@ -48,6 +48,11 @@ export default function EventOrganizerControlPanel() {
   const [groupByField, setGroupByField] = useState("");
   const [groupAnalytics, setGroupAnalytics] = useState<any[]>([]);
   const [groupLoading, setGroupLoading] = useState(false);
+  const [lateParticipantModalOpen, setLateParticipantModalOpen] = useState(false);
+  const [lateParticipantEmail, setLateParticipantEmail] = useState("");
+  const [lateParticipantValues, setLateParticipantValues] = useState<Record<string, string>>({});
+  const [lateParticipantSubmitting, setLateParticipantSubmitting] = useState(false);
+  const [lateParticipantMessage, setLateParticipantMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   // ── Leaderboard Table Pagination State ──
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -220,6 +225,50 @@ export default function EventOrganizerControlPanel() {
     else {
       fetchDashboardData();
       if (selectedScriptId) fetchComplianceScripts(eventData.id);
+    }
+  };
+
+  const openLateParticipantModal = () => {
+    const initialValues: Record<string, string> = {};
+    (eventData?.customVerificationFields || []).forEach((field: any) => {
+      initialValues[field.fieldKey] = "";
+    });
+    setLateParticipantEmail("");
+    setLateParticipantValues(initialValues);
+    setLateParticipantMessage(null);
+    setLateParticipantModalOpen(true);
+  };
+
+  const addLateParticipant = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!eventData?.id || !lateParticipantEmail.trim()) return;
+    setLateParticipantSubmitting(true);
+    setLateParticipantMessage(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/${eventData.id}/participants/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${passcode}`,
+        },
+        body: JSON.stringify({
+          email: lateParticipantEmail.trim().toLowerCase(),
+          customFieldValues: lateParticipantValues,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setLateParticipantMessage({ type: "error", text: json.message || "Could not add this participant." });
+        return;
+      }
+      setLateParticipantMessage({ type: "success", text: json.message || "Participant added successfully." });
+      setLateParticipantEmail("");
+      await fetchDashboardData();
+      setTimeout(() => setLateParticipantModalOpen(false), 700);
+    } catch (error) {
+      setLateParticipantMessage({ type: "error", text: "Network error while adding the participant." });
+    } finally {
+      setLateParticipantSubmitting(false);
     }
   };
 
@@ -710,7 +759,7 @@ export default function EventOrganizerControlPanel() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          {/* <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${autoRefresh
               ? "bg-green-500/10 text-green-500 border-green-500/30"
@@ -727,7 +776,7 @@ export default function EventOrganizerControlPanel() {
           >
             <Icon icon="solar:restart-bold" width="14" height="14" />
             <span>Refresh</span>
-          </button>
+          </button> */}
 
           <button
             onClick={exportToCSV}
@@ -751,6 +800,16 @@ export default function EventOrganizerControlPanel() {
           >
             <Icon icon="solar:bell-bing-bold" width="14" height="14" />
             <span>Notify Participants</span>
+          </button>
+
+          <button
+            onClick={openLateParticipantModal}
+            disabled={eventData?.status !== "LIVE" || participants.length >= (eventData?.maxParticipants || 150)}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Add a verified user after the event has started"
+          >
+            <Icon icon="solar:user-plus-bold" width="14" height="14" />
+            <span>Add Participant</span>
           </button>
         </div>
       </header>
@@ -1770,8 +1829,8 @@ export default function EventOrganizerControlPanel() {
                       setCurrentPage(1);
                     }}
                     className={`px-3 py-1 rounded-lg text-xs font-extrabold transition ${rowsPerPage === option
-                        ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
-                        : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
+                      ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
+                      : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
                       }`}
                   >
                     {option}
@@ -1915,6 +1974,112 @@ export default function EventOrganizerControlPanel() {
         </div>
       </main>
 
+      {/* Organizer-assisted late participant modal */}
+      {lateParticipantModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-darkHeroBg border border-emerald-500/30 rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-grey/10 dark:border-white/10">
+              <div>
+                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                  <Icon icon="solar:user-plus-bold" width="20" height="20" />
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider">Organizer-assisted join</span>
+                </div>
+                <h3 className="text-xl font-extrabold text-midnight_text dark:text-white mt-1">Add participant to live event</h3>
+                <p className="text-xs text-muted dark:text-white/60 mt-1">
+                  The user must already have a verified Arthhwise account. Their event wallet starts with the configured initial capital.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLateParticipantModalOpen(false)}
+                disabled={lateParticipantSubmitting}
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white flex items-center justify-center font-bold transition"
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={addLateParticipant} className="mt-5 space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase mb-1 text-midnight_text dark:text-white">
+                  Registered email address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={lateParticipantEmail}
+                  onChange={(e) => setLateParticipantEmail(e.target.value)}
+                  placeholder="participant@example.com"
+                  required
+                  className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {(eventData?.customVerificationFields || []).map((field: any) => {
+                const options = (field.options || []).map((option: any) => (
+                  typeof option === "string" ? { value: option, label: option } : option
+                ));
+                return (
+                  <div key={field.fieldKey}>
+                    <label className="block text-xs font-bold uppercase mb-1 text-midnight_text dark:text-white">
+                      {field.fieldLabel || field.fieldKey} {field.isRequired && <span className="text-red-500">*</span>}
+                    </label>
+                    {field.fieldType === "select" ? (
+                      <select
+                        value={lateParticipantValues[field.fieldKey] || ""}
+                        onChange={(e) => setLateParticipantValues((prev) => ({ ...prev, [field.fieldKey]: e.target.value }))}
+                        required={Boolean(field.isRequired)}
+                        className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="">Select {field.fieldLabel || field.fieldKey}</option>
+                        {options.map((option: any) => (
+                          <option key={String(option.value)} value={String(option.value)}>{option.label || option.value}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.fieldType === "number" ? "number" : "text"}
+                        value={lateParticipantValues[field.fieldKey] || ""}
+                        onChange={(e) => setLateParticipantValues((prev) => ({ ...prev, [field.fieldKey]: e.target.value }))}
+                        placeholder={field.placeholder || "Enter value"}
+                        required={Boolean(field.isRequired)}
+                        className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-emerald-500"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              {lateParticipantMessage && (
+                <div className={`rounded-xl px-3 py-2.5 text-xs font-semibold ${lateParticipantMessage.type === "success"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                  : "bg-red-500/10 text-red-600 dark:text-red-300 border border-red-500/20"}`}>
+                  {lateParticipantMessage.text}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-grey/10 dark:border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setLateParticipantModalOpen(false)}
+                  disabled={lateParticipantSubmitting}
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={lateParticipantSubmitting || !lateParticipantEmail.trim()}
+                  className="px-5 py-2 rounded-xl text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/25"
+                >
+                  {lateParticipantSubmitting ? "Adding..." : "Add to Event"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Trade Audit Modal */}
       {selectedStudent && (() => {
         const totalTradePages = Math.max(1, Math.ceil(tradeLogs.length / tradeAuditRowsPerPage));
@@ -1955,8 +2120,8 @@ export default function EventOrganizerControlPanel() {
                               setTradeAuditPage(1);
                             }}
                             className={`px-2.5 py-0.5 rounded-lg text-xs font-extrabold transition ${tradeAuditRowsPerPage === option
-                                ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
-                                : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
+                              ? "bg-white dark:bg-primary text-primary dark:text-white shadow-sm"
+                              : "text-muted dark:text-white/60 hover:text-midnight_text dark:hover:text-white"
                               }`}
                           >
                             {option}
@@ -2140,8 +2305,8 @@ export default function EventOrganizerControlPanel() {
             <div className="flex justify-between items-start pb-4 border-b border-grey/10 dark:border-white/10">
               <div>
                 <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${announcementTargetUserIds && announcementTargetUserIds.length > 0
-                    ? "text-amber-600 bg-amber-500/15 border border-amber-500/30"
-                    : "text-amber-500 bg-amber-500/10"
+                  ? "text-amber-600 bg-amber-500/15 border border-amber-500/30"
+                  : "text-amber-500 bg-amber-500/10"
                   }`}>
                   {announcementTargetUserIds && announcementTargetUserIds.length > 0
                     ? "⚠️ TARGETED COMPLIANCE WARNING"
@@ -2219,8 +2384,8 @@ export default function EventOrganizerControlPanel() {
                   type="submit"
                   disabled={announcementSending || !announcementTitle.trim() || !announcementDescription.trim()}
                   className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition shadow-md ${announcementTargetUserIds && announcementTargetUserIds.length > 0
-                      ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
-                      : "bg-amber-500 hover:bg-amber-400 shadow-amber-500/20"
+                    ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
+                    : "bg-amber-500 hover:bg-amber-400 shadow-amber-500/20"
                     }`}
                 >
                   {announcementSending
