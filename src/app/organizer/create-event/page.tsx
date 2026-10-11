@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
+import { invalidateOrganizerDashboardCache } from "@/lib/organizerCache";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -311,6 +312,7 @@ function CreateOrEditEventForm() {
         setSimulationProfileId("attached");
       }
 
+      invalidateOrganizerDashboardCache();
       router.push("/organizer/dashboard");
     } catch (err: any) {
       console.error(err);
@@ -327,6 +329,7 @@ function CreateOrEditEventForm() {
     try {
       await attachSimulationProfile(createdScenarioEventId);
       setCreatedScenarioEventId(null);
+      invalidateOrganizerDashboardCache();
       router.push("/organizer/dashboard");
     } catch (err: any) {
       setFormError(err.message || "The simulation profile could not be attached.");

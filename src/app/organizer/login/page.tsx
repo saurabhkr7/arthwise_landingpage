@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
+import { invalidateOrganizerDashboardCache } from "@/lib/organizerCache";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -45,6 +46,9 @@ export default function OrganizerLoginPage() {
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Invalid email or password.");
       }
+
+      // Invalidate any previous session cache on fresh login
+      invalidateOrganizerDashboardCache();
 
       // Store organizer auth details
       sessionStorage.setItem("organizer_token", json.accessToken);

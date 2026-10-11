@@ -4,14 +4,39 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 
+import {
+  getCachedOrganizerEvents,
+  setCachedOrganizerEvents,
+  invalidateOrganizerDashboardCache,
+} from "@/lib/organizerCache";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
 export default function OrganizerDashboard() {
   const router = useRouter();
   const [organizerName, setOrganizerName] = useState("");
   const [token, setToken] = useState("");
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // Instant hydration from cache (0ms delay when navigating back and forth)
+  const [events, setEvents] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const cached = getCachedOrganizerEvents();
+      if (cached && cached.events) {
+        return cached.events;
+      }
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== "undefined") {
+      const cached = getCachedOrganizerEvents();
+      if (cached && cached.events && cached.events.length > 0) {
+        return false;
+      }
+    }
+    return true;
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [actionSuccessMsg, setActionSuccessMsg] = useState("");
   const [retryingEventId, setRetryingEventId] = useState<string | null>(null);
@@ -31,7 +56,61 @@ export default function OrganizerDashboard() {
   const [complianceModalError, setComplianceModalError] = useState("");
   const [cooldownMinutesMap, setCooldownMinutesMap] = useState<Record<string, number>>({});
 
-  // Authentication check
+  // Load events (supports forced refresh bypass)
+  const fetchEvents = async (forceRefresh: boolean = false, overrideToken?: string) => {
+    const activeToken = overrideToken || token || (typeof window !== "undefined" ? sessionStorage.getItem("organizer_token") : null);
+    if (!activeToken) return;
+
+    // Fast-path: if not forced and cache is fresh, skip network roundtrip entirely
+    if (!forceRefresh) {
+      const cached = getCachedOrganizerEvents();
+      if (cached && cached.isFresh) {
+        setEvents(cached.events);
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (events.length === 0) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/market-event/organizer/list`, {
+        headers: {
+          Authorization: `Bearer ${activeToken}`,
+        },
+      });
+      const json = await res.json();
+      
+      if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again") || json.message.includes("Invalid token")))) {
+        invalidateOrganizerDashboardCache();
+        sessionStorage.clear();
+        router.push("/organizer/login");
+        return;
+      }
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Failed to load events.");
+      }
+      const freshEvents = json.events || [];
+      setEvents(freshEvents);
+      setCachedOrganizerEvents(freshEvents);
+      setError("");
+    } catch (err: any) {
+      console.error(err);
+      if (events.length === 0) {
+        setError(err.message || "Failed to load dashboard data.");
+      }
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Authentication check & initial hydration
   useEffect(() => {
     const storedToken = sessionStorage.getItem("organizer_token");
     const name = sessionStorage.getItem("organizer_name");
@@ -41,46 +120,25 @@ export default function OrganizerDashboard() {
     }
     setToken(storedToken);
     setOrganizerName(name || "Organizer");
-  }, [router]);
 
-  // Load events
-  const fetchEvents = async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/market-event/organizer/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const json = await res.json();
-      
-      if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again") || json.message.includes("Invalid token")))) {
-        sessionStorage.clear();
-        router.push("/organizer/login");
+    // Check if we have cached events ready immediately
+    const cached = getCachedOrganizerEvents();
+    if (cached && cached.events) {
+      setEvents(cached.events);
+      setLoading(false);
+      // If cached data is already fresh (< 5 mins), do NOT call API!
+      if (cached.isFresh) {
         return;
       }
-
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to load events.");
-      }
-      setEvents(json.events || []);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to load dashboard data.");
-    } finally {
-      setLoading(false);
     }
-  };
 
-  useEffect(() => {
-    if (token) {
-      fetchEvents();
-    }
-  }, [token]);
+    // Either no cache or cache is stale (> 5 mins), fetch from API
+    fetchEvents(false, storedToken);
+  }, [router]);
 
   // Logout handler
   const handleLogout = () => {
+    invalidateOrganizerDashboardCache();
     sessionStorage.clear();
     router.push("/organizer/login");
   };
@@ -105,9 +163,13 @@ export default function OrganizerDashboard() {
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Could not retry event finalization.");
       }
-      setEvents((previous) => previous.map((item) => (
-        item._id === event._id ? { ...item, status: "FINALIZATION_RETRYING" } : item
-      )));
+      setEvents((previous) => {
+        const updated = previous.map((item) => (
+          item._id === event._id ? { ...item, status: "FINALIZATION_RETRYING" } : item
+        ));
+        setCachedOrganizerEvents(updated);
+        return updated;
+      });
       setActionSuccessMsg(`Finalization retry started for "${event.title}".`);
       setTimeout(() => setActionSuccessMsg(""), 6000);
     } catch (err: any) {
@@ -132,6 +194,7 @@ export default function OrganizerDashboard() {
 
       const json = await res.json();
       if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again")))) {
+        invalidateOrganizerDashboardCache();
         sessionStorage.clear();
         router.push("/organizer/login");
         return;
@@ -142,9 +205,16 @@ export default function OrganizerDashboard() {
       }
 
       const deletedTitle = eventToDelete.title;
+      const deletedId = eventToDelete._id;
       setEventToDelete(null);
       setActionSuccessMsg(`Event "${deletedTitle}" and all related participant records were successfully deleted.`);
-      fetchEvents();
+      
+      // Update local state and cache immediately
+      setEvents((prev) => {
+        const remaining = prev.filter((ev) => ev._id !== deletedId);
+        setCachedOrganizerEvents(remaining);
+        return remaining;
+      });
       setTimeout(() => setActionSuccessMsg(""), 6000);
     } catch (err: any) {
       console.error("❌ Delete event error:", err);
@@ -206,13 +276,15 @@ export default function OrganizerDashboard() {
         const newScripts = updatedJson.scripts || [];
         setComplianceScripts(newScripts);
 
-        setEvents((prev) =>
-          prev.map((ev) =>
+        setEvents((prev) => {
+          const updated = prev.map((ev) =>
             ev._id === selectedEventForCompliance._id
               ? { ...ev, complianceScripts: newScripts }
               : ev
-          )
-        );
+          );
+          setCachedOrganizerEvents(updated);
+          return updated;
+        });
         setSelectedEventForCompliance((prev: any) => ({ ...prev, complianceScripts: newScripts }));
         setActionSuccessMsg(`Compliance filter attached to "${selectedEventForCompliance.title}".`);
         setTimeout(() => setActionSuccessMsg(""), 5000);
@@ -241,13 +313,15 @@ export default function OrganizerDashboard() {
         const newScripts = complianceScripts.filter((s) => s.scriptId !== scriptId);
         setComplianceScripts(newScripts);
 
-        setEvents((prev) =>
-          prev.map((ev) =>
+        setEvents((prev) => {
+          const updated = prev.map((ev) =>
             ev._id === selectedEventForCompliance._id
               ? { ...ev, complianceScripts: newScripts }
               : ev
-          )
-        );
+          );
+          setCachedOrganizerEvents(updated);
+          return updated;
+        });
         setSelectedEventForCompliance((prev: any) => ({ ...prev, complianceScripts: newScripts }));
         setActionSuccessMsg(`Compliance filter removed from "${selectedEventForCompliance.title}".`);
         setTimeout(() => setActionSuccessMsg(""), 5000);
@@ -276,10 +350,32 @@ export default function OrganizerDashboard() {
               </span>
               <span className="text-muted dark:text-white/60 text-xs font-semibold">• Active Admin Session</span>
             </div>
-            <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white mt-1">Welcome back, {organizerName}</h1>
+            <div className="flex items-center gap-3 mt-1">
+              <h1 className="text-3xl font-extrabold text-midnight_text dark:text-white">Welcome back, {organizerName}</h1>
+              {isRefreshing && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full animate-pulse">
+                  <Icon icon="solar:restart-bold" className="animate-spin" width="12" height="12" />
+                  Syncing...
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => fetchEvents(true)}
+              disabled={isRefreshing}
+              title="Refresh events list from server"
+              className="bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-midnight_text dark:text-white px-3.5 py-2.5 rounded-xl text-sm font-semibold border border-grey/10 dark:border-white/10 transition flex items-center gap-2 disabled:opacity-50"
+            >
+              <Icon
+                icon="solar:restart-bold"
+                width="16"
+                height="16"
+                className={isRefreshing ? "animate-spin text-primary" : ""}
+              />
+              <span className="hidden sm:inline">{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+            </button>
             <button
               onClick={() => router.push("/organizer/create-event")}
               className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-extrabold transition shadow-lg shadow-primary/20 flex items-center gap-2"
