@@ -47,6 +47,7 @@ function CreateOrEditEventForm() {
   const [eventMode, setEventMode] = useState<"LIVE_MARKET" | "SCENARIO_SIMULATION">("LIVE_MARKET");
   const [simulationProfile, setSimulationProfile] = useState<any | null>(null);
   const [simulationProfileName, setSimulationProfileName] = useState("");
+  const [simulationProfileId, setSimulationProfileId] = useState<string | null>(null);
   const [eventStatus, setEventStatus] = useState("UPCOMING");
   const [participantCount, setParticipantCount] = useState(0);
   
@@ -68,6 +69,8 @@ function CreateOrEditEventForm() {
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const [createdScenarioEventId, setCreatedScenarioEventId] = useState<string | null>(null);
+  const [profileRetryLoading, setProfileRetryLoading] = useState(false);
 
   // Authentication check
   useEffect(() => {
@@ -119,6 +122,7 @@ function CreateOrEditEventForm() {
         setEndTime(toDatetimeLocal(ev.endTime));
         setAllowedAssetClasses(ev.allowedAssetClasses || ["EQUITY"]);
         setEventMode(ev.eventMode === "SCENARIO_SIMULATION" ? "SCENARIO_SIMULATION" : "LIVE_MARKET");
+        setSimulationProfileId(ev.simulationProfileId || null);
         setCustomFields(ev.customVerificationFields || []);
         setRules(ev.rules || []);
         setEventStatus(ev.status || "UPCOMING");
@@ -167,6 +171,28 @@ function CreateOrEditEventForm() {
 
   const removeRule = (index: number) => {
     setRules(rules.filter((_, i) => i !== index));
+  };
+
+  const attachSimulationProfile = async (eventId: string) => {
+    if (!simulationProfile) throw new Error("Select the generated simulation profile JSON before attaching it.");
+
+    const profileRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/simulation/profile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(simulationProfile)
+    });
+    const profileJson = await profileRes.json();
+    if (!profileRes.ok || !profileJson.success) {
+      throw new Error(
+        profileJson.message
+          || profileJson.code
+          || `The simulation profile could not be attached (HTTP ${profileRes.status}).`
+      );
+    }
+    return profileJson;
   };
 
   const handleSimulationProfileFile = async (file?: File) => {
@@ -225,6 +251,10 @@ function CreateOrEditEventForm() {
         maxParticipants: Number(maxParticipants),
         startTime: new Date(startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
+        // Persist the selected market mode on the event as well as attaching
+        // the profile below. This keeps the organizer's intent visible to
+        // the backend during the two-step scenario setup flow.
+        eventMode,
         // Scenario events currently use the same V2 equity engine, but never
         // expose live F&O/crypto/commodity flows to participants.
         allowedAssetClasses: eventMode === "SCENARIO_SIMULATION" ? ["EQUITY"] : allowedAssetClasses,
@@ -256,24 +286,29 @@ function CreateOrEditEventForm() {
         throw new Error(json.message || `Failed to ${isEditMode ? "update" : "create"} trading event.`);
       }
 
-      if (!isEditMode && eventMode === "SCENARIO_SIMULATION") {
-        const createdEventId = json.event?._id || json.event?.id;
-        if (!createdEventId) {
+      if (eventMode === "SCENARIO_SIMULATION" && simulationProfile && (!isEditMode || !simulationProfileId)) {
+        const scenarioEventId = isEditMode ? editId : (json.event?._id || json.event?.id);
+        if (!scenarioEventId) {
           throw new Error("The event was created, but the API did not return its id for profile attachment.");
         }
+        setCreatedScenarioEventId(String(scenarioEventId));
 
-        const profileRes = await fetch(`${API_BASE_URL}/market-event/${createdEventId}/simulation/profile`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(simulationProfile)
-        });
-        const profileJson = await profileRes.json();
-        if (!profileRes.ok || !profileJson.success) {
-          throw new Error(profileJson.message || "Event was created, but the simulation profile could not be attached.");
+        // Retry once for transient failures and for an idempotent retry after
+        // a profile was created but the first response was interrupted.
+        let profileError: any = null;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          try {
+            await attachSimulationProfile(String(scenarioEventId));
+            profileError = null;
+            break;
+          } catch (error) {
+            profileError = error;
+            if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 300));
+          }
         }
+        if (profileError) throw profileError;
+        setCreatedScenarioEventId(null);
+        setSimulationProfileId("attached");
       }
 
       router.push("/organizer/dashboard");
@@ -282,6 +317,21 @@ function CreateOrEditEventForm() {
       setFormError(err.message || "Failed to save event configuration. Please check your inputs.");
     } finally {
       setSubmitLoading(false);
+    }
+  };
+
+  const retryCreatedScenarioProfile = async () => {
+    if (!createdScenarioEventId) return;
+    setProfileRetryLoading(true);
+    setFormError("");
+    try {
+      await attachSimulationProfile(createdScenarioEventId);
+      setCreatedScenarioEventId(null);
+      router.push("/organizer/dashboard");
+    } catch (err: any) {
+      setFormError(err.message || "The simulation profile could not be attached.");
+    } finally {
+      setProfileRetryLoading(false);
     }
   };
 
@@ -344,6 +394,20 @@ function CreateOrEditEventForm() {
           <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-500 font-medium text-sm flex items-center gap-2">
             <Icon icon="solar:danger-triangle-bold" width="20" height="20" />
             <span>{formError}</span>
+          </div>
+        )}
+
+        {createdScenarioEventId && eventMode === "SCENARIO_SIMULATION" && simulationProfile && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-amber-700 dark:text-amber-300 text-sm">
+            <p className="font-semibold">The event was created, but its simulation profile is not attached yet.</p>
+            <button
+              type="button"
+              onClick={retryCreatedScenarioProfile}
+              disabled={profileRetryLoading}
+              className="mt-3 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+            >
+              {profileRetryLoading ? "Attaching profile..." : "Retry profile attachment"}
+            </button>
           </div>
         )}
 
@@ -558,7 +622,7 @@ function CreateOrEditEventForm() {
             </div>}
           </div>
 
-          {eventMode === "SCENARIO_SIMULATION" && !isEditMode && (
+          {eventMode === "SCENARIO_SIMULATION" && (!isEditMode || !simulationProfileId) && (
             <div className="border-t border-grey/10 dark:border-white/10 pt-6">
               <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
                 <Icon icon="solar:database-bold" width="16" height="16" />
