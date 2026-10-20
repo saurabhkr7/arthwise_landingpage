@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
+import EventStockUniversePanel from "@/components/Organizer/EventStockUniversePanel";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -816,6 +817,7 @@ export default function EventOrganizerControlPanel() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto mt-6">
+        <EventStockUniversePanel event={eventData} token={passcode} onUpdated={fetchDashboardData} />
         {/* Metric Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
