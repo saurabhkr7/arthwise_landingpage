@@ -46,6 +46,9 @@ function CreateOrEditEventForm() {
   const [endTime, setEndTime] = useState("");
   const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO", "COMMODITY"]);
   const [eventMode, setEventMode] = useState<"LIVE_MARKET" | "SCENARIO_SIMULATION">("LIVE_MARKET");
+  const [equityUniverseMode, setEquityUniverseMode] = useState<"ALL" | "CURATED">("ALL");
+  const [equitySymbols, setEquitySymbols] = useState("");
+  const [existingEquityInstruments, setExistingEquityInstruments] = useState<Array<{ symbol: string; name?: string; sector?: string }>>([]);
   const [simulationProfile, setSimulationProfile] = useState<any | null>(null);
   const [simulationProfileName, setSimulationProfileName] = useState("");
   const [simulationProfileId, setSimulationProfileId] = useState<string | null>(null);
@@ -123,6 +126,9 @@ function CreateOrEditEventForm() {
         setEndTime(toDatetimeLocal(ev.endTime));
         setAllowedAssetClasses(ev.allowedAssetClasses || ["EQUITY"]);
         setEventMode(ev.eventMode === "SCENARIO_SIMULATION" ? "SCENARIO_SIMULATION" : "LIVE_MARKET");
+        setEquityUniverseMode(ev.equityUniverse?.mode === "CURATED" ? "CURATED" : "ALL");
+        setEquitySymbols((ev.equityUniverse?.instruments || []).map((item: any) => item.symbol).join("\n"));
+        setExistingEquityInstruments(ev.equityUniverse?.instruments || []);
         setSimulationProfileId(ev.simulationProfileId || null);
         setCustomFields(ev.customVerificationFields || []);
         setRules(ev.rules || []);
@@ -231,6 +237,19 @@ function CreateOrEditEventForm() {
       return;
     }
 
+    if (eventMode === "SCENARIO_SIMULATION" && simulationProfile) {
+      const scheduledSeconds = (new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000;
+      if (Math.abs(scheduledSeconds - Number(simulationProfile.durationSeconds)) > 1) {
+        setFormError(`This profile runs for ${simulationProfile.durationSeconds} seconds. Set the event start/end times to the same duration, or generate a profile for your chosen duration.`);
+        return;
+      }
+      if ((simulationProfile.scenarios || []).some((scenario: any) =>
+        Number(scenario.offsetSeconds) + Math.max(0, Number(scenario.durationSeconds) || 0) > scheduledSeconds)) {
+        setFormError("At least one scenario news reaction ends after the event. Update the profile timeline before creating this event.");
+        return;
+      }
+    }
+
     if (!isEditMode && eventMode === "SCENARIO_SIMULATION" && !simulationProfile) {
       setFormError("Select the generated simulation profile JSON before creating a scenario event.");
       return;
@@ -258,7 +277,12 @@ function CreateOrEditEventForm() {
         eventMode,
         // Scenario events currently use the same V2 equity engine, but never
         // expose live F&O/crypto/commodity flows to participants.
-        allowedAssetClasses: eventMode === "SCENARIO_SIMULATION" ? ["EQUITY"] : allowedAssetClasses,
+        allowedAssetClasses: eventMode === "SCENARIO_SIMULATION" || equityUniverseMode === "CURATED" ? ["EQUITY"] : allowedAssetClasses,
+        ...(eventMode === "LIVE_MARKET" && (!isEditMode || eventStatus === "UPCOMING") ? {
+          equityUniverse: { mode: equityUniverseMode, instruments: equityUniverseMode === "CURATED"
+            ? equitySymbols.split(/[\s,;]+/).map((value) => value.trim().toUpperCase()).filter(Boolean)
+              .map((symbol) => existingEquityInstruments.find((item) => item.symbol === symbol) || { symbol }) : [] },
+        } : {}),
         customVerificationFields: customFields,
         rules
       };
@@ -598,11 +622,21 @@ function CreateOrEditEventForm() {
           </div>
 
           {/* Allowed asset classes */}
+          {eventMode === "LIVE_MARKET" && <div className="border-t border-grey/10 dark:border-white/10 pt-6">
+            <label htmlFor="event-equity-universe" className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Equity stock list</label>
+            <select id="event-equity-universe" value={equityUniverseMode} disabled={isEditMode && eventStatus !== "UPCOMING"} onChange={(e) => setEquityUniverseMode(e.target.value as "ALL" | "CURATED")} className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white">
+              <option value="ALL">All NSE equities</option><option value="CURATED">Curated equity-only event</option>
+            </select>
+            {equityUniverseMode === "CURATED" && <>
+              <textarea aria-label="Permitted NSE symbols" value={equitySymbols} disabled={isEditMode && eventStatus !== "UPCOMING"} onChange={(e) => setEquitySymbols(e.target.value)} rows={6} placeholder={"HDFCBANK\nTCS\nITC"} required className="w-full mt-3 bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white" />
+              <p className="text-xs mt-2 text-muted dark:text-white/60">Enter 1–100 unique NSE symbols, separated by lines or commas. Participants see this list with live prices. Use Add stock on the event dashboard to append stocks after trading starts.</p>
+            </>}
+          </div>}
           <div>
             <label className="block text-xs font-bold text-midnight_text dark:text-white mb-3">Allowed Asset Classes</label>
-            {eventMode === "SCENARIO_SIMULATION" ? (
+            {eventMode === "SCENARIO_SIMULATION" || equityUniverseMode === "CURATED" ? (
               <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs font-bold text-primary">
-                EQUITY only — F&O, crypto, and commodity tabs are disabled for scenario events.
+                EQUITY only — participants trade the event's curated stock list.
               </div>
             ) : <div className="flex gap-6">
               {["EQUITY", "FNO", "CRYPTO", "COMMODITY"].map((asset) => (
