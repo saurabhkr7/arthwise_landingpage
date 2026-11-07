@@ -90,7 +90,7 @@ Additional Details: ${formData.message || "None"}`,
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             href={`https://wa.me/918770117256?text=${encodeURIComponent(
-              `Hi Saurabh, I just submitted an event inquiry for ${formData.institution} (${formData.name}, ${formData.phone})!`
+              `Hello Arthhwise, I just submitted an event inquiry for ${formData.institution} (${formData.name}, ${formData.phone})!`
             )}`}
             target="_blank"
             rel="noopener noreferrer"

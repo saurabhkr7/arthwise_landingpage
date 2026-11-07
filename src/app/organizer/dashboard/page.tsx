@@ -582,7 +582,7 @@ export default function OrganizerDashboard() {
                   }`}>{eventToDelete.status}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-muted dark:text-white/60">Student Join Code:</span>
+                  <span className="font-semibold text-muted dark:text-white/60">Participant Join Code:</span>
                   <span className="font-mono font-extrabold text-primary">{eventToDelete.joinCode}</span>
                 </div>
                 <div className="flex justify-between items-center">

@@ -34,6 +34,8 @@ export default function EventOrganizerControlPanel() {
   const [allowedEdit, setAllowedEdit] = useState<string[]>([]);
   const [assetSaving, setAssetSaving] = useState(false);
   const [assetSaveMsg, setAssetSaveMsg] = useState("");
+  const [leaderboardVisibilitySaving, setLeaderboardVisibilitySaving] = useState(false);
+  const [leaderboardVisibilityMsg, setLeaderboardVisibilityMsg] = useState("");
   const [announcementModalOpen, setAnnouncementModalOpen] = useState(false);
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementDescription, setAnnouncementDescription] = useState("");
@@ -49,6 +51,7 @@ export default function EventOrganizerControlPanel() {
   const [groupByField, setGroupByField] = useState("");
   const [groupAnalytics, setGroupAnalytics] = useState<any[]>([]);
   const [groupLoading, setGroupLoading] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [lateParticipantModalOpen, setLateParticipantModalOpen] = useState(false);
   const [lateParticipantEmail, setLateParticipantEmail] = useState("");
   const [lateParticipantValues, setLateParticipantValues] = useState<Record<string, string>>({});
@@ -197,8 +200,6 @@ export default function EventOrganizerControlPanel() {
         if (lbJson.success) {
           setParticipants(lbJson.leaderboard || []);
         }
-        if (groupByField) fetchGroupAnalytics(eventId, groupByField);
-
         fetchFinalizationHealth(eventId);
         fetchCertificates(eventId);
         fetchComplianceScripts(eventId);
@@ -211,7 +212,7 @@ export default function EventOrganizerControlPanel() {
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, groupByField, fetchGroupAnalytics, fetchComplianceScripts]);
+  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, fetchComplianceScripts]);
 
   const removeParticipant = async (student: any) => {
     if (!eventData?.id || !student?.userId) return;
@@ -562,6 +563,15 @@ export default function EventOrganizerControlPanel() {
     return () => clearInterval(interval);
   }, [isAuthenticated, autoRefresh, fetchDashboardData]);
 
+  // Keep the aggregate board fresh independently; its polling must not refetch
+  // event details, participants, announcements, and other dashboard sections.
+  useEffect(() => {
+    if (!isAuthenticated || !autoRefresh || !eventData?.id || !groupByField) return;
+    fetchGroupAnalytics(eventData.id, groupByField);
+    const interval = setInterval(() => fetchGroupAnalytics(eventData.id, groupByField), 15000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, autoRefresh, eventData?.id, groupByField, fetchGroupAnalytics]);
+
   // Fetch Trade Audit Log for a student
   const openTradeAudit = async (student: any) => {
     setSelectedStudent(student);
@@ -577,7 +587,7 @@ export default function EventOrganizerControlPanel() {
         setTradeLogs(json.trades || []);
       }
     } catch (err) {
-      console.error("Error fetching student trade audit:", err);
+      console.error("Error fetching participant trade audit:", err);
     } finally {
       setLoadingTrades(false);
     }
@@ -601,7 +611,7 @@ export default function EventOrganizerControlPanel() {
       const headers = [
         "Rank",
         ...customFieldColumns.map((field: any) => field.fieldLabel || field.fieldKey),
-        "Student Name",
+        "Participant Name",
         "Email Address",
         "Open Holdings",
         "Net Portfolio Valuation (INR)",
@@ -656,7 +666,7 @@ export default function EventOrganizerControlPanel() {
       const json = await res.json();
       if (json.success) {
         setEventData((prev: any) => ({ ...prev, allowedAssetClasses: allowedEdit }));
-        setAssetSaveMsg("✅ Asset classes updated. Students can now place orders for enabled classes.");
+        setAssetSaveMsg("✅ Asset classes updated. Participants can now place orders for enabled classes.");
       } else {
         setAssetSaveMsg(`❌ ${json.message || "Update failed."}`);
       }
@@ -665,6 +675,35 @@ export default function EventOrganizerControlPanel() {
     } finally {
       setAssetSaving(false);
       setTimeout(() => setAssetSaveMsg(""), 5000);
+    }
+  };
+
+  const handleToggleLeaderboardVisibility = async () => {
+    if (!eventData?.id || leaderboardVisibilitySaving) return;
+    const nextVisible = eventData.leaderboardVisible === false;
+    setLeaderboardVisibilitySaving(true);
+    setLeaderboardVisibilityMsg("");
+    try {
+      const orgToken = sessionStorage.getItem("organizer_token") || passcode;
+      const res = await fetch(`${API_BASE_URL}/market-event/organizer/${eventData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${orgToken}`,
+        },
+        body: JSON.stringify({ leaderboardVisible: nextVisible }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || "Could not update leaderboard visibility.");
+      setEventData((prev: any) => ({ ...prev, leaderboardVisible: nextVisible }));
+      setLeaderboardVisibilityMsg(nextVisible
+        ? "✅ Leaderboard is visible to participants again."
+        : "✅ Leaderboard hidden from participants. Organisers can still view it here.");
+    } catch (err: any) {
+      setLeaderboardVisibilityMsg(`❌ ${err.message || "Could not update leaderboard visibility."}`);
+    } finally {
+      setLeaderboardVisibilitySaving(false);
+      setTimeout(() => setLeaderboardVisibilityMsg(""), 6000);
     }
   };
 
@@ -821,7 +860,7 @@ export default function EventOrganizerControlPanel() {
         {/* Metric Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
-            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Registered Students</span>
+            <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Registered Participants</span>
             <p className="text-2xl font-extrabold text-midnight_text dark:text-white mt-1">
               {participants.length} / {eventData?.maxParticipants || 150}
             </p>
@@ -959,7 +998,7 @@ export default function EventOrganizerControlPanel() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">⚡ Allowed Trading Instruments</span>
-              <p className="text-xs text-muted dark:text-white/60 mt-0.5">Enable or disable asset classes for students in this live event.</p>
+              <p className="text-xs text-muted dark:text-white/60 mt-0.5">Enable or disable asset classes for participants in this live event.</p>
             </div>
             <div className="flex flex-wrap items-center gap-4">
               {["EQUITY", "FNO", "CRYPTO", "COMMODITY"].map((asset) => (
@@ -986,6 +1025,28 @@ export default function EventOrganizerControlPanel() {
             </div>
           </div>
           {assetSaveMsg && <p className="text-xs mt-3 font-semibold">{assetSaveMsg}</p>}
+        </div>
+
+        <div className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-primary uppercase tracking-widest">Participant leaderboard visibility</span>
+              <p className="text-xs text-muted dark:text-white/60 mt-1">
+                {eventData?.leaderboardVisible === false
+                  ? "Rankings are hidden in the participant app. Your organiser view remains available."
+                  : "Rankings are currently visible in the participant app."}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleLeaderboardVisibility}
+              disabled={leaderboardVisibilitySaving}
+              className={`px-4 py-2.5 rounded-xl text-xs font-extrabold text-white transition disabled:opacity-50 ${eventData?.leaderboardVisible === false ? "bg-emerald-600 hover:bg-emerald-500" : "bg-slate-700 hover:bg-slate-600"}`}
+            >
+              {leaderboardVisibilitySaving ? "Saving..." : eventData?.leaderboardVisible === false ? "Reveal leaderboard" : "Hide leaderboard"}
+            </button>
+          </div>
+          {leaderboardVisibilityMsg && <p className="text-xs mt-3 font-semibold">{leaderboardVisibilityMsg}</p>}
         </div>
 
         {/* Event announcement history */}
@@ -1783,25 +1844,25 @@ export default function EventOrganizerControlPanel() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="🔍 Search student by name, enrollment number, or division..."
+            placeholder="🔍 Search participants by name or registration details..."
             className="w-full bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl px-4 py-3 text.midnight_text dark:text-white placeholder-gray-400 focus:outline-none focus:border-primary transition text-sm shadow-md"
           />
         </div>
 
-        {eventData?.customVerificationFields?.length > 0 && (
+        {eventData?.customVerificationFields?.some((field: any) => field.isGroupable === true) && (
           <section className="bg-white dark:bg-darkHeroBg border border-primary/20 rounded-2xl p-5 shadow-xl mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold text-primary uppercase tracking-widest">Group performance</span>
                 <p className="text-xs text-muted dark:text-white/60 mt-1">Compare combined event portfolio performance by a verification field.</p>
               </div>
-              <select value={groupByField} onChange={(e) => { setGroupByField(e.target.value); if (e.target.value) fetchGroupAnalytics(eventData.id, e.target.value); }} className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white">
+              <select value={groupByField} onChange={(e) => { setGroupByField(e.target.value); setExpandedGroups({}); setGroupAnalytics([]); if (e.target.value) fetchGroupAnalytics(eventData.id, e.target.value); }} className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-midnight_text dark:text-white">
                 <option value="">Select group field</option>
-                {eventData.customVerificationFields.map((field: any) => <option key={field.fieldKey} value={field.fieldKey}>{field.fieldLabel || field.fieldKey}</option>)}
+                {eventData.customVerificationFields.filter((field: any) => field.isGroupable === true).map((field: any) => <option key={field.fieldKey} value={field.fieldKey}>{field.fieldLabel || field.fieldKey}</option>)}
               </select>
             </div>
-            {groupByField && (groupLoading ? <p className="text-xs mt-4 text-muted">Loading group totals...</p> : (
-              <div className="overflow-x-auto mt-4"><table className="w-full text-left text-xs"><thead><tr className="text-muted dark:text-white/60 uppercase"><th className="py-2">#</th><th>Group</th><th className="text-right">Participants</th><th className="text-right">Portfolio Value</th><th className="text-right">Return</th><th className="text-right">P&L</th><th className="text-right">Holdings</th><th className="text-right">Trades</th></tr></thead><tbody className="divide-y divide-grey/10 dark:divide-white/10">{groupAnalytics.map((group, index) => <tr key={group.groupValue}><td className="py-2 font-bold">{index + 1}</td><td className="font-semibold">{group.groupValue}</td><td className="text-right">{group.participantCount}</td><td className="text-right">₹{Number(group.totalPortfolioValue || 0).toLocaleString("en-IN")}</td><td className={`text-right font-bold ${group.aggregateReturnPercent >= 0 ? "text-green-500" : "text-red-500"}`}>{group.aggregateReturnPercent >= 0 ? "+" : ""}{Number(group.aggregateReturnPercent || 0).toFixed(2)}%</td><td className="text-right">₹{Number(group.totalNetPnl || 0).toLocaleString("en-IN")}</td><td className="text-right">{group.totalOpenHoldings}</td><td className="text-right">{group.totalTrades}</td></tr>)}</tbody></table></div>
+            {groupByField && (groupLoading && !groupAnalytics.length ? <p className="text-xs mt-4 text-muted">Loading group totals...</p> : (
+              <div className="overflow-x-auto mt-4"><table className="w-full text-left text-xs"><thead><tr className="text-muted dark:text-white/60 uppercase"><th className="py-2">#</th><th>Group</th><th className="text-right">Participants</th><th className="text-right">Portfolio Value</th><th className="text-right">Return</th><th className="text-right">P&amp;L</th><th className="text-right">Holdings</th><th className="text-right">Trades</th><th className="text-right">Members</th></tr></thead><tbody className="divide-y divide-grey/10 dark:divide-white/10">{groupAnalytics.map((group, index) => <React.Fragment key={group.groupValue}><tr className="hover:bg-gray-50 dark:hover:bg-white/5"><td className="py-2 font-bold">{index + 1}</td><td className="font-semibold">{group.groupValue}</td><td className="text-right">{group.participantCount}</td><td className="text-right">₹{Number(group.totalPortfolioValue || 0).toLocaleString("en-IN")}</td><td className={`text-right font-bold ${group.aggregateReturnPercent >= 0 ? "text-green-500" : "text-red-500"}`}>{group.aggregateReturnPercent >= 0 ? "+" : ""}{Number(group.aggregateReturnPercent || 0).toFixed(2)}%</td><td className="text-right">₹{Number(group.totalNetPnl || 0).toLocaleString("en-IN")}</td><td className="text-right">{group.totalOpenHoldings}</td><td className="text-right">{group.totalTrades}</td><td className="text-right"><button type="button" className="text-primary font-bold" onClick={() => setExpandedGroups((current) => ({ ...current, [group.groupValue]: !current[group.groupValue] }))} aria-expanded={!!expandedGroups[group.groupValue]}>{expandedGroups[group.groupValue] ? "Hide" : "Expand"} ({group.members?.length || 0})</button></td></tr>{expandedGroups[group.groupValue] && <tr><td colSpan={9} className="p-0"><div className="overflow-x-auto bg-gray-50/70 dark:bg-slate-900/50 px-4 py-2"><table className="w-full text-left"><thead><tr className="text-[10px] text-muted dark:text-white/60 uppercase"><th className="py-2">Rank</th><th>Participant</th><th className="text-right">Open Holdings</th><th className="text-right">Portfolio Value</th><th className="text-right">Return</th><th className="text-right">Win Rate</th><th className="text-right">Trades</th></tr></thead><tbody className="divide-y divide-grey/10 dark:divide-white/10">{(group.members || []).map((member: any) => <tr key={member.userId}><td className="py-2">#{member.rank}</td><td className="font-semibold">{member.displayName}</td><td className="text-right">{member.openHoldingsCount || 0}</td><td className="text-right">₹{Number(member.eventValuation || 0).toLocaleString("en-IN")}</td><td className={`text-right font-bold ${Number(member.returnPercent || 0) >= 0 ? "text-green-500" : "text-red-500"}`}>{Number(member.returnPercent || 0).toFixed(2)}%</td><td className="text-right">{Number(member.winRate || 0).toFixed(0)}%</td><td className="text-right">{member.totalTrades || 0}</td></tr>)}</tbody></table></div></td></tr>}</React.Fragment>)}</tbody></table></div>
             ))}
           </section>
         )}
@@ -1815,7 +1876,7 @@ export default function EventOrganizerControlPanel() {
                 Leaderboard Rankings
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                {filteredParticipants.length} {filteredParticipants.length === 1 ? "student" : "students"}
+                {filteredParticipants.length} {filteredParticipants.length === 1 ? "participant" : "participants"}
               </span>
             </div>
 
@@ -1843,11 +1904,11 @@ export default function EventOrganizerControlPanel() {
           </div>
 
           {loading && !participants.length ? (
-            <div className="p-12 text-center text-muted dark:text-white/60">Loading student rankings...</div>
+            <div className="p-12 text-center text-muted dark:text-white/60">Loading participant rankings...</div>
           ) : filteredParticipants.length === 0 ? (
             <div className="p-12 text-center text-muted dark:text-white/60">
               <span className="text-2xl block mb-2">🔍</span>
-              No students found matching your search.
+              No participants found matching your search.
             </div>
           ) : (
             <>
@@ -1859,7 +1920,7 @@ export default function EventOrganizerControlPanel() {
                       {visibleCustomFields.map((field: any) => (
                         <th key={field.fieldKey} className="py-4 px-4">{field.fieldLabel || field.fieldKey}</th>
                       ))}
-                      <th className="py-4 px-4">Student Name</th>
+                      <th className="py-4 px-4">Participant Name</th>
                       <th className="py-4 px-4 text-right">Open Holdings</th>
                       <th className="py-4 px-4 text-right">Portfolio Value</th>
                       <th className="py-4 px-4 text-right">Return (%)</th>
@@ -1920,7 +1981,7 @@ export default function EventOrganizerControlPanel() {
                 <div className="text-muted dark:text-white/60">
                   Showing <span className="font-bold text-midnight_text dark:text-white">{startIndex + 1}</span> to{" "}
                   <span className="font-bold text-midnight_text dark:text-white">{endIndex}</span> of{" "}
-                  <span className="font-bold text-midnight_text dark:text-white">{filteredParticipants.length}</span> students
+                  <span className="font-bold text-midnight_text dark:text-white">{filteredParticipants.length}</span> participants
                 </div>
 
                 <div className="flex items-center gap-1.5 self-end sm:self-center">
@@ -2097,7 +2158,7 @@ export default function EventOrganizerControlPanel() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-0.5 rounded-md">
-                      STUDENT TRADE AUDIT
+                      PARTICIPANT TRADE AUDIT
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 dark:bg-slate-800 text-muted dark:text-white/70 border border-grey/10 dark:border-white/10">
                       {tradeLogs.length} {tradeLogs.length === 1 ? "trade" : "trades"} executed
@@ -2146,9 +2207,9 @@ export default function EventOrganizerControlPanel() {
               {/* Modal Body / Table */}
               <div className="overflow-y-auto flex-grow my-4 rounded-xl border border-grey/10 dark:border-white/10">
                 {loadingTrades ? (
-                  <div className="p-8 text-center text-muted dark:text-white/60">Loading student trade history...</div>
+                  <div className="p-8 text-center text-muted dark:text-white/60">Loading participant trade history...</div>
                 ) : !tradeLogs.length ? (
-                  <div className="p-8 text-center text-muted dark:text-white/50">No trades executed by this student yet.</div>
+                  <div className="p-8 text-center text-muted dark:text-white/50">No trades executed by this participant yet.</div>
                 ) : (
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>

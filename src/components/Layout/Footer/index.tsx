@@ -25,11 +25,11 @@ const Footer = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          email: formData.email, 
-          name: formData.name, 
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.name,
           device: formData.device,
-          comments: "Subscribed via Footer Newsletter" 
+          comments: "Subscribed via Footer Newsletter"
         }),
       });
 
@@ -56,15 +56,8 @@ const Footer = () => {
             <div className="flex items-center text-foottext text-16">
               <Icon icon="weui:location-outlined" className="w-7 h-7 mr-3" />
               <div className="flex flex-col">
-                <span>ANS Homes, Gulmohar enclave,</span>
                 <span>Banagalore, India, 560037</span>
               </div>
-            </div>
-            <div className="flex items-center gap-2 text-foottext">
-              <Icon icon="majesticons:phone-retro-line" className="w-7 h-7" />
-              <Link href="#" className="text-16 hover:text-primary">
-                <span> +91-8770117256</span>
-              </Link>
             </div>
             <div className="flex items-center text-foottext gap-2">
               <Icon icon="clarity:email-line" className="w-7 h-7" />
@@ -188,8 +181,8 @@ const Footer = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={submitting}
                   className="absolute right-5 top-3.5 text-foottext hover:text-primary transition-colors disabled:opacity-50"
                   aria-label="Submit subscriber form"
@@ -230,7 +223,7 @@ const Footer = () => {
                 />
               </Link>
             </div>
-            
+
             <div className="pt-6 border-t border-dark_border">
               <p className="text-xs font-bold text-foottext uppercase tracking-widest mb-3">Cloud Infrastructure</p>
               <div className="flex items-center gap-2">

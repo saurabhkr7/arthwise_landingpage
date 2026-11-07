@@ -233,15 +233,8 @@ const PrivacyContent = () => {
                   Arthhwise@gmail.com
                 </a>
               </p>
-              <p className="text-DeepOcean dark:text-white dark:text-opacity-70">
-                Phone:{" "}
-                <a href="tel:+918770117256" className="text-primary hover:underline">
-                  +91-8770117256
-                </a>
-              </p>
               <p className="text-DeepOcean dark:text-white dark:text-opacity-70 mt-2">
-                Address: ANS Homes, Gulmohar Enclave<br />
-                Bangalore, India 560037
+                Address: Bangalore, India 560037
               </p>
             </div>
           </div>

@@ -63,6 +63,7 @@ function CreateOrEditEventForm() {
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldType, setNewFieldType] = useState("text");
   const [newFieldOptions, setNewFieldOptions] = useState("");
+  const [newFieldGroupable, setNewFieldGroupable] = useState(false);
 
   // Rules list
   const [rules, setRules] = useState<string[]>([
@@ -155,6 +156,7 @@ function CreateOrEditEventForm() {
         fieldLabel: newFieldLabel.trim(),
         fieldType: newFieldType,
         isRequired: true,
+        isGroupable: newFieldGroupable,
         ...(newFieldType === "select" ? {
           options: newFieldOptions.split(/\r?\n/).map((value) => value.trim()).filter(Boolean).map((value) => ({ value, label: value }))
         } : {})
@@ -163,6 +165,13 @@ function CreateOrEditEventForm() {
     setNewFieldKey("");
     setNewFieldLabel("");
     setNewFieldOptions("");
+    setNewFieldGroupable(false);
+  };
+
+  const toggleCustomFieldGroupable = (index: number) => {
+    setCustomFields((current) => current.map((field, fieldIndex) => (
+      fieldIndex === index ? { ...field, isGroupable: !field.isGroupable } : field
+    )));
   };
 
   const removeCustomField = (index: number) => {
@@ -598,7 +607,7 @@ function CreateOrEditEventForm() {
           {/* Access Credentials */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Student Join Code (Unique) *</label>
+              <label className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Participant Join Code (Unique) *</label>
               <input
                 type="text"
                 value={joinCode}
@@ -689,24 +698,30 @@ function CreateOrEditEventForm() {
           <div className="border-t border-grey/10 dark:border-white/10 pt-6">
             <h3 className="text-xs font-extrabold text-primary uppercase tracking-widest mb-2 flex items-center gap-1.5">
               <Icon icon="solar:user-id-bold" width="16" height="16" />
-              <span>3. Student Verification Fields</span>
+              <span>3. Participant Registration Fields</span>
             </h3>
-            <p className="text-muted dark:text-white/70 text-xs mb-4">Define inputs required from students during enrollment (e.g. Division, Roll No).</p>
+            <p className="text-muted dark:text-white/70 text-xs mb-4">Define the details participants provide when registering (e.g. department, employee ID, or team).</p>
             
             {/* Added Fields List */}
             <div className="space-y-2 mb-4">
               {customFields.map((field, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 rounded-xl p-3.5 text-sm">
+                <div key={idx} className="flex flex-wrap justify-between items-center gap-3 bg-gray-50 dark:bg-slate-900/60 border border-grey/20 dark:border-white/10 rounded-xl p-3.5 text-sm">
                   <span className="text-midnight_text dark:text-white">
                     <strong>{field.fieldLabel}</strong> <span className="text-xs text-muted dark:text-white/50">({field.fieldKey} - {field.fieldType})</span>
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => removeCustomField(idx)}
-                    className="text-red-500 hover:text-red-600 text-xs font-bold transition"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <label className="inline-flex items-center gap-2 text-xs font-semibold text-midnight_text dark:text-white cursor-pointer">
+                      <input type="checkbox" checked={field.isGroupable === true} onChange={() => toggleCustomFieldGroupable(idx)} className="accent-primary" />
+                      Allow group-by
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => removeCustomField(idx)}
+                      className="text-red-500 hover:text-red-600 text-xs font-bold transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -744,6 +759,10 @@ function CreateOrEditEventForm() {
                   className="bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-2.5 text-xs text-midnight_text dark:text-white focus:outline-none focus:border-primary transition flex-1 min-h-[38px]"
                 />
               )}
+              <label className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-midnight_text dark:text-white cursor-pointer">
+                <input type="checkbox" checked={newFieldGroupable} onChange={(e) => setNewFieldGroupable(e.target.checked)} className="accent-primary" />
+                Allow group-by
+              </label>
               <button
                 type="button"
                 onClick={addCustomField}
