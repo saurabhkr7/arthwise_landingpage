@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { invalidateOrganizerDashboardCache } from "@/lib/organizerCache";
+import EventProgramEditor, { type EventProgramSessionDraft } from "@/components/Organizer/EventProgramEditor";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -46,6 +47,9 @@ function CreateOrEditEventForm() {
   const [endTime, setEndTime] = useState("");
   const [allowedAssetClasses, setAllowedAssetClasses] = useState<string[]>(["EQUITY", "FNO", "CRYPTO", "COMMODITY"]);
   const [eventMode, setEventMode] = useState<"LIVE_MARKET" | "SCENARIO_SIMULATION">("LIVE_MARKET");
+  const [eventProgramEnabled, setEventProgramEnabled] = useState(false);
+  const [eventProgramSessions, setEventProgramSessions] = useState<EventProgramSessionDraft[]>([]);
+  const [eventProgramLoadFailed, setEventProgramLoadFailed] = useState(false);
   const [equityUniverseMode, setEquityUniverseMode] = useState<"ALL" | "CURATED">("ALL");
   const [equitySymbols, setEquitySymbols] = useState("");
   const [existingEquityInstruments, setExistingEquityInstruments] = useState<Array<{ symbol: string; name?: string; sector?: string }>>([]);
@@ -54,6 +58,7 @@ function CreateOrEditEventForm() {
   const [simulationProfileId, setSimulationProfileId] = useState<string | null>(null);
   const [eventStatus, setEventStatus] = useState("UPCOMING");
   const [participantCount, setParticipantCount] = useState(0);
+  const canEditProgram = !isEditMode || (eventStatus === "UPCOMING" && Date.now() < new Date(startTime).getTime());
   
   // Custom Verification Fields
   const [customFields, setCustomFields] = useState<any[]>([
@@ -76,6 +81,9 @@ function CreateOrEditEventForm() {
   const [formError, setFormError] = useState("");
   const [createdScenarioEventId, setCreatedScenarioEventId] = useState<string | null>(null);
   const [profileRetryLoading, setProfileRetryLoading] = useState(false);
+  const [createdProgramEventId, setCreatedProgramEventId] = useState<string | null>(null);
+  const [programRetryPayload, setProgramRetryPayload] = useState<any | null>(null);
+  const [programRetryLoading, setProgramRetryLoading] = useState(false);
 
   // Authentication check
   useEffect(() => {
@@ -113,6 +121,8 @@ function CreateOrEditEventForm() {
         }
 
         const ev = json.event;
+        setEventProgramEnabled(Boolean(ev.eventProgramEnabled));
+        setEventProgramLoadFailed(false);
         setTitle(ev.title || "");
         setSponsorName(ev.sponsorName || "");
         setBannerImageUrl(ev.bannerImageUrl || PRESET_BANNERS[0].url);
@@ -135,8 +145,47 @@ function CreateOrEditEventForm() {
         setRules(ev.rules || []);
         setEventStatus(ev.status || "UPCOMING");
         setParticipantCount(ev.participantCount || 0);
+
+        {
+          const programRes = await fetch(`${API_BASE_URL}/market-event/${editId}/program`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const programJson = await programRes.json();
+          if (!programRes.ok || !programJson.success || !Array.isArray(programJson.sessions)) {
+            // A missing program is normal for legacy/single-session events.
+            // Any other failure must be visible: silently treating a failed
+            // lookup as "no sessions" made multi-session events look like
+            // ordinary events in the edit form when the parent flag was stale.
+            if (programJson.code === "EVENT_PROGRAM_CONFIG_REQUIRED") {
+              setEventProgramEnabled(false);
+              setEventProgramSessions([]);
+            } else {
+              throw new Error(programJson.message || "Could not load this event's multi-session schedule.");
+            }
+          } else {
+            const loadedSessions: EventProgramSessionDraft[] = programJson.sessions.map((session: any, index: number) => ({
+              key: session.key || `session_${index + 1}`,
+              title: session.title || `Session ${index + 1}`,
+              sequence: Number(session.sequence ?? index),
+              bookKey: session.bookKey || "LIVE",
+              mode: session.mode === "SCENARIO_SIMULATION" ? "SCENARIO_SIMULATION" : "LIVE_MARKET",
+              startsAt: toDatetimeLocal(session.startsAt),
+              endsAt: toDatetimeLocal(session.endsAt),
+              positionPolicy: session.positionPolicy === "CLOSE_AT_SESSION_END" ? "CLOSE_AT_SESSION_END" : "CARRY",
+              allowedAssetClasses: session.allowedAssetClasses || ["EQUITY"],
+              equityUniverse: session.equityUniverse || { mode: "ALL", instruments: [] },
+              equityUniverseText: (session.equityUniverse?.instruments || []).map((item: any) => item.symbol).join(", "),
+              simulationProfileId: session.simulationProfileId ? String(session.simulationProfileId) : undefined,
+            }));
+            setEventProgramEnabled(true);
+            setEventProgramSessions(loadedSessions);
+            setAllowedAssetClasses(["EQUITY"]);
+            setEventMode("LIVE_MARKET");
+          }
+        }
       } catch (err: any) {
         console.error("❌ Error fetching event for edit:", err);
+        setEventProgramLoadFailed(true);
         setFormError(err.message || "Could not retrieve event details.");
       } finally {
         setInitialLoading(false);
@@ -246,6 +295,63 @@ function CreateOrEditEventForm() {
       return;
     }
 
+    if (eventProgramEnabled && eventProgramLoadFailed) {
+      setFormError("The multi-session schedule could not be loaded. Refresh the page before editing this event.");
+      return;
+    }
+
+    if (eventProgramEnabled) {
+      if (eventMode !== "LIVE_MARKET" || eventProgramSessions.length < 2) {
+        setFormError("A multi-session event needs at least two scheduled sessions; configure each session's live or simulated market mode below.");
+        return;
+      }
+      let previousEnd = -Infinity;
+      for (const session of eventProgramSessions) {
+        const sessionStart = new Date(session.startsAt).getTime();
+        const sessionEnd = new Date(session.endsAt).getTime();
+        if (!Number.isFinite(sessionStart) || !Number.isFinite(sessionEnd) || sessionEnd <= sessionStart
+          || sessionStart < new Date(startTime).getTime() || sessionEnd > new Date(endTime).getTime()
+          || sessionStart < previousEnd) {
+          setFormError("Program sessions must have valid times, fit inside the event window, and be listed in chronological order without overlap.");
+          return;
+        }
+        previousEnd = sessionEnd;
+        if (session.mode === "SCENARIO_SIMULATION") {
+          if (!session.profileData && !session.simulationProfileId) {
+            setFormError(`Upload a scenario profile for ${session.title}.`);
+            return;
+          }
+          const seconds = (sessionEnd - sessionStart) / 1000;
+          if (session.profileData && Math.abs(seconds - Number(session.profileData.durationSeconds)) > 1) {
+            setFormError(`${session.title}: the profile duration must match the session length.`);
+            return;
+          }
+        }
+        if (session.mode === "LIVE_MARKET" && session.equityUniverse.mode === "CURATED"
+          && session.equityUniverse.instruments.length === 0) {
+          setFormError(`${session.title}: add at least one stock or select all NSE equities.`);
+          return;
+        }
+      }
+      if (!eventProgramSessions.some((session) => session.mode === "LIVE_MARKET")) {
+        setFormError("A multi-session program must include at least one live-market session.");
+        return;
+      }
+    }
+
+    if (eventProgramEnabled && isEditMode) {
+      const eventStart = new Date(startTime).getTime();
+      const eventEnd = new Date(endTime).getTime();
+      const sessionsFitEventWindow = eventProgramSessions.every((session) => (
+        new Date(session.startsAt).getTime() >= eventStart
+        && new Date(session.endsAt).getTime() <= eventEnd
+      ));
+      if (!sessionsFitEventWindow) {
+        setFormError("The event start/end times must continue to include every scheduled session.");
+        return;
+      }
+    }
+
     if (eventMode === "SCENARIO_SIMULATION" && simulationProfile) {
       const scheduledSeconds = (new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000;
       if (Math.abs(scheduledSeconds - Number(simulationProfile.durationSeconds)) > 1) {
@@ -283,11 +389,11 @@ function CreateOrEditEventForm() {
         // Persist the selected market mode on the event as well as attaching
         // the profile below. This keeps the organizer's intent visible to
         // the backend during the two-step scenario setup flow.
-        eventMode,
+        eventMode: eventProgramEnabled ? "LIVE_MARKET" : eventMode,
         // Scenario events currently use the same V2 equity engine, but never
         // expose live F&O/crypto/commodity flows to participants.
-        allowedAssetClasses: eventMode === "SCENARIO_SIMULATION" || equityUniverseMode === "CURATED" ? ["EQUITY"] : allowedAssetClasses,
-        ...(eventMode === "LIVE_MARKET" && (!isEditMode || eventStatus === "UPCOMING") ? {
+        allowedAssetClasses: eventProgramEnabled || eventMode === "SCENARIO_SIMULATION" || equityUniverseMode === "CURATED" ? ["EQUITY"] : allowedAssetClasses,
+        ...(eventMode === "LIVE_MARKET" && !eventProgramEnabled && (!isEditMode || eventStatus === "UPCOMING") ? {
           equityUniverse: { mode: equityUniverseMode, instruments: equityUniverseMode === "CURATED"
             ? equitySymbols.split(/[\s,;]+/).map((value) => value.trim().toUpperCase()).filter(Boolean)
               .map((symbol) => existingEquityInstruments.find((item) => item.symbol === symbol) || { symbol }) : [] },
@@ -345,6 +451,31 @@ function CreateOrEditEventForm() {
         setSimulationProfileId("attached");
       }
 
+      if (eventProgramEnabled && canEditProgram) {
+        const programEventId = isEditMode ? editId : (json.event?._id || json.event?.id);
+        if (!programEventId) throw new Error(`The event was ${isEditMode ? "updated" : "created"}, but the API did not return its id for program setup.`);
+        const programPayload = {
+          sessions: eventProgramSessions.map((session) => ({
+            ...session,
+            startsAt: new Date(session.startsAt).toISOString(),
+            endsAt: new Date(session.endsAt).toISOString(),
+          })),
+        };
+        setCreatedProgramEventId(String(programEventId));
+        setProgramRetryPayload(programPayload);
+        const programRes = await fetch(`${API_BASE_URL}/market-event/${programEventId}/program`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(programPayload),
+        });
+        const programJson = await programRes.json();
+        if (!programRes.ok || !programJson.success) {
+          throw new Error(programJson.message || `The event was ${isEditMode ? "updated" : "created"}, but its session program could not be saved.`);
+        }
+        setCreatedProgramEventId(null);
+        setProgramRetryPayload(null);
+      }
+
       invalidateOrganizerDashboardCache();
       router.push("/organizer/dashboard");
     } catch (err: any) {
@@ -368,6 +499,29 @@ function CreateOrEditEventForm() {
       setFormError(err.message || "The simulation profile could not be attached.");
     } finally {
       setProfileRetryLoading(false);
+    }
+  };
+
+  const retryCreatedProgram = async () => {
+    if (!createdProgramEventId || !programRetryPayload) return;
+    setProgramRetryLoading(true);
+    setFormError("");
+    try {
+      const response = await fetch(`${API_BASE_URL}/market-event/${createdProgramEventId}/program`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(programRetryPayload),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || "Could not attach the event sessions.");
+      setCreatedProgramEventId(null);
+      setProgramRetryPayload(null);
+      invalidateOrganizerDashboardCache();
+      router.push("/organizer/dashboard");
+    } catch (error: any) {
+      setFormError(error.message || "Could not attach the event sessions.");
+    } finally {
+      setProgramRetryLoading(false);
     }
   };
 
@@ -446,6 +600,14 @@ function CreateOrEditEventForm() {
             </button>
           </div>
         )}
+        {createdProgramEventId && programRetryPayload && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-amber-700 dark:text-amber-300 text-sm">
+            <p className="font-semibold">The event was created, but its session schedule is not attached yet.</p>
+            <button type="button" onClick={retryCreatedProgram} disabled={programRetryLoading} className="mt-3 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">
+              {programRetryLoading ? "Attaching sessions..." : "Retry session setup"}
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-3xl p-8 space-y-8 shadow-2xl relative overflow-hidden">
 
@@ -465,7 +627,7 @@ function CreateOrEditEventForm() {
                 setEventMode(nextMode);
                 if (nextMode === "SCENARIO_SIMULATION") setAllowedAssetClasses(["EQUITY"]);
               }}
-              disabled={isEditMode}
+              disabled={isEditMode || eventProgramEnabled}
               className="w-full md:w-1/2 bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white focus:outline-none focus:border-primary transition disabled:opacity-60"
             >
               <option value="LIVE_MARKET">Live Market Event</option>
@@ -476,7 +638,23 @@ function CreateOrEditEventForm() {
                 Event mode and its profile are locked after creation. Edit branding, timings, and other permitted event settings only.
               </p>
             )}
+            {eventProgramEnabled && <p className="mt-2 text-[11px] text-muted dark:text-white/60">The event-wide market mode is set to Live Market. Each session below selects its own live or simulated market.</p>}
           </div>
+          {eventProgramLoadFailed && <div role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-300">
+            We could not load the saved session schedule. Refresh the page before changing this event; session details are not being treated as empty.
+          </div>}
+          <EventProgramEditor
+            initialEnabled={isEditMode && (eventProgramEnabled || eventProgramSessions.length > 0)}
+            initialSessions={isEditMode ? eventProgramSessions : undefined}
+            locked={isEditMode && eventProgramEnabled && !canEditProgram}
+            onChange={(sessions, enabled) => {
+            setEventProgramSessions(sessions);
+            setEventProgramEnabled(enabled);
+            if (enabled) {
+              setEventMode("LIVE_MARKET");
+              setAllowedAssetClasses(["EQUITY"]);
+            }
+          }} />
           
           {/* Section 1: Identity */}
           <div>
@@ -631,7 +809,7 @@ function CreateOrEditEventForm() {
           </div>
 
           {/* Allowed asset classes */}
-          {eventMode === "LIVE_MARKET" && <div className="border-t border-grey/10 dark:border-white/10 pt-6">
+          {eventMode === "LIVE_MARKET" && !eventProgramEnabled && <div className="border-t border-grey/10 dark:border-white/10 pt-6">
             <label htmlFor="event-equity-universe" className="block text-xs font-bold text-midnight_text dark:text-white mb-2">Equity stock list</label>
             <select id="event-equity-universe" value={equityUniverseMode} disabled={isEditMode && eventStatus !== "UPCOMING"} onChange={(e) => setEquityUniverseMode(e.target.value as "ALL" | "CURATED")} className="w-full bg-gray-50 dark:bg-slate-900 border border-grey/20 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-midnight_text dark:text-white">
               <option value="ALL">All NSE equities</option><option value="CURATED">Curated equity-only event</option>
@@ -641,7 +819,7 @@ function CreateOrEditEventForm() {
               <p className="text-xs mt-2 text-muted dark:text-white/60">Enter 1–100 unique NSE symbols, separated by lines or commas. Participants see this list with live prices. Use Add stock on the event dashboard to append stocks after trading starts.</p>
             </>}
           </div>}
-          <div>
+          {!eventProgramEnabled && <div>
             <label className="block text-xs font-bold text-midnight_text dark:text-white mb-3">Allowed Asset Classes</label>
             {eventMode === "SCENARIO_SIMULATION" || equityUniverseMode === "CURATED" ? (
               <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs font-bold text-primary">
@@ -666,7 +844,7 @@ function CreateOrEditEventForm() {
                 </label>
               ))}
             </div>}
-          </div>
+          </div>}
 
           {eventMode === "SCENARIO_SIMULATION" && (!isEditMode || !simulationProfileId) && (
             <div className="border-t border-grey/10 dark:border-white/10 pt-6">
