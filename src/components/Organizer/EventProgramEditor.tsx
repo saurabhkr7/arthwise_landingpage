@@ -11,6 +11,7 @@ export type EventProgramSessionDraft = {
   startsAt: string;
   endsAt: string;
   positionPolicy: "CARRY" | "CLOSE_AT_SESSION_END";
+  simulationGrant?: number;
   allowedAssetClasses: string[];
   equityUniverse: { mode: "ALL" | "CURATED"; instruments: Array<{ symbol: string; name?: string; sector?: string }> };
   /** Raw editor text; removed before the session draft is sent to the parent/API. */
@@ -71,6 +72,7 @@ export default function EventProgramEditor({
       equityUniverse: mode === "LIVE_MARKET" ? current.equityUniverse : { mode: "CURATED", instruments: [] },
       profileData: undefined,
       profileFileName: undefined,
+      simulationGrant: 0,
     });
   };
   const loadProfile = async (index: number, file?: File) => {
@@ -163,6 +165,15 @@ export default function EventProgramEditor({
             />}
             {session.equityUniverse.mode === "CURATED" && <p className="mt-1 text-xs text-muted dark:text-white/60">Separate stock symbols with spaces, commas, or new lines.</p>}
           </div> : <div>
+            <label className="block text-xs font-semibold mb-3">Additional simulation capital per participant (₹)
+              <input className={`${inputClass} mt-2`} type="number" min="0" step="0.01"
+                disabled={locked} value={session.simulationGrant || 0}
+                onChange={(event) => update(index, { simulationGrant: Number(event.target.value) })} />
+              <span className="block mt-2 font-normal text-muted dark:text-white/60">
+                Set 0 to use shared event cash as before. A positive amount (for example 200000) is a fresh, isolated budget for this session.
+                Live cash stays protected; the full closing balance merges back after settlement. Grants are excluded from trading returns.
+              </span>
+            </label>
             {locked ? <p className="text-xs text-muted dark:text-white/60">Attached simulation profile: {session.simulationProfileId || "profile linked"}</p> : <>
               <label className="block text-xs font-semibold">Scenario profile JSON
                 <input className={`${inputClass} mt-2`} type="file" accept="application/json,.json" onChange={(event) => loadProfile(index, event.target.files?.[0])} />

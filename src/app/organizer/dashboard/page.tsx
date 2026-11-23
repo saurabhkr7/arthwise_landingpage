@@ -1,43 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 
 import {
-  getCachedOrganizerEvents,
   setCachedOrganizerEvents,
   invalidateOrganizerDashboardCache,
 } from "@/lib/organizerCache";
+import { useOrganizerEvents } from "@/features/organizer-dashboard/hooks/useOrganizerEvents";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
 export default function OrganizerDashboard() {
   const router = useRouter();
-  const [organizerName, setOrganizerName] = useState("");
-  const [token, setToken] = useState("");
-
-  // Instant hydration from cache (0ms delay when navigating back and forth)
-  const [events, setEvents] = useState<any[]>(() => {
-    if (typeof window !== "undefined") {
-      const cached = getCachedOrganizerEvents();
-      if (cached && cached.events) {
-        return cached.events;
-      }
-    }
-    return [];
-  });
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      const cached = getCachedOrganizerEvents();
-      if (cached && cached.events && cached.events.length > 0) {
-        return false;
-      }
-    }
-    return true;
-  });
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState("");
+  const { organizerName, token, events, setEvents, loading, isRefreshing, error, setError, fetchEvents }
+    = useOrganizerEvents({ apiBaseUrl: API_BASE_URL, router });
   const [actionSuccessMsg, setActionSuccessMsg] = useState("");
   const [retryingEventId, setRetryingEventId] = useState<string | null>(null);
 
@@ -55,86 +33,6 @@ export default function OrganizerDashboard() {
   const [complianceActionLoading, setComplianceActionLoading] = useState<string>("");
   const [complianceModalError, setComplianceModalError] = useState("");
   const [cooldownMinutesMap, setCooldownMinutesMap] = useState<Record<string, number>>({});
-
-  // Load events (supports forced refresh bypass)
-  const fetchEvents = async (forceRefresh: boolean = false, overrideToken?: string) => {
-    const activeToken = overrideToken || token || (typeof window !== "undefined" ? sessionStorage.getItem("organizer_token") : null);
-    if (!activeToken) return;
-
-    // Fast-path: if not forced and cache is fresh, skip network roundtrip entirely
-    if (!forceRefresh) {
-      const cached = getCachedOrganizerEvents();
-      if (cached && cached.isFresh) {
-        setEvents(cached.events);
-        setLoading(false);
-        return;
-      }
-    }
-
-    if (events.length === 0) {
-      setLoading(true);
-    } else {
-      setIsRefreshing(true);
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/market-event/organizer/list`, {
-        headers: {
-          Authorization: `Bearer ${activeToken}`,
-        },
-      });
-      const json = await res.json();
-      
-      if (res.status === 401 || (json && json.message && (json.message.includes("expired") || json.message.includes("login again") || json.message.includes("Invalid token")))) {
-        invalidateOrganizerDashboardCache();
-        sessionStorage.clear();
-        router.push("/organizer/login");
-        return;
-      }
-
-      if (!res.ok || !json.success) {
-        throw new Error(json.message || "Failed to load events.");
-      }
-      const freshEvents = json.events || [];
-      setEvents(freshEvents);
-      setCachedOrganizerEvents(freshEvents);
-      setError("");
-    } catch (err: any) {
-      console.error(err);
-      if (events.length === 0) {
-        setError(err.message || "Failed to load dashboard data.");
-      }
-    } finally {
-      setLoading(false);
-      setIsRefreshing(false);
-    }
-  };
-
-  // Authentication check & initial hydration
-  useEffect(() => {
-    const storedToken = sessionStorage.getItem("organizer_token");
-    const name = sessionStorage.getItem("organizer_name");
-    if (!storedToken) {
-      router.push("/organizer/login");
-      return;
-    }
-    setToken(storedToken);
-    setOrganizerName(name || "Organizer");
-
-    // Check if we have cached events ready immediately
-    const cached = getCachedOrganizerEvents();
-    if (cached && cached.events) {
-      setEvents(cached.events);
-      setLoading(false);
-      // If cached data is already fresh (< 5 mins), do NOT call API!
-      if (cached.isFresh) {
-        return;
-      }
-    }
-
-    // Either no cache or cache is stale (> 5 mins), fetch from API
-    fetchEvents(false, storedToken);
-  }, [router]);
 
   // Logout handler
   const handleLogout = () => {

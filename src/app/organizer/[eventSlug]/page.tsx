@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import EventStockUniversePanel from "@/components/Organizer/EventStockUniversePanel";
+import EventSessionStatus from "@/features/organizer-dashboard/components/EventSessionStatus";
+import MarketSourceBadge from "@/features/organizer-dashboard/components/MarketSourceBadge";
 import { useOrganizerParticipants } from "@/features/organizer-dashboard/hooks/useOrganizerParticipants";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
@@ -848,6 +850,7 @@ export default function EventOrganizerControlPanel() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto mt-6">
+        <EventSessionStatus event={eventData} />
         <EventStockUniversePanel event={eventData} token={passcode} onUpdated={fetchDashboardData} />
         {participantError && (
           <p role="alert" className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
@@ -2235,6 +2238,7 @@ export default function EventOrganizerControlPanel() {
                                   </span>
                                 )}
                               </div>
+                              <MarketSourceBadge record={trade} />
                             </td>
                             <td className="py-2.5 px-3">
                               <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${isBuy ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>

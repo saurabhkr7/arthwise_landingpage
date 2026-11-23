@@ -172,6 +172,7 @@ function CreateOrEditEventForm() {
               startsAt: toDatetimeLocal(session.startsAt),
               endsAt: toDatetimeLocal(session.endsAt),
               positionPolicy: session.positionPolicy === "CLOSE_AT_SESSION_END" ? "CLOSE_AT_SESSION_END" : "CARRY",
+              simulationGrant: Number(session.simulationGrant || 0),
               allowedAssetClasses: session.allowedAssetClasses || ["EQUITY"],
               equityUniverse: session.equityUniverse || { mode: "ALL", instruments: [] },
               equityUniverseText: (session.equityUniverse?.instruments || []).map((item: any) => item.symbol).join(", "),
