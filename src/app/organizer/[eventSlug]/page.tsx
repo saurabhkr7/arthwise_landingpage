@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import EventStockUniversePanel from "@/components/Organizer/EventStockUniversePanel";
+import { useOrganizerParticipants } from "@/features/organizer-dashboard/hooks/useOrganizerParticipants";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.arthhwise.com/api";
 
@@ -15,7 +16,9 @@ export default function EventOrganizerControlPanel() {
   const [passcode, setPasscode] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [eventData, setEventData] = useState<any>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
+  const { participants, totalParticipants, participantError, refreshParticipants } = useOrganizerParticipants({
+    apiBaseUrl: API_BASE_URL, eventSlug, token: passcode,
+  });
   const [finalizationHealth, setFinalizationHealth] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [notifRetryLoading, setNotifRetryLoading] = useState(false);
@@ -193,13 +196,7 @@ export default function EventOrganizerControlPanel() {
         setIsAuthenticated(true);
 
         const eventId = eventJson.event.id;
-        const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
-          headers: { Authorization: `Bearer ${passcode}` },
-        });
-        const lbJson = await lbRes.json();
-        if (lbJson.success) {
-          setParticipants(lbJson.leaderboard || []);
-        }
+        await refreshParticipants(eventId);
         fetchFinalizationHealth(eventId);
         fetchCertificates(eventId);
         fetchComplianceScripts(eventId);
@@ -212,7 +209,7 @@ export default function EventOrganizerControlPanel() {
     } catch (err) {
       console.error("❌ Error fetching organizer dashboard data:", err);
     }
-  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, fetchComplianceScripts]);
+  }, [eventSlug, passcode, fetchFinalizationHealth, fetchCertificates, fetchComplianceScripts, refreshParticipants]);
 
   const removeParticipant = async (student: any) => {
     if (!eventData?.id || !student?.userId) return;
@@ -530,13 +527,7 @@ export default function EventOrganizerControlPanel() {
         setAllowedEdit(eventJson.event.allowedAssetClasses || ["EQUITY"]);
 
         const eventId = eventJson.event.id;
-        const lbRes = await fetch(`${API_BASE_URL}/market-event/${eventId}/leaderboard?limit=200`, {
-          headers: { Authorization: `Bearer ${passcode.trim()}` },
-        });
-        const lbJson = await lbRes.json();
-        if (lbJson.success) {
-          setParticipants(lbJson.leaderboard || []);
-        }
+        await refreshParticipants(eventId);
       } else {
         setPasscodeError(eventJson.message || "Failed to load event.");
       }
@@ -724,6 +715,7 @@ export default function EventOrganizerControlPanel() {
   const visibleCustomFields = (eventData?.customVerificationFields || []).filter((field: any) =>
     participants.some((participant: any) => String(participant.customFieldValues?.[field.fieldKey] || '').trim())
   );
+  const registeredParticipantCount = totalParticipants ?? eventData?.participantCount ?? 0;
 
   // Passcode Auth View
   if (!isAuthenticated) {
@@ -844,7 +836,7 @@ export default function EventOrganizerControlPanel() {
 
           <button
             onClick={openLateParticipantModal}
-            disabled={eventData?.status !== "LIVE" || participants.length >= (eventData?.maxParticipants || 150)}
+            disabled={eventData?.status !== "LIVE" || registeredParticipantCount >= (eventData?.maxParticipants || 150)}
             className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             title="Add a verified user after the event has started"
           >
@@ -857,12 +849,17 @@ export default function EventOrganizerControlPanel() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto mt-6">
         <EventStockUniversePanel event={eventData} token={passcode} onUpdated={fetchDashboardData} />
+        {participantError && (
+          <p role="alert" className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+            Participant list could not refresh. {participantError} Any previously loaded list is unchanged.
+          </p>
+        )}
         {/* Metric Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-darkHeroBg border border-grey/10 dark:border-white/10 rounded-2xl p-5 shadow-xl">
             <span className="text-xs font-bold text-muted dark:text-white/60 uppercase">Registered Participants</span>
             <p className="text-2xl font-extrabold text-midnight_text dark:text-white mt-1">
-              {participants.length} / {eventData?.maxParticipants || 150}
+              {registeredParticipantCount} / {eventData?.maxParticipants || 150}
             </p>
           </div>
 
